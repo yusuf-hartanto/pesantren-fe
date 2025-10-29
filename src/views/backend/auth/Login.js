@@ -40,7 +40,7 @@ const ToastContent = ({ name, role }) => (
       </div>
     </div>
     <div className='toastify-body'>
-      <span>You have successfully logged in as an {role} user to Bawaslu. Now you can start to explore. Enjoy!</span>
+      <span>You have successfully logged in as an {role} user to Pesantren. Now you can start to explore. Enjoy!</span>
     </div>
   </Fragment>
 )
@@ -163,7 +163,7 @@ const Login = props => {
       <Row className='auth-inner m-0'>
         <Link className='brand-logo' to='/'>
           <img src={Logo} width="40"/>
-          <h2 className='brand-text text-primary ml-1'>Bawaslu</h2>
+          <h2 className='brand-text text-primary ml-1'>Pesantren</h2>
         </Link>
         <Col className='d-none d-lg-flex align-items-center p-5' lg='8' sm='12'>
           <div className='w-100 d-lg-flex align-items-center justify-content-center px-5'>
@@ -173,7 +173,7 @@ const Login = props => {
         <Col className='d-flex align-items-center auth-bg px-2 p-lg-5' lg='4' sm='12'>
           <Col className='px-xl-2 mx-auto' sm='8' md='6' lg='12'>
             <CardTitle tag='h2' className='font-weight-bold mb-1'>
-              Welcome to Bawaslu! 👋
+              Welcome to Pesantren! 👋
             </CardTitle>
             <CardText className='mb-2'>Please sign-in to your account and start the adventure</CardText>
             {errorResponse && 

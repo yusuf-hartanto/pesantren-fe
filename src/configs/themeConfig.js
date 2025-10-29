@@ -3,7 +3,7 @@
 //Template config options
 const themeConfig = {
   app: {
-    appName: 'BAWASLU',
+    appName: 'PESANTREN',
     appLogoImage: require('@src/assets/images/logo/logo.jpg').default
   },
   layout: {
