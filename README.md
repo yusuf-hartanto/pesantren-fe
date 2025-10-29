@@ -1,3 +1,3 @@
-Node 14
-npm install
-npm start
+Node 14 <br/>
+npm install <br/>
+npm start <br/>
