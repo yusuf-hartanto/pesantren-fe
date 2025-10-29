@@ -1,0 +1,4 @@
+include:
+  - project: 'sphere154/Automation'
+    ref: master
+    file: 'reactjs-gitlab-ci.yml'
