@@ -68,7 +68,7 @@ const Login = props => {
             const {userdata, access_token, refresh_token} = res.data.data
 
             let menus = []
-            if (userdata.resource_id === 1) {
+            if (userdata.role?.role_name === "administrator") {
               menus = [
                 {
                   action: 'manage',

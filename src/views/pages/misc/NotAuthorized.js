@@ -18,7 +18,7 @@ const NotAuthorized = () => {
     <div className='misc-wrapper'>
       <a className='brand-logo' href='/'>
         <img className='img-fluid' width="40px" src={logo} />
-        <h2 className='brand-text text-primary ml-1'>Bawaslu</h2>
+        <h2 className='brand-text text-primary ml-1'>Pesantren</h2>
       </a>
       <div className='misc-inner p-2 p-sm-3'>
         <div className='text-center d-flex flex-column align-items-center'>

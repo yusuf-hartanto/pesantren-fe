@@ -13,12 +13,12 @@ import '@styles/react/apps/app-users.scss'
 
 //** Element
 import StatsCard from '@src/views/element/StatsCard'
-import StatPengguna from '@src/views/backend/statistik_pengguna/list/Table'
-import StatPenggunaKomunitas from '@src/views/backend/statistik_pengguna_komunitas/list/Table'
-import StatArtikelKomunitas from '@src/views/backend/statistik_artikel_komunitas/list/Table'
-import StatArtikelTema from '@src/views/backend/statistik_artikel_tema/list/Table'
-import StatPenggunaProvince from '@src/views/backend/statistik_pengguna_provinsi/list/Table'
-import StatPenggunaProvinceKomunitas from '@src/views/backend/statistik_pengguna_provinsi_komunitas/list/Table'
+// import StatPengguna from '@src/views/backend/statistik_pengguna/list/Table'
+// import StatPenggunaKomunitas from '@src/views/backend/statistik_pengguna_komunitas/list/Table'
+// import StatArtikelKomunitas from '@src/views/backend/statistik_artikel_komunitas/list/Table'
+// import StatArtikelTema from '@src/views/backend/statistik_artikel_tema/list/Table'
+// import StatPenggunaProvince from '@src/views/backend/statistik_pengguna_provinsi/list/Table'
+// import StatPenggunaProvinceKomunitas from '@src/views/backend/statistik_pengguna_provinsi_komunitas/list/Table'
 
 const Dashboard = () => {
 
@@ -45,9 +45,9 @@ const Dashboard = () => {
       setUserData(user.userdata)
     }
 
-    dispatch(getStatistikDasboard(d => {
-      setStatDashboard(d.data)
-    }))
+    // dispatch(getStatistikDasboard(d => {
+    //   setStatDashboard(d.data)
+    // }))
 
     setIsMounted(true)
   }, [])
@@ -60,12 +60,12 @@ const Dashboard = () => {
     <div id='dashboard' className="px-1">
       <Row className='match-height'>
         <Col xs='12'>
-          <StatsCard cols={{ lg: '4' }} datas={statDashboard} />
+          {/* <StatsCard cols={{ lg: '4' }} datas={statDashboard} /> */}
         </Col>
         <Col xs='12'>
           <Card>
             <CardBody>
-              <Nav tabs justified>
+              {/* <Nav tabs justified>
                 <NavItem>
                   <NavLink
                     active={active === '1'}
@@ -146,7 +146,7 @@ const Dashboard = () => {
                 <TabPane tabId='6'>
                   <StatPenggunaProvinceKomunitas active={active === '6'} />
                 </TabPane>
-              </TabContent>
+              </TabContent> */}
             </CardBody>
           </Card>
         </Col>
