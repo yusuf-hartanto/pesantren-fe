@@ -17,6 +17,9 @@ import roles from '@src/views/backend/role/store/reducer'
 import menus from '@src/views/backend/menu/store/reducer'
 import rolemenus from '@src/views/backend/role_menu/store/reducer'
 import globalparams from '@src/views/backend/global_param/store/reducer'
+// ** master
+import tahunangkatans from '@src/views/backend/tahun_angkatan/store/reducer'
+import tingkats from '@src/views/backend/tingkat/store/reducer'
 
 const rootReducer = combineReducers({
   navigations,
@@ -29,7 +32,9 @@ const rootReducer = combineReducers({
   roles,
   menus,
   rolemenus,
-  globalparams
+  globalparams,
+  tahunangkatans,
+  tingkats
 })
 
 export default rootReducer
