@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom'
 
 // ** Store & Actions
-import { getTahunAngkatan, deleteTahunAngkatan } from '../store/action'
+import { getSemester, deleteSemester } from '../store/action'
 import { store } from '@store/storeConfig/store'
 
 // ** Third Party Components
@@ -12,6 +12,7 @@ import { FormattedMessage } from 'react-intl'
 
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { status } from '../../../../utility/Constants'
 
 const MySwal = withReactContent(Swal)
 
@@ -29,7 +30,7 @@ const handleDelete = (row) => {
     buttonsStyling: false
   }).then(function (result) {
     if (result.value) {
-      store.dispatch(deleteTahunAngkatan(row.id_angkatan))
+      store.dispatch(deleteSemester(row.id_semester))
     }
   })
 }
@@ -50,18 +51,18 @@ export const columns = (number, ability) => {
             <MoreVertical size={14} className='cursor-pointer' />
           </DropdownToggle>
           <DropdownMenu right>
-            {ability.can('edit', 'tahun_angkatan') &&
+            {ability.can('edit', 'semester') &&
               <DropdownItem
                 tag={Link}
-                to={`/tahun_angkatan/edit/${row.id_angkatan}`}
+                to={`/semester/edit/${row.id_semester}`}
                 className='w-100'
-                onClick={() => store.dispatch(getTahunAngkatan(row))}
+                onClick={() => store.dispatch(getSemester(row))}
               >
                 <Archive size={14} className='mr-50' />
                 <span className='align-middle'>Edit</span>
               </DropdownItem>
             }
-            {ability.can('delete', 'tahun_angkatan') &&
+            {ability.can('delete', 'semester') &&
               <DropdownItem className='w-100' onClick={() => handleDelete(row)}>
                 <Trash2 size={14} className='mr-50' />
                 <span className='align-middle'><FormattedMessage id='Delete'/></span>
@@ -72,13 +73,35 @@ export const columns = (number, ability) => {
       )
     },
     {
-      name: 'Tahun Angkatan',
+      name: 'Status',
+      maxWidth: '10%',
+      selector: 'status',
+      sortable: true,
+      cell: row => (
+        <Badge className='text-capitalize' color={status().find(r => r.value === row.status)?.color} pill>
+          {status().find(r => r.value === row.status)?.value}
+        </Badge>
+      )
+    },
+    {
+      name: 'Tahun Ajaran',
       minWidth: '200px',
-      selector: 'tahun_angkatan',
+      selector: 'tahun_ajaran',
       sortable: false,
       cell: row => (
         <div className='d-flex justify-content-left align-items-center'>
-          {row.tahun_angkatan}
+          {row.tahun_ajaran?.tahun_ajaran}
+        </div>
+      )
+    },
+    {
+      name: 'Nama Semester',
+      minWidth: '200px',
+      selector: 'nama_semester',
+      sortable: false,
+      cell: row => (
+        <div className='d-flex justify-content-left align-items-center'>
+          {row.nama_semester}
         </div>
       )
     },

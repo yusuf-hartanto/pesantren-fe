@@ -97,7 +97,7 @@ export const columns = (number, ability) => {
       name: 'Nomor Urut',
       minWidth: '300px',
       selector: 'nomor_urut',
-      sortable: false,
+      sortable: true,
       cell: row => (
         <div className='d-flex justify-content-left align-items-center hide-long-text'>
           {row.nomor_urut}

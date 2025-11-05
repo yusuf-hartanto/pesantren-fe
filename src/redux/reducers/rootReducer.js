@@ -20,6 +20,8 @@ import globalparams from '@src/views/backend/global_param/store/reducer'
 // ** master
 import tahunangkatans from '@src/views/backend/tahun_angkatan/store/reducer'
 import tingkats from '@src/views/backend/tingkat/store/reducer'
+import tahunajarans from '@src/views/backend/tahun_ajaran/store/reducer'
+import semesters from '@src/views/backend/semester/store/reducer'
 
 const rootReducer = combineReducers({
   navigations,
@@ -34,7 +36,9 @@ const rootReducer = combineReducers({
   rolemenus,
   globalparams,
   tahunangkatans,
-  tingkats
+  tingkats,
+  tahunajarans,
+  semesters
 })
 
 export default rootReducer

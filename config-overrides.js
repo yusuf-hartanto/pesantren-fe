@@ -16,7 +16,8 @@ module.exports = function override(config, env) {
     '@styles': path.resolve(__dirname, 'src/@core/scss'),
     '@configs': path.resolve(__dirname, 'src/configs'),
     '@utils': path.resolve(__dirname, 'src/utility/Utils'),
-    '@hooks': path.resolve(__dirname, 'src/utility/hooks')
+    '@hooks': path.resolve(__dirname, 'src/utility/hooks'),
+    '@constants': path.resolve(__dirname, 'src/utility/Constants')
   })(config, env)
 
   config = new SassRuleRewire()
