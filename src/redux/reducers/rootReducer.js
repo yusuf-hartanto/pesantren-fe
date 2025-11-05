@@ -22,6 +22,8 @@ import tahunangkatans from '@src/views/backend/tahun_angkatan/store/reducer'
 import tingkats from '@src/views/backend/tingkat/store/reducer'
 import tahunajarans from '@src/views/backend/tahun_ajaran/store/reducer'
 import semesters from '@src/views/backend/semester/store/reducer'
+import statusawalsantris from '@src/views/backend/status_awal_santri/store/reducer'
+import beasiswasantris from '@src/views/backend/beasiswa_santri/store/reducer'
 
 const rootReducer = combineReducers({
   navigations,
@@ -38,7 +40,9 @@ const rootReducer = combineReducers({
   tahunangkatans,
   tingkats,
   tahunajarans,
-  semesters
+  semesters,
+  statusawalsantris,
+  beasiswasantris
 })
 
 export default rootReducer

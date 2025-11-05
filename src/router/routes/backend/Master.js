@@ -96,6 +96,54 @@ const Master = [
       action: 'create',
       resource: 'semester'
     }
+  },
+  {
+    path: '/status_awal_santri/list',
+    component: lazy(() => import('../../../views/backend/status_awal_santri/list')),
+    meta: {
+      action: 'read',
+      resource: 'status_awal_santri'
+    }
+  },
+  {
+    path: '/status_awal_santri/edit/:id',
+    component: lazy(() => import('../../../views/backend/status_awal_santri/save')),
+    meta: {
+      action: 'edit',
+      resource: 'status_awal_santri'
+    }
+  },
+  {
+    path: '/status_awal_santri/save',
+    component: lazy(() => import('../../../views/backend/status_awal_santri/save')),
+    meta: {
+      action: 'create',
+      resource: 'status_awal_santri'
+    }
+  },
+  {
+    path: '/beasiswa_santri/list',
+    component: lazy(() => import('../../../views/backend/beasiswa_santri/list')),
+    meta: {
+      action: 'read',
+      resource: 'beasiswa_santri'
+    }
+  },
+  {
+    path: '/beasiswa_santri/edit/:id',
+    component: lazy(() => import('../../../views/backend/beasiswa_santri/save')),
+    meta: {
+      action: 'edit',
+      resource: 'beasiswa_santri'
+    }
+  },
+  {
+    path: '/beasiswa_santri/save',
+    component: lazy(() => import('../../../views/backend/beasiswa_santri/save')),
+    meta: {
+      action: 'create',
+      resource: 'beasiswa_santri'
+    }
   }
 ]
 
