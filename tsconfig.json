@@ -48,7 +48,10 @@
       ],
       "@views/*": [
         "./src/views/*"
-      ]
+      ],
+      "@libs/*": [
+        "./src/libs/*"
+        ]
     }
   },
   "include": [
