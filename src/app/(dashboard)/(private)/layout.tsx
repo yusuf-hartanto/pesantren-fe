@@ -3,7 +3,6 @@ import Button from '@mui/material/Button'
 
 // Type Imports
 import type { ChildrenType } from '@core/types'
-import type { Locale } from '@configs/i18n'
 
 // Layout Imports
 import LayoutWrapper from '@layouts/LayoutWrapper'
@@ -21,15 +20,10 @@ import Customizer from '@core/components/customizer'
 import ScrollToTop from '@core/components/scroll-to-top'
 import AuthGuard from '@/hocs/AuthGuard'
 
-// Config Imports
-import { i18n } from '@configs/i18n'
-
-// Util Imports
-import { getDictionary } from '@/utils/getDictionary'
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
 
 const Layout = async (props: ChildrenType ) => {
-  
+
 
   const { children } = props
 

@@ -11,8 +11,7 @@
     "lint:fix": "next lint --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "build:icons": "tsx src/assets/iconify-icons/bundle-icons-css.ts",
-    "migrate": "dotenv -e .env -- npx prisma migrate dev",
-    "postinstall": "prisma generate && npm run build:icons",
+    "postinstall": "npm run build:icons",
     "removeI18n": "tsx src/remove-translation-scripts/index.ts"
   },
   "dependencies": {
@@ -45,8 +44,10 @@
     "@tiptap/react": "^2.10.4",
     "@tiptap/starter-kit": "^2.10.4",
     "apexcharts": "3.49.0",
+    "axios": "^1.13.2",
     "bootstrap-icons": "1.11.3",
     "classnames": "2.5.1",
+    "cleave.js": "^1.6.0",
     "cmdk": "1.0.4",
     "date-fns": "4.1.0",
     "fs-extra": "11.2.0",
@@ -61,6 +62,7 @@
     "react-datepicker": "7.3.0",
     "react-dom": "18.3.1",
     "react-dropzone": "14.3.5",
+    "react-google-map-picker": "^1.2.3",
     "react-hook-form": "7.54.1",
     "react-map-gl": "7.1.8",
     "react-perfect-scrollbar": "1.5.8",
@@ -112,8 +114,5 @@
   },
   "overrides": {
     "rimraf": "^5.0.7"
-  },
-  "prisma": {
-    "schema": "./src/prisma/schema.prisma"
   }
 }

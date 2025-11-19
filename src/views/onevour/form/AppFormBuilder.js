@@ -1,0 +1,1477 @@
+import React, { Fragment, useRef, useState } from 'react'
+
+import Grid from '@mui/material/Grid2'
+import FormControl from '@mui/material/FormControl'
+import TextField from '@mui/material/TextField'
+import Checkbox from '@mui/material/Checkbox'
+import Radio from '@mui/material/Radio'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import { Controller } from 'react-hook-form'
+import Autocomplete from '@mui/material/Autocomplete'
+import InputAdornment from '@mui/material/InputAdornment'
+
+import Button from '@mui/material/Button'
+import FormHelperText from '@mui/material/FormHelperText'
+import CircularProgress from '@mui/material/CircularProgress'
+
+// numeral
+import Cleave from 'cleave.js/react'
+
+import Typography from '@mui/material/Typography'
+import Divider from '@mui/material/Divider'
+
+import DatePicker from 'react-datepicker'
+
+import Box from '@mui/material/Box'
+
+import {
+  updateFile,
+  updateValueDate,
+  updateValueEditor,
+  updateValueMaskingThousand,
+  updateValueNumber,
+  updateValueSelect,
+  updateValueSelected,
+  updateValueSelectedDate,
+  updateValueSelectMulti,
+  updateValueText
+} from './AppFormInputCommons'
+
+import InputFile from '../components/input-file'
+
+import MapGoogle from '../components/input-maps'
+
+import InputImage from '../components/input-image'
+
+// Generated Icon CSS Imports
+import '@assets/iconify-icons/generated-icons.css'
+
+function MaskedTextField(props) {
+  const { options, inputRef, ...other } = props
+
+  return <Cleave {...other} ref={inputRef} options={options} />
+}
+
+export function fieldBuildType(label, type, key, options, placeholder) {
+  return fieldBuild(label, type, key, false, options, placeholder)
+}
+
+export function field(props) {
+  const {
+    type,
+    label,
+    key,
+    placeholder,
+    required = false,
+    readOnly = false,
+    options,
+    callback,
+    ref,
+    checked = false,
+    startAdornment = null,
+    endAdornment = null,
+    portalId = '',
+    minDate = null,
+    variant = null,
+    color = null,
+    autoFocus = false,
+    urlImage = null
+  } = props
+
+  return {
+    type: type,
+    label: label,
+    key: key,
+    placeholder: placeholder,
+    required: required,
+    readOnly: readOnly,
+    options: options,
+    callback: callback,
+    ref: ref,
+    checked: checked,
+    startAdornment: startAdornment,
+    endAdornment: endAdornment,
+    portalId: portalId,
+    minDate: minDate,
+    variant: variant,
+    color: color,
+    autoFocus: autoFocus,
+    urlImage: urlImage
+  }
+}
+
+export function fieldEditor(control, state, setter, label, type, key, placeholder, options, callback, ref) {
+  return {
+    control: control,
+    state: state,
+    setter: setter,
+    label: label,
+    type: type,
+    key: key,
+    placeholder: placeholder,
+    options: options,
+    callback: callback,
+    ref: ref
+  }
+}
+
+export function fieldBuild(label, type, key, options, placeholder, callback, ref) {
+  return {
+    label: label,
+    type: type,
+    key: key,
+    options: options,
+    placeholder: placeholder,
+    callback: callback,
+    ref: ref
+  }
+}
+
+export function fieldBuildSpace(label = '') {
+  return {
+    label: label,
+    type: 'space'
+  }
+}
+
+// https://www.digitalocean.com/community/tutorials/understanding-default-parameters-in-javascript
+export const fieldBuildSubmit = form => {
+  const {
+    type = 'submit',
+    submit = 'Submit',
+    cancel = 'Cancel',
+    onClick,
+    onCancel,
+    loading = false,
+    disabled = false,
+    print = false,
+    onPrint,
+    label = '',
+    onApprove,
+    onReject
+  } = form
+
+  return {
+    type: type,
+    submit: submit,
+    cancel: cancel,
+    onClick: onClick,
+    onCancel: onCancel,
+    loading: loading,
+    disabled: disabled,
+    print: print,
+    onPrint: onPrint,
+    label: label,
+    onApprove: onApprove,
+    onReject: onReject
+  }
+}
+
+// single column per row
+export function formColumnSingle(state, values) {
+  return formColumn(state, values, 1)
+}
+
+// render column
+export const formColumn = param => {
+  // const param = {
+  //     control: control, errors: errors, state: state, setState: setState, fields: fields, count: count
+  // }
+
+  const { control, errors, state, setState, fields, count = 2 } = param
+
+  // 1 column
+  if (1 === param.count) {
+    return (
+      <>
+        {param.values.map((o, i) => {
+          return (
+            <Grid container spacing={5} key={i} sx={{ width: '100%' }}>
+              {formColumnSingleDetailField(param.state, o, i)}
+            </Grid>
+          )
+        })}
+      </>
+    )
+  }
+
+  // 2 column
+  return (
+    <Grid container spacing={5} sx={{ width: '100%' }}>
+      {param.fields.map((o, i) => {
+        return formColumnDetailField({
+          control: param.control,
+          errors: errors,
+          session: { state: param.state, setState: param.setState },
+          props: o,
+          index: i
+        })
+      })}
+    </Grid>
+  )
+}
+
+export function formColumnSingleDetailField(state, o, i) {
+  if ('submit' === o?.type) {
+    return (
+      <Fragment>
+        <button type='submit' className='btn btn-success'>
+          {o?.label}
+        </button>
+      </Fragment>
+    )
+  }
+
+  if ('submit-cancel' === o?.type) {
+
+    return (
+      <Fragment>
+        <button type='submit' className='btn btn-success mr-2'>
+          {o?.label}
+        </button>
+        <button type='cancel' className='btn mr-2' onClick={o?.clearForm}>
+          {o?.cancel}
+        </button>
+      </Fragment>
+    )
+  }
+
+  if ('space' === o?.type) {
+
+    return (
+      <Fragment>
+        <Grid item size={{ xs: 12, sm: 6 }} key={index} />
+      </Fragment>
+    )
+  }
+
+  return (
+    <>
+      <label>{o?.label}</label>
+      {'text' === o?.type ? textField(state, o?.control, o?.label, o?.type, o?.key, o?.option, o?.placeholder) : null}
+      {'editor' === o?.type ? textFieldEditor(state, o?.control, o?.key, o?.placeholder, o.ref) : null}
+      {'select' === o?.type
+        ? selectField(state, o?.control, o?.key, o?.option?.is_number, o?.placeholder, o?.options, o.callback)
+        : null}
+      {'space' === o?.type ? null : null}
+
+      {'year' === o?.type ? textFieldYear(state, o?.control, o?.key, o?.placeholder, o.ref) : null}
+      {'password' === o?.type
+        ? textField(state, o?.control, o?.type, o?.key, o?.option?.is_number, o?.placeholder)
+        : null}
+      {'hidden' === o?.type ? textFieldHidden(state, o?.control, o?.key) : null}
+      {'textarea' === o?.type ? textareaField(state, o?.control, o?.key, o?.option?.is_number, o?.placeholder) : null}
+      {'date' === o?.type ? textFieldDate(state, o?.control, o?.key, o?.placeholder, o.ref) : null}
+      {'file' === o?.type ? textFieldFile(state, o?.control, o?.key, o?.placeholder, o.ref) : null}
+
+      {error(state, o?.key)}
+    </>
+  )
+}
+
+/**
+ * 2 column
+ * */
+export function formColumnDetailField(form) {
+  // form = {
+  //     control: undefined, errors: undefined, session: undefined, props: undefined, index: 0,
+  // }
+  const { props, index = 0 } = form
+
+  if (undefined === props || null === props) return
+
+  // console.log("type", props.type, props.label)
+  if ('submit' === props.type) {
+    return (
+      <Grid item size={12} key={index}>
+        <div className='demo-space-x'>
+          <Button size='medium' type='submit' variant='contained' disabled={props.disabled}>
+            {props?.loading ? (
+              <CircularProgress
+                sx={{
+                  color: 'common.white',
+                  width: '18px !important',
+                  height: '18px !important',
+                  mr: theme => theme.spacing(2)
+                }}
+              />
+            ) : null}
+            {props?.submit}
+          </Button>
+          <Button size='medium' variant='outlined' color='secondary' onClick={props?.onCancel}>
+            {props?.cancel}
+          </Button>
+        </div>
+      </Grid>
+    )
+  }
+
+  if ('button' === props.type) {
+    return (
+      <Grid item size={12} key={index}>
+        <div className='demo-space-x'>
+          {props.print ? (
+            <Button
+              size='medium'
+              type='button'
+              variant='contained'
+              onClick={props.onPrint}
+              disabled={props.disabled}
+              color='info'
+              startIcon={<i className='material-symbols-print' />}
+            >
+              Print
+            </Button>
+          ) : (
+            <Button size='medium' type='button' variant='contained' onClick={props.onClick} disabled={props.disabled}>
+              {props?.loading ? (
+                <CircularProgress
+                  sx={{
+                    color: 'common.white',
+                    width: '18px !important',
+                    height: '18px !important',
+                    mr: theme => theme.spacing(2)
+                  }}
+                />
+              ) : null}
+              {props?.submit}
+            </Button>
+          )}
+          {props?.onCancel && (
+            <Button size='medium' variant='outlined' color='secondary' onClick={props?.onCancel}>
+              {props?.cancel}
+            </Button>
+          )}
+        </div>
+      </Grid>
+    )
+  }
+
+  if ('approve' === props.type) {
+    return (
+      <Grid item size={12} key={index}>
+        <div className='demo-space-x'>
+          {props.print ? (
+            <Button
+              size='medium'
+              type='button'
+              variant='contained'
+              onClick={props.onPrint}
+              disabled={props.disabled}
+              color='success'
+              startIcon={<i className='material-symbols-check' />}
+            >
+              {props.label ? props.label : 'Approve'}
+            </Button>
+          ) : (
+            <Button size='medium' type='button' variant='contained' onClick={props.onClick} disabled={props.disabled}>
+              {props?.loading ? (
+                <CircularProgress
+                  sx={{
+                    color: 'common.white',
+                    width: '18px !important',
+                    height: '18px !important',
+                    mr: theme => theme.spacing(2)
+                  }}
+                />
+              ) : null}
+              {props?.submit}
+            </Button>
+          )}
+          <Button size='medium' variant='outlined' color='secondary' onClick={props?.onCancel}>
+            {props?.cancel}
+          </Button>
+        </div>
+      </Grid>
+    )
+  }
+
+  if ('approve-reject' === props.type) {
+    return (
+      <Grid item size={12} key={index}>
+        <div className='demo-space-x'>
+          {props.print ? (
+            <>
+              <Button
+                size='medium'
+                type='button'
+                variant='contained'
+                onClick={props.onApprove}
+                disabled={props.disabled}
+                color='success'
+                startIcon={<i className='material-symbols-check' />}
+              >
+                Approve
+              </Button>
+              <Button
+                size='medium'
+                type='button'
+                variant='contained'
+                onClick={props.onReject}
+                disabled={props.disabled}
+                color='error'
+                startIcon={<i className='material-symbols-check' />}
+              >
+                Unapprove
+              </Button>
+            </>
+          ) : (
+            <Button size='medium' type='button' variant='contained' onClick={props.onClick} disabled={props.disabled}>
+              {props?.loading ? (
+                <CircularProgress
+                  sx={{
+                    color: 'common.white',
+                    width: '18px !important',
+                    height: '18px !important',
+                    mr: theme => theme.spacing(2)
+                  }}
+                />
+              ) : null}
+              {props?.submit}
+            </Button>
+          )}
+          <Button size='medium' variant='outlined' color='secondary' onClick={props?.onCancel}>
+            {props?.cancel}
+          </Button>
+        </div>
+      </Grid>
+    )
+  }
+
+  if ('check' === props.type) {
+    return (
+      <Grid item size={12} key={index}>
+        <div className='demo-space-x'>
+          {props.print ? (
+            <>
+              <Button
+                size='medium'
+                type='button'
+                variant='contained'
+                onClick={props.onApprove}
+                disabled={props.disabled}
+                color='success'
+                startIcon={<i className='material-symbols-check' />}
+              >
+                Check
+              </Button>
+            </>
+          ) : (
+            <Button size='medium' type='button' variant='contained' onClick={props.onClick} disabled={props.disabled}>
+              {props?.loading ? (
+                <CircularProgress
+                  sx={{
+                    color: 'common.white',
+                    width: '18px !important',
+                    height: '18px !important',
+                    mr: theme => theme.spacing(2)
+                  }}
+                />
+              ) : null}
+              {props?.submit}
+            </Button>
+          )}
+          <Button size='medium' variant='outlined' color='secondary' onClick={props?.onCancel}>
+            {props?.cancel}
+          </Button>
+        </div>
+      </Grid>
+    )
+  }
+
+  if ('paid-unpaid' === props.type) {
+    return (
+      <Grid item size={12} key={index}>
+        <div className='demo-space-x'>
+          {props.print ? (
+            <>
+              <Button
+                size='medium'
+                type='button'
+                variant='contained'
+                onClick={props.onApprove}
+                disabled={props.disabled}
+                color='success'
+                startIcon={<i className='material-symbols-check' />}
+              >
+                Paid
+              </Button>
+              <Button
+                size='medium'
+                type='button'
+                variant='contained'
+                onClick={props.onReject}
+                disabled={props.disabled}
+                color='error'
+                startIcon={<i className='material-symbols-check' />}
+              >
+                Unpaid
+              </Button>
+            </>
+          ) : (
+            <Button size='medium' type='button' variant='contained' onClick={props.onClick} disabled={props.disabled}>
+              {props?.loading ? (
+                <CircularProgress
+                  sx={{
+                    color: 'common.white',
+                    width: '18px !important',
+                    height: '18px !important',
+                    mr: theme => theme.spacing(2)
+                  }}
+                />
+              ) : null}
+              {props?.submit}
+            </Button>
+          )}
+          <Button size='medium' variant='outlined' color='secondary' onClick={props?.onCancel}>
+            {props?.cancel}
+          </Button>
+        </div>
+      </Grid>
+    )
+  }
+
+  if ('submit-cancel' === props.type) {
+    return (
+      <div className='col-md-6 mt-2' key={index}>
+        <div className='form-group row'>
+          <div className='col-sm-3' />
+          <div className='col-sm-9'>
+            <button type='submit' className='btn btn-success mr-2'>
+              {props?.label}
+            </button>
+            <button type='cancel' className='btn mr-2' onClick={props?.clearForm}>
+              {props?.cancel}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if ('text' === props.type) {
+    return (
+      <Grid item size={{ xs: 12, sm: 6 }} key={index}>
+        <FormControl fullWidth size='small'>
+          {textField(form)}
+        </FormControl>
+      </Grid>
+    )
+  }
+
+  if ('password' === props.type) {
+    return (
+      <Grid item size={{ xs: 12, sm: 6 }} key={index}>
+        <FormControl fullWidth size='small'>
+          {textField(form)}
+        </FormControl>
+      </Grid>
+    )
+  }
+
+  if ('checkbox' === props.type) {
+    return (
+      <Grid item size={{ xs: 12, sm: 6 }} key={index}>
+        <FormControl fullWidth size='small'>
+          {checkboxField(form)}
+        </FormControl>
+      </Grid>
+    )
+  }
+
+  if ('numeral' === props.type) {
+    return (
+      <Grid item size={{ xs: 12, sm: 6 }} key={index}>
+        <FormControl fullWidth size='small'>
+          {numeralField(form)}
+        </FormControl>
+      </Grid>
+    )
+  }
+
+  if ('textarea' === props.type) {
+    return (
+      <Grid item size={{ xs: 12, sm: 6 }} key={index}>
+        <FormControl fullWidth size='small'>
+          {textareaField(form)}
+        </FormControl>
+      </Grid>
+    )
+  }
+
+  if ('select' === props.type) {
+    return (
+      <Grid item size={{ xs: 12, sm: 6 }} key={index}>
+        <FormControl fullWidth size='small'>
+          {selectField(form)}
+        </FormControl>
+      </Grid>
+    )
+  }
+
+  if ('select-multi' === props.type) {
+    return (
+      <Grid item size={{ xs: 12, sm: 6 }} key={index}>
+        <FormControl fullWidth size='small'>
+          {selectMultiField(form)}
+        </FormControl>
+      </Grid>
+    )
+  }
+
+  if ('date' === props.type) {
+    return (
+      <Grid item size={{ xs: 12, sm: props?.options?.grid | 6 }} key={index}>
+        <FormControl fullWidth size='small'>
+          {selectDate(form)}
+        </FormControl>
+      </Grid>
+    )
+  }
+
+  if ('time' === props.type) {
+    return (
+      <Grid item size={{ xs: 12, sm: props?.options?.grid | 6 }} key={index}>
+        <FormControl fullWidth size='small'>
+          {selectTime(form)}
+        </FormControl>
+      </Grid>
+    )
+  }
+
+  if ('separator' === props.type) {
+    return (
+      <Grid item size={{ xs: 12, sm: 12 }} key={index}>
+        <Grid item size={12}>
+          <Divider sx={{ mb: '0 !important' }} />
+        </Grid>
+        <Grid item size={12} mt={3} mb={3}>
+          <Typography variant='body2' sx={{ fontWeight: 600 }}>
+            {props.label}
+          </Typography>
+        </Grid>
+      </Grid>
+    )
+  }
+
+  if ('space' === props.type) {
+    return <Grid item size={{ xs: 12, sm: 6 }} key={index} />
+  }
+
+  if ('image' === props.type) {
+    let session = form.session
+
+    const { key } = props
+
+    const defaultImage = 'https://placehold.co/300x300?font=roboto&text=Upload image'
+
+    const valueImage = session.state[key] ? process.env.NEXT_PUBLIC_API_URL + props.urlImage + session.state[key] : ''
+
+    const imageData = { value: 'img', img: valueImage ? valueImage : defaultImage }
+
+    const selected = 'img'
+
+    return (
+      <Grid item size={{ xs: 12, sm: 6 }} key={index}>
+        <FormHelperText id='validation-basic-last-name'>{props.label}</FormHelperText>
+        <InputImage
+          key={index}
+          data={imageData}
+          selected={selected}
+          name='custom-checkbox-img'
+          handleChange={image => {
+            let store = { ...session.state }
+
+            store[props.key] = image
+            session.setState(store)
+          }}
+          gridProps={{ sm: 4, md: 2, xs: 12 }}
+        />
+      </Grid>
+    )
+  }
+
+  if ('file' === props.type) {
+    let session = form.session
+
+    const { key } = props
+
+    const valueFile = session.state[key] ? session.state[key] : ''
+
+    return (
+      <Grid item size={{ xs: 12, sm: 6 }} key={index}>
+        <FormHelperText id='validation-basic-last-name'>{props.label}</FormHelperText>
+        <InputFile
+          key={index}
+          handleChange={file => {
+            if (typeof props?.options?.onChange === 'function') {
+              props?.options?.onChange(file)
+            }
+          }}
+          handleClear={() => {
+            updateValueText(session, props, { target: { value: '' } })
+          }}
+          gridProps={{ sm: 4, md: 2, xs: 12 }}
+          selected={valueFile}
+          url={props?.urlImage}
+        />
+      </Grid>
+    )
+  }
+
+  if ('map' === props.type) {
+    let session = form.session
+
+    const { key } = props
+
+    const valueMap = session.state[key] ? session.state[key] : ''
+
+    return (
+      <Grid item size={{ xs: 12, sm: 6 }} key={index}>
+        <FormHelperText id='validation-basic-last-name'>{props.label}</FormHelperText>
+        <MapGoogle
+          key={index}
+          selected={valueMap}
+          gridProps={{ sm: 4, md: 2, xs: 12 }}
+          handleChange={data => {
+            if (typeof props?.options?.onChange === 'function') {
+              props?.options?.onChange(data)
+            }
+          }}
+        ></MapGoogle>
+      </Grid>
+    )
+  }
+
+  if ('editor' === props.type) {
+    return (
+      <Grid item size={{ xs: 12, sm: 12 }} key={index}>
+        <FormControl fullWidth size='small'>
+          {textFieldEditor(form)}
+        </FormControl>
+      </Grid>
+    )
+  }
+}
+
+const formColumnDetailSingleField = form => {
+  const { props } = form
+
+  if (undefined === props || null === props) return
+
+  if ('text' === props.type) {
+    return <>{textField(form)}</>
+  }
+
+  if ('password' === props.type) {
+    return <>{textField(form)}</>
+  }
+
+  if ('numeral' === props.type) {
+    return <>{numeralField(form)}</>
+  }
+
+  if ('textarea' === props.type) {
+    return <>{textareaField(form)}</>
+  }
+
+  if ('select' === props.type) {
+    return <>{selectField(form)}</>
+  }
+
+  if ('select-multi' === props.type) {
+    return <>{selectMultiField(form)}</>
+  }
+
+  if ('date' === props.type) {
+    return <>{selectDate(form)}</>
+  }
+
+  if ('time' === props.type) {
+    return <>{selectTime(form)}</>
+  }
+
+  if ('checkbox' === props.type) {
+    return <>{checkboxField(form)}</>
+  }
+
+  if ('radio' === props.type) {
+    return <>{radioField(form)}</>
+  }
+
+  if ('button' === props.type) {
+    return <>{buttonField(form)}</>
+  }
+
+  if ('image' === props.type) {
+    let session = form.session
+
+    const { key } = props
+
+    const defaultImage = `https://placehold.co/300x300?font=roboto&text=${props.placeholder}`
+
+    const valueImage = session.state[key] ? process.env.NEXT_PUBLIC_API_URL + props.urlImage + session.state[key] : ''
+
+    const imageData = { value: 'img', img: valueImage ? valueImage : defaultImage }
+
+    const selected = 'img'
+
+    return (
+      <Grid item size={{ xs: 12, sm: 6 }}>
+        <FormHelperText id='validation-basic-last-name'>{props.label}</FormHelperText>
+        <InputImage
+          data={imageData}
+          selected={selected}
+          name='custom-checkbox-img'
+          handleChange={image => {
+            let store = { ...session.state }
+
+            store[props.key] = image
+            session.setState(store)
+          }}
+          gridProps={{ sm: 4, md: 2, xs: 12 }}
+        />
+      </Grid>
+    )
+  }
+}
+
+export function error(state, key) {
+  if (!key) return
+  let errorMessage = state[key + '_error']
+
+  if (!errorMessage) return
+
+  return (
+    <label data-test='error' style={{ color: 'red', fontSize: 10, marginTop: 10 }}>
+      {errorMessage}
+    </label>
+  )
+}
+
+/**
+ *             {errors[props.key] && (
+ *                 <FormHelperText sx={{color: 'error.main'}} id='validation-basic-last-name'>
+ *                     This field is required
+ *                 </FormHelperText>
+ *             )}
+ */
+//export function textField(form = {control: control, errors: errors, session: session, props: props}) {
+const textField = form => {
+  const { control, errors, session, props } = form
+
+  return (
+    <Controller
+      control={control}
+      name={props.key}
+      rules={{ required: props.required }}
+      render={({ field: { value, onChange } }) => {
+        const valueText = props?.options?.converter ? props.options.converter(value) : value
+
+        return (
+          <TextField
+            type={props.type}
+            size='small'
+            value={valueText}
+            label={props.label}
+            placeholder={props.placeholder}
+            error={Boolean(errors[props.key])}
+            aria-describedby='validation-basic-first-name'
+            onChange={e => {
+              if (props.readOnly) return
+              onChange(e) // trigger for default value useForm
+
+              if (props?.options?.is_number) {
+                updateValueNumber(session, props, e)
+              } else {
+                updateValueText(session, props, e)
+              }
+
+              if (typeof props?.options?.onChange === 'function') {
+                props?.options?.onChange(e.target.value)
+              }
+            }}
+            onClick={props?.options?.onClick}
+            InputLabelProps={{
+              shrink: true,
+              readOnly: props.readOnly
+            }}
+            InputProps={{
+              inputProps: {
+                readOnly: props.readOnly,
+                inputRef: props.ref
+              },
+              startAdornment: props.startAdornment ? (
+                <InputAdornment position='start'>{props.startAdornment}</InputAdornment>
+              ) : null,
+              endAdornment: props.endAdornment ? (
+                <InputAdornment position='end'>{props.endAdornment}</InputAdornment>
+              ) : null,
+              className: props.readOnly ? 'Mui-disabled' : ''
+            }}
+            autoFocus={props.autoFocus}
+            {...(errors[props.key] && { helperText: errors[props.key].message })}
+          />
+        )
+      }}
+    />
+  )
+}
+
+const checkboxField = form => {
+  const { control, errors, session, props } = form
+  const valueTmp = session.state[props.key]
+
+  return (
+    <FormControlLabel
+      control={
+        <Checkbox
+          checked={valueTmp || props.checked}
+          onChange={e => {
+            let val = {
+              target: {
+                value: true
+              }
+            }
+
+            if (valueTmp) {
+              val.target.value = false
+            }
+
+            updateValueText(session, props, val)
+
+            if (typeof props?.options?.onChange === 'function') {
+              props?.options?.onChange(val.target.value)
+            }
+          }}
+          disabled={props.readOnly}
+        />
+      }
+      label={props.label}
+    />
+  )
+}
+
+const radioField = form => {
+  const { control, errors, session, props } = form
+  const valueTmp = session.state[props.key]
+
+  return (
+    <FormControlLabel
+      control={
+        <Radio
+          checked={valueTmp || props.checked}
+          onChange={e => {
+            let val = {
+              target: {
+                value: true
+              }
+            }
+
+            if (valueTmp) {
+              val.target.value = false
+            }
+
+            updateValueText(session, props, val)
+
+            if (typeof props?.options?.onChange === 'function') {
+              props?.options?.onChange(val.target.value)
+            }
+          }}
+          disabled={props.readOnly}
+        />
+      }
+      label={props.label}
+    />
+  )
+}
+
+const numeralField = form => {
+  const { control, errors, session, props } = form
+
+  return (
+    <Controller
+      control={control}
+      name={props.key}
+      rules={{ required: props.required }}
+      render={({ field: { value, onChange } }) => {
+        const valueText = props?.options?.converter ? props.options.converter(value) : value
+
+        return (
+          <TextField
+            size='small'
+            value={valueText}
+            label={props.label}
+            placeholder={props.placeholder}
+            error={Boolean(errors[props.key])}
+            aria-describedby='validation-basic-first-name'
+            onChange={e => {
+              onChange(e) // trigger for default value useForm
+              updateValueMaskingThousand(session, props, e)
+
+              if (typeof props?.options?.onChange === 'function') {
+                props?.options?.onChange(e.target.value)
+              }
+            }}
+            InputProps={{
+              inputComponent: MaskedTextField,
+              inputProps: {
+                inputRef: props.ref,
+                options: {
+                  numeral: true,
+                  numeralThousandsGroupStyle: 'thousand'
+                },
+                readOnly: props.readOnly
+              },
+              startAdornment: props.startAdornment ? (
+                <InputAdornment position='start'>{props.startAdornment}</InputAdornment>
+              ) : null,
+              endAdornment: props.endAdornment ? (
+                <InputAdornment position='end'>{props.endAdornment}</InputAdornment>
+              ) : null,
+              className: props.readOnly ? 'Mui-disabled' : ''
+            }}
+            InputLabelProps={{
+              shrink: true
+            }}
+            autoFocus={props.autoFocus}
+          />
+        )
+      }}
+    />
+  )
+}
+
+export function editorStateHtml(text) {
+  if (undefined === text || null === text) text = ''
+
+  const blocksFromHTML = convertFromHTML(text)
+
+  return EditorState.createWithContent(
+    ContentState.createFromBlockArray(blocksFromHTML.contentBlocks, blocksFromHTML.entityMap)
+  )
+}
+
+const textFieldEditor = form => {
+  let session = form.session
+  let props = form.props
+
+  // let {control, session, props} = form
+  const { options, key } = props
+
+  const onUpdateText = result => {
+    let store = { ...session.state }
+
+    store[key] = result
+    session.setState(store)
+    console.log('update', key, result)
+  }
+
+  return (
+    <>
+      <FormHelperText id='validation-basic-last-name'>{props.label}</FormHelperText>
+      <EditorWrapper>
+        <ReactDraftWysiwyg
+          editorState={options.editor}
+          onEditorStateChange={data => {
+            let resultData = draftToHtml(convertToRaw(data.getCurrentContent()))
+
+            onUpdateText(resultData)
+            options.setEditor(data)
+          }}
+        />
+      </EditorWrapper>
+    </>
+  )
+}
+
+export function textFieldHidden(state, key) {
+  let valueTmp = state.state[key]
+
+  if (!valueTmp) {
+    valueTmp = ''
+  }
+
+  return <input type='hidden' className='form-control' value={valueTmp} />
+}
+
+// https://codesandbox.io/s/react-hook-form-v7-controller-forked-7cns76?file=/src/MuiAutoComplete.js:657-668
+const selectField = form => {
+  const { control, errors, session, props } = form
+
+  if (undefined === props.options || null === props.options) {
+    props.options = {}
+  }
+
+  if (undefined === props.options.values || null === props.options.values) {
+    props.options.values = []
+  }
+
+  const valueTmp = session.state[props.key]
+
+  let selected = valueTmp ? props.options.values.find(e => e.value === valueTmp) : { label: '', value: null }
+
+  return (
+    <Controller
+      control={control}
+      name={props.key}
+      value={selected}
+      defaultValue={null}
+      rules={{ required: props.required }}
+      render={({ field: { value, onChange } }) => {
+        return (
+          <Autocomplete
+            size='small'
+            autoHighlight
+            value={value}
+            defaultValue={null}
+            getOptionLabel={option => {
+              return option.label || ''
+            }}
+            isOptionEqualToValue={(option, val) => {
+              return option.value === val.value
+            }}
+            onChange={(event, newValue) => {
+              onChange(newValue) // Update the Controller's value
+              updateValueSelect(session, props, newValue)
+
+              if (typeof props?.options?.onChange === 'function') {
+                props?.options?.onChange(newValue)
+              }
+            }}
+            options={props.options.values}
+            renderInput={params => (
+              <TextField
+                {...params}
+                label={props.label}
+                error={Boolean(errors[props.key])}
+                placeholder={props.placeholder}
+                inputProps={{
+                  ...params.inputProps,
+                  autoComplete: 'new-password', // disable autocomplete and autofill,
+                  inputRef: props.ref
+                }}
+                InputLabelProps={{
+                  shrink: true
+                }}
+              />
+            )}
+            renderOption={(props, option) => (
+              <Box
+                component='li'
+                {...props}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  whiteSpace: 'normal', // ✅ allow wrapping
+                  wordBreak: 'break-word', // ✅ break long words if needed
+                  lineHeight: 1.4 // nicer spacing for wrapped text
+                }}
+              >
+                {option.icon && (
+                  <i className={option.icon} style={{ marginRight: 8, flexShrink: 0, width: 24, height: 24 }} />
+                )}
+                <Box component='span' sx={{ flex: 1 }}>
+                  {option.html ? option.htmlLabel : option.label}
+                </Box>
+              </Box>
+            )}
+            disabled={props.readOnly}
+          />
+        )
+      }}
+    />
+  )
+}
+
+const selectMultiField = form => {
+  const { control, errors, session, props } = form
+
+  if (undefined === props.options || null === props.options) {
+    props.options = {}
+  }
+
+  if (undefined === props.options.values || null === props.options.values) {
+    props.options.values = []
+  }
+
+  let selected = session.state[props.key]
+
+  // let selected = valueTmp ? props.options.values.find(e => e.value === valueTmp) : {value: null, label: ''}
+
+  console.log('selected', props.key, selected)
+
+  return (
+    <Controller
+      control={control}
+      name={props.key}
+      value={selected ?? []}
+      defaultValue={[]}
+      rules={{ required: props.required }}
+      render={({ field: { value, onChange } }) => {
+        if (value && value?.value) {
+          // console.log('selected-render change', props.key, selected, value)
+          // selected = value
+        } else {
+          // console.log('selected-render change', props.key, selected, value)
+        }
+
+        // value={value ? selected : value}
+        // defaultValue={null}
+        return (
+          <Autocomplete
+            size='small'
+            multiple
+            autoHighlight
+            filterSelectedOptions
+            value={value ?? []}
+            defaultValue={[]}
+            getOptionLabel={option => {
+              return option.label || ''
+            }}
+            isOptionEqualToValue={(option, val) => {
+              return option.value === val.value
+            }}
+            onChange={(event, newValue) => {
+              onChange(newValue) // Update the Controller's value
+              updateValueSelectMulti(session, props, newValue)
+
+              if (typeof props?.options?.onChange === 'function') {
+                props?.options?.onChange(newValue)
+              }
+            }}
+            options={props.options.values}
+            renderInput={params => (
+              <TextField
+                {...params}
+                label={props.label}
+                error={Boolean(errors[props.key])}
+                placeholder={props.placeholder}
+                inputProps={{
+                  ...params.inputProps,
+                  autoComplete: 'new-password' // disable autocomplete and autofill
+                }}
+                InputLabelProps={{
+                  shrink: true
+                }}
+              />
+            )}
+          />
+        )
+      }}
+    />
+  )
+}
+
+const selectDate = form => {
+  const { control, errors, session, props } = form
+
+  // const theme = useTheme()
+
+  // const {direction} = theme
+
+  // const popperPlacement = direction === 'ltr' ? 'bottom-start' : 'bottom-end'
+
+  const popperPlacement = 'bottom-start'
+
+  if (undefined === props.options || null === props.options) {
+    props.options = {}
+  }
+
+  if (undefined === props.options.values || null === props.options.values) {
+    props.options.values = []
+  }
+
+  const valueTmp = session.state[props.key]
+
+  let selected = valueTmp ? props.options.values.find(e => e.value === valueTmp) : { label: '', value: null }
+
+  // console.log('selected', valueTmp, props.key, selected)
+
+  return (
+    <Controller
+      control={control}
+      name={props.key}
+      value={selected}
+      defaultValue={null}
+      rules={{ required: props.required }}
+      render={({ field: { value, onChange } }) => {
+        if (value && value?.value) {
+          // console.log('selected-render change', props.key, selected, value)
+          selected = value
+        } else {
+          // console.log('selected-render change', props.key, selected, value)
+        }
+
+        return (
+          <DatePicker
+            selected={value}
+            id='basic-input'
+            popperPlacement={popperPlacement}
+            onChange={date => {
+              onChange(date)
+              updateValueDate(session, props, date)
+
+              if (typeof props?.options?.onChange === 'function') {
+                props?.options?.onChange(date)
+              }
+            }}
+            placeholderText='Click to select a date'
+
+            //customInput={<PickersCustomInput label={props.label} />}
+            disabled={props.readOnly}
+            portalId={props.portalId}
+            minDate={props.minDate}
+          />
+        )
+      }}
+    />
+  )
+}
+
+const selectTime = form => {
+  const { control, errors, session, props } = form
+
+  // const theme = useTheme()
+
+  // const {direction} = theme
+
+  // const popperPlacement = direction === 'ltr' ? 'bottom-start' : 'bottom-end'
+
+  const popperPlacement = 'bottom-start'
+
+  if (undefined === props.options || null === props.options) {
+    props.options = {}
+  }
+
+  if (undefined === props.options.values || null === props.options.values) {
+    props.options.values = []
+  }
+
+  let valueTmp = session.state[props.key]
+
+  let selected = valueTmp ? props.options.values.find(e => e.value === valueTmp) : { label: '', value: null }
+
+  return (
+    <Controller
+      control={control}
+      name={props.key}
+      value={selected}
+      defaultValue={null}
+      rules={{ required: props.required }}
+      render={({ field: { value, onChange } }) => {
+        if (value && value?.value) {
+          selected = value
+        }
+
+        return (
+          <DatePicker
+            id='time-only-picker'
+            showTimeSelect
+            showTimeSelectOnly
+            timeIntervals={60}
+            dateFormat='HH:mm'
+            timeFormat='HH:mm'
+            selected={value}
+            popperPlacement={popperPlacement}
+            onChange={date => {
+              onChange(date)
+              updateValueDate(session, props, date)
+            }}
+            placeholderText='Click to select a time'
+
+            //customInput={<PickersCustomInput label={props.label} />}
+          />
+        )
+      }}
+    />
+  )
+}
+
+export function textareaField(form) {
+  const { control, errors, session, props } = form
+
+  return (
+    <Controller
+      control={control}
+      name={props.key}
+      rules={{ required: props.required }}
+      render={({ field: { value, onChange } }) => {
+        return (
+          <TextField
+            size='small'
+            value={value}
+            rows={4}
+            multiline
+            {...field}
+            label={props.label}
+            error={Boolean(errors[props.key])}
+            aria-describedby='validation-basic-textarea'
+            onChange={e => {
+              onChange(e) // trigger for default value useForm
+              updateValueText(session, props, e)
+            }}
+            InputLabelProps={{
+              shrink: true
+            }}
+            InputProps={{
+              inputProps: {
+                readOnly: props.readOnly,
+                inputRef: props.ref
+              }
+            }}
+            onClick={props?.options?.onClick}
+          />
+        )
+      }}
+    />
+  )
+}
+
+export function textFieldFile(state, key, placeholder, ref) {
+  return (
+    <input
+      type='file'
+      className='form-control'
+      ref={ref}
+      placeholder={placeholder}
+      onChange={e => {
+        updateFile(e, state, key)
+      }}
+    />
+  )
+}
+
+export function submitField(state, key, isNumber, placeholder, optValue) {
+  return (
+    <button type='submit' className='btn btn-success'>
+      Simpan
+    </button>
+  )
+}
+
+export function buttonField(form) {
+  const { control, errors, session, props } = form
+
+  return (
+    <Button
+      size={'medium'}
+      variant={props?.variant || 'outlined'}
+      color={props?.color || 'primary'}
+      onClick={props?.options?.onClick}
+    >
+      {props.label}
+    </Button>
+  )
+}
+
+export const formSingleColumn = param => {
+  const { control, errors, state, setState, field } = param
+
+  return formColumnDetailSingleField({
+    control,
+    errors: errors,
+    session: { state, setState },
+    props: field
+  })
+}
