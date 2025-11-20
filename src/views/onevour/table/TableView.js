@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 
 import TableContainer from '@mui/material/TableContainer'
 import Paper from '@mui/material/Paper'
@@ -62,13 +62,11 @@ const TableView = ({ model, changeSort, ...res }) => {
   }
 
   const renderTableRows = model => {
-
     return (
       <>
         {model &&
           model.values &&
           model.values.map((o, i) => {
-
             return (
               <TableRow
                 key={i}
@@ -82,7 +80,7 @@ const TableView = ({ model, changeSort, ...res }) => {
               >
                 {model.fields.map((x, y) => {
                   if (x.key === 'act-x') {
-                    return <>{x.format(o, o[x.key])}</>
+                    return <Fragment key={y}>{x.format(o, o[x.key])}</Fragment>
                   }
 
                   // has format
