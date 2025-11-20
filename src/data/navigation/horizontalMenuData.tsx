@@ -1,6 +1,5 @@
 // Type Imports
 import type { HorizontalMenuDataType } from '@/types/menuTypes'
-import type { getDictionary } from '@/utils/getDictionary'
 
 const horizontalMenuData = (): HorizontalMenuDataType[] => [
   // This is how you will normally render submenu
@@ -464,31 +463,31 @@ const horizontalMenuData = (): HorizontalMenuDataType[] => [
             label: 'landing',
             href: '/front-pages/landing-page',
             target: '_blank',
-            
+
           },
           {
             label: 'pricing',
             href: '/front-pages/pricing',
             target: '_blank',
-            
+
           },
           {
             label: 'payment',
             href: '/front-pages/payment',
             target: '_blank',
-            
+
           },
           {
             label: 'checkout',
             href: '/front-pages/checkout',
             target: '_blank',
-            
+
           },
           {
             label: 'helpCenter',
             href: '/front-pages/help-center',
             target: '_blank',
-            
+
           }
         ]
       }

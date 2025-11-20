@@ -8,7 +8,6 @@ import { useParams } from 'next/navigation'
 import type { ChipProps } from '@mui/material/Chip'
 
 // Type Imports
-import type { Locale } from '@configs/i18n'
 import type {
   VerticalMenuDataType,
   VerticalSectionDataType,
@@ -24,13 +23,10 @@ import { SubMenu as HorizontalSubMenu, MenuItem as HorizontalMenuItem } from '@m
 import { SubMenu as VerticalSubMenu, MenuItem as VerticalMenuItem, MenuSection } from '@menu/vertical-menu'
 import CustomChip from '@core/components/mui/Chip'
 
-// Util Imports
-import { getLocalizedUrl } from '@/utils/i18n'
-
 // Generate a menu from the menu data array
 export const GenerateVerticalMenu = ({ menuData }: { menuData: VerticalMenuDataType[] }) => {
   // Hooks
-  
+
 
   const renderMenuItems = (data: VerticalMenuDataType[]) => {
     // Use the map method to iterate through the array of menu data
@@ -90,7 +86,7 @@ export const GenerateVerticalMenu = ({ menuData }: { menuData: VerticalMenuDataT
       const { label,  icon, prefix, suffix, ...rest } = menuItem
 
       // Localize the href
-      
+
       const Icon = icon ? <i className={icon} /> : null
 
       const menuItemPrefix: ReactNode =
@@ -128,7 +124,7 @@ export const GenerateVerticalMenu = ({ menuData }: { menuData: VerticalMenuDataT
 // Generate a menu from the menu data array
 export const GenerateHorizontalMenu = ({ menuData }: { menuData: HorizontalMenuDataType[] }) => {
   // Hooks
-  
+
 
   const renderMenuItems = (data: HorizontalMenuDataType[]) => {
     // Use the map method to iterate through the array of menu data
@@ -174,7 +170,7 @@ export const GenerateHorizontalMenu = ({ menuData }: { menuData: HorizontalMenuD
       const { label,  icon, prefix, suffix, ...rest } = menuItem
 
       // Localize the href
-      
+
       const Icon = icon ? <i className={icon} /> : null
 
       const menuItemPrefix: ReactNode =

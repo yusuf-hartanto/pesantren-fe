@@ -42,14 +42,14 @@ const initialState: InitialState = {
    3. Async Thunks (typed)
 --------------------------- */
 
-export const fetchRoleAll = createAsyncThunk<any>(
-  'role/fetchAll',
+export const fetchSemesterAll = createAsyncThunk<any>(
+  'semester/fetchAll',
   async (params, thunkAPI) => {
     const session = await getSession()
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/role/all-data`,
+        `${process.env.NEXT_PUBLIC_API_URL}/app/semester/all-data`,
         {
           headers: { Authorization: `Bearer ${session?.access_token}` },
           params
@@ -63,14 +63,14 @@ export const fetchRoleAll = createAsyncThunk<any>(
   }
 )
 
-export const fetchRolePage = createAsyncThunk<any, FetchParams>(
-  'role/fetchPage',
+export const fetchSemesterPage = createAsyncThunk<any, FetchParams>(
+  'semester/fetchPage',
   async (params, thunkAPI) => {
     const session = await getSession()
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/role`,
+        `${process.env.NEXT_PUBLIC_API_URL}/app/semester`,
         {
           headers: { Authorization: `Bearer ${session?.access_token}` },
           params
@@ -84,14 +84,14 @@ export const fetchRolePage = createAsyncThunk<any, FetchParams>(
   }
 )
 
-export const fetchRoleById = createAsyncThunk<any, string>(
-  'role/fetchById',
+export const fetchSemesterById = createAsyncThunk<any, string>(
+  'semester/fetchById',
   async (id, thunkAPI) => {
     const session = await getSession()
 
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/role/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/app/semester/${id}`,
         {
           headers: { Authorization: `Bearer ${session?.access_token}` },
         }
@@ -104,14 +104,14 @@ export const fetchRoleById = createAsyncThunk<any, string>(
   }
 )
 
-export const postRole = createAsyncThunk<any, any>(
-  'role/create',
+export const postSemester = createAsyncThunk<any, any>(
+  'semester/create',
   async (params, thunkAPI) => {
     const session = await getSession()
 
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/role`,
+        `${process.env.NEXT_PUBLIC_API_URL}/app/semester`,
         params,
         {
           headers: { Authorization: `Bearer ${session?.access_token}` },
@@ -125,14 +125,14 @@ export const postRole = createAsyncThunk<any, any>(
   }
 )
 
-export const postRoleUpdate = createAsyncThunk<any, { id: string; param: any }>(
-  'role/update',
+export const postSemesterUpdate = createAsyncThunk<any, { id: string; param: any }>(
+  'semester/update',
   async ({ id, param }, thunkAPI) => {
     const session = await getSession()
 
     try {
       const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/role/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/app/semester/${id}`,
         param,
         {
           headers: { Authorization: `Bearer ${session?.access_token}` },
@@ -146,14 +146,14 @@ export const postRoleUpdate = createAsyncThunk<any, { id: string; param: any }>(
   }
 )
 
-export const deleteRole = createAsyncThunk<any, string>(
-  'role/delete',
+export const deleteSemester = createAsyncThunk<any, string>(
+  'semester/delete',
   async (id, thunkAPI) => {
     const session = await getSession()
 
     try {
       const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/role/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/app/semester/${id}`,
         {
           headers: { Authorization: `Bearer ${session?.access_token}` },
         }
@@ -171,36 +171,36 @@ export const deleteRole = createAsyncThunk<any, string>(
 --------------------------- */
 
 export const slice = createSlice({
-  name: 'role',
+  name: 'semester',
   initialState,
   reducers: {
     resetRedux: () => initialState,
   },
   extraReducers: builder => {
-    builder.addCase(fetchRoleAll.fulfilled, (state, action) => {
+    builder.addCase(fetchSemesterAll.fulfilled, (state, action) => {
       state.datas = action.payload.data || []
     })
 
-    builder.addCase(fetchRolePage.fulfilled, (state, action) => {
+    builder.addCase(fetchSemesterPage.fulfilled, (state, action) => {
       state.dataPage = {
         values: action.payload.data?.values || [],
         total: action.payload.data?.total || 0
       }
     })
 
-    builder.addCase(fetchRoleById.fulfilled, (state, action) => {
+    builder.addCase(fetchSemesterById.fulfilled, (state, action) => {
       state.data = action.payload.data
     })
 
-    builder.addCase(deleteRole.fulfilled, (state, action) => {
+    builder.addCase(deleteSemester.fulfilled, (state, action) => {
       state.delete = action.payload.message
     })
 
-    builder.addCase(postRole.fulfilled, (state, action) => {
+    builder.addCase(postSemester.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
-    builder.addCase(postRoleUpdate.fulfilled, (state, action) => {
+    builder.addCase(postSemesterUpdate.fulfilled, (state, action) => {
       state.crud = action.payload
     })
   },

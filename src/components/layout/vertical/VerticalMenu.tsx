@@ -8,14 +8,13 @@ import { useTheme } from '@mui/material/styles'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 
 // Type Imports
-import type { getDictionary } from '@/utils/getDictionary'
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
 // Component Imports
 import { Menu, SubMenu, MenuItem, MenuSection } from '@menu/vertical-menu'
 import CustomChip from '@core/components/mui/Chip'
 
-// import { GenerateVerticalMenu } from '@components/GenerateMenu'
+import { GenerateVerticalMenu } from '@components/GenerateMenu'
 
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
@@ -28,7 +27,7 @@ import menuItemStyles from '@core/styles/vertical/menuItemStyles'
 import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 
 // Menu Data Imports
-// import menuData from '@/data/navigation/verticalMenuData'
+import menuData from '@/data/navigation/verticalMenuData'
 
 type RenderExpandIconProps = {
   open?: boolean
@@ -36,7 +35,7 @@ type RenderExpandIconProps = {
 }
 
 type Props = {
-  
+
   scrollMenu: (container: any, isPerfectScrollbar: boolean) => void
 }
 
@@ -50,11 +49,11 @@ const VerticalMenu = ({  scrollMenu }: Props) => {
   // Hooks
   const theme = useTheme()
   const verticalNavOptions = useVerticalNav()
-  
+
 
   // Vars
   const { isBreakpointReached, transitionDuration } = verticalNavOptions
-  
+
 
   const ScrollWrapper = isBreakpointReached ? 'div' : PerfectScrollbar
 
@@ -74,7 +73,7 @@ const VerticalMenu = ({  scrollMenu }: Props) => {
     >
       {/* Incase you also want to scroll NavHeader to scroll with Vertical Menu, remove NavHeader from above and paste it below this comment */}
       {/* Vertical Menu */}
-      <Menu
+      {/* <Menu
         popoutMenuOffset={{ mainAxis: 23 }}
         menuItemStyles={menuItemStyles(verticalNavOptions, theme)}
         renderExpandIcon={({ open }) => <RenderExpandIcon open={open} transitionDuration={transitionDuration} />}
@@ -91,6 +90,12 @@ const VerticalMenu = ({  scrollMenu }: Props) => {
           <MenuItem href='/dashboards/ecommerce'>eCommerce</MenuItem>
           <MenuItem href='/dashboards/academy'>academy</MenuItem>
           <MenuItem href='/dashboards/logistics'>logistics</MenuItem>
+        </SubMenu>
+        <SubMenu
+          label='Control Panel'
+          icon={<i className='tabler-settings' />}
+        >
+          <MenuItem href='/app/role/list'>Role</MenuItem>
         </SubMenu>
         <SubMenu label='frontPages' icon={<i className='tabler-files' />}>
           <MenuItem href='/front-pages/landing-page' target='_blank'>
@@ -386,16 +391,16 @@ const VerticalMenu = ({  scrollMenu }: Props) => {
             <MenuItem disabled>disabledMenu</MenuItem>
           </SubMenu>
         </MenuSection>
-      </Menu>
-      {/* <Menu
+      </Menu> */}
+      <Menu
         popoutMenuOffset={{ mainAxis: 23 }}
         menuItemStyles={menuItemStyles(verticalNavOptions, theme)}
         renderExpandIcon={({ open }) => <RenderExpandIcon open={open} transitionDuration={transitionDuration} />}
         renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
-        <GenerateVerticalMenu menuData={menuData(dictionary)} />
-      </Menu> */}
+        <GenerateVerticalMenu menuData={menuData()} />
+      </Menu>
     </ScrollWrapper>
   )
 }

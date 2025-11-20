@@ -2,15 +2,15 @@
 import { configureStore } from '@reduxjs/toolkit'
 
 // Slice Imports
-// import chatReducer from '@/redux-store/slices/chat'
-// import calendarReducer from '@/redux-store/slices/calendar'
-// import kanbanReducer from '@/redux-store/slices/kanban'
-// import emailReducer from '@/redux-store/slices/email'
 import role from '@/app/(dashboard)/(private)/app/role/slice/index'
+import tahun_ajaran from '@/app/(dashboard)/(private)/app/tahun-ajaran/slice/index'
+import semester from '@/app/(dashboard)/(private)/app/semester/slice/index'
 
 export const store = configureStore({
   reducer: {
-    role
+    role,
+    tahun_ajaran,
+    semester
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false })
 })

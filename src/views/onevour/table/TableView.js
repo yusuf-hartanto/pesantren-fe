@@ -35,15 +35,6 @@ const TableView = ({ model, changeSort, ...res }) => {
     }
   }, [order, orderBy])
 
-  // 2 return header
-  /*
-    <TableRow>
-        <TableCell>Action</TableCell>
-        <TableCell>Product</TableCell>
-        <TableCell align='right'>Category</TableCell>
-        <TableCell align='right'>Harga Jual</TableCell>
-    </TableRow>
-     */
   const renderTableHeader = (model = [], { order, orderBy, onSort }) => {
     if (!model.fields) {
       return <></>
@@ -70,30 +61,8 @@ const TableView = ({ model, changeSort, ...res }) => {
     )
   }
 
-  // 3 return row
-  /*
-    {store.products.map(row => (
-        <TableRow key={row.id} sx={{'&:last-of-type td, &:last-of-type th': {border: 0}}}>
-            <RowAction row={row}/>
-            <TableCell component='th' scope='row'>{row.name}</TableCell>
-            <TableCell align='right'>{row.category}</TableCell>
-            <TableCell align='right'>{row.value_last}</TableCell>
-        </TableRow>
-    ))}
-
-    // backup
-
-    // is moments
-    if (moment.isMoment(o[x.key])) {
-        if (x.format) {
-            return <TableCell key={y}>{x.format(o, o[x.key])}</TableCell>
-        } else {
-            return <TableCell key={y}>Invalid format</TableCell>
-        }
-    }
-
-    */
   const renderTableRows = model => {
+
     return (
       <>
         {model &&
@@ -167,10 +136,10 @@ const TableView = ({ model, changeSort, ...res }) => {
           </TableContainer>
 
           <TablePagination
-            page={model.page}
+            page={model.page - 1}
             component='div'
             count={model.count}
-            rowsPerPage={model.rowsPerPage}
+            rowsPerPage={model.perPage}
             onPageChange={model.changePage}
             rowsPerPageOptions={[15, 30, 50]}
             onRowsPerPageChange={model.changePerPage}

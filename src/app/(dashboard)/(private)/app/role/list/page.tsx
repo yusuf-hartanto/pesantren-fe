@@ -5,8 +5,6 @@ import React, { useEffect, useState } from 'react'
 import Link, { } from 'next/link'
 import { useRouter } from 'next/navigation'
 
-import { useDispatch, useSelector } from 'react-redux'
-
 // ** MUI Imports
 import Grid from '@mui/material/Grid2'
 import Card from '@mui/material/Card'
@@ -21,6 +19,7 @@ import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 
+import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
 import { deleteRole, fetchRolePage, resetRedux } from '../slice/index'
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
@@ -30,7 +29,7 @@ import DialogDelete from '@views/onevour/components/dialog-delete'
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
 
-const statusObj = {
+const statusObj: Record<number, { color: any; value: string }> = {
   1: {
     color: 'success',
     value: 'Aktif'
@@ -41,14 +40,14 @@ const statusObj = {
   }
 }
 
-const RowAction = (data) => {
+function RowAction(data: any) {
   const [anchorEl, setAnchorEl] = useState(null)
   const [openConfirm, setOpenConfirm] = useState(false)
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const rowOptionsOpen = Boolean(anchorEl)
 
-  const setOpen = (event) => {
+  const setOpen = (event: any) => {
     setAnchorEl(event.currentTarget)
   }
 
@@ -60,7 +59,7 @@ const RowAction = (data) => {
     optionsOnClose()
   }
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: string) => {
     dispatch(deleteRole(id))
     optionsOnClose()
   }
@@ -106,20 +105,19 @@ const RowAction = (data) => {
         <DialogDelete
           id={data.row.role_name}
           open={openConfirm}
-          onClose={(event, reason) => {
+          onClose={(event: any, reason: any) => {
             if (reason !== 'backdropClick') {
               setOpenConfirm(false)
             }
-          }}
+          } }
           handleOk={() => {
-            handleDelete(data.row.id)
+            handleDelete(data.row.role_id)
             setOpenConfirm(false)
-          }}
+          } }
           handleClose={() => {
             setOpenConfirm(false)
-          }}
-          disableEscapeKeyDown={true}
-        />
+          } }
+          disableEscapeKeyDown={true} />
       </Menu>
     </TableCell>
   )
@@ -129,19 +127,20 @@ const Table = () => {
   // ** Hooks
   const router = useRouter()
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
-  const store = useSelector((state) => state.role)
+  const store = useAppSelector(state => state.role)
 
   const [filter, setFilter] = useState('')
 
   const [page, setPage] = useState(1)
 
-  const [rowsPerPage, setRowsPerPage] = useState(15)
+  const [perPage, setPerPage] = useState(15)
 
   useEffect(() => {
 
     if (store.delete) {
+      dispatch(fetchRolePage({ page: 1, perPage: perPage, q: filter }))
 
       dispatch(resetRedux())
 
@@ -152,7 +151,7 @@ const Table = () => {
     const timer = setTimeout(() => {
       setPage(1)
 
-      dispatch(fetchRolePage({ page: 1, rowsPerPage: rowsPerPage, filter: filter }))
+      dispatch(fetchRolePage({ page: 1, perPage: perPage, q: filter }))
 
     }, 500)
 
@@ -163,24 +162,24 @@ const Table = () => {
     router.replace('/app/role/form')
   }
 
-  const handleFilter = (event) => {
+  const handleFilter = (event: any) => {
     setFilter(event.target.value)
   }
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event: any, newPage: number) => {
     setPage(newPage)
-    dispatch(fetchRolePage({ page: newPage, rowsPerPage: rowsPerPage, filter: filter }))
+    dispatch(fetchRolePage({ page: newPage, perPage: perPage, q: filter }))
   }
 
-  const handleChangeRowsPerPage = (event) => {
-    const newRorPerPage = parseInt(event.target.value, 10)
+  const handleChangePerPage = (event: any) => {
+    const newPerPage = parseInt(event.target.value, 10)
 
     setPage(1)
-    setRowsPerPage(newRorPerPage)
-    dispatch(fetchRolePage({ page: 1, rowsPerPage: newRorPerPage, filter: filter }))
+    setPerPage(newPerPage)
+    dispatch(fetchRolePage({ page: 1, perPage: newPerPage, q: filter }))
   }
 
-  const renderOption = (row) => {
+  const renderOption = (row: any) => {
     return <RowAction row={row} />
   }
 
@@ -193,19 +192,18 @@ const Table = () => {
       return {
         page: page,
         fields: [
-          tableColumn('OPTION', 'act-x', 'left', renderOption),
+          tableColumn('OPTION', 'act-x', 'left', renderOption as any),
           tableColumn('NAME', 'role_name'),
           tableColumn('STATUS', 'status'),
           tableColumn('CREATED BY', 'created_by'),
           tableColumn('UPDATED BY', 'modified_by')
         ],
-        values: values?.map(row => {
+        values: values?.map((row: any) => {
           return {
             ...row,
             status: (
               <CustomChip
-                rounded
-                skin='light'
+                round='true'
                 size='small'
                 label={statusObj[row.status]?.value}
                 color={statusObj[row.status]?.color}
@@ -215,12 +213,12 @@ const Table = () => {
           }
         }),
         count: total,
-        rowsPerPage: rowsPerPage,
-        changePage: (event, newPage) => {
+        perPage: perPage,
+        changePage: (event: any, newPage: number) => {
           handleChangePage(event, newPage)
         },
-        changePerPage: (event, o) => {
-          handleChangeRowsPerPage(event)
+        changePerPage: (event: any, o: any) => {
+          handleChangePerPage(event)
         }
       }
     }
@@ -228,7 +226,7 @@ const Table = () => {
 
   return (
     <Grid container spacing={6} sx={{ width: '100%' }}>
-      <Grid item size={12}>
+      <Grid size={12}>
         <Card>
           <CardHeader title='Role' sx={{ paddingBottom: 0 }} />
           <Toolbar sx={{ paddingLeft: '1.5rem !important', paddingRight: '1.5rem !important' }}>
@@ -239,10 +237,10 @@ const Table = () => {
             </Tooltip>
             <Typography sx={{ flex: '1 1 100%' }} variant='h6' id='tableTitle' component='div'></Typography>
             <Tooltip title='Search'>
-              <TextField id='outlined-basic' label='Search' size='small' onChange={handleFilter} />
+              <TextField id='outlined-basic' fullWidth label='Search' size='small' onChange={handleFilter} />
             </Tooltip>
           </Toolbar>
-          <TableView model={buildTable()} />
+          <TableView model={buildTable()} changeSort={null}/>
         </Card>
       </Grid>
     </Grid>

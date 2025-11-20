@@ -14,8 +14,7 @@ import CardContent from '@mui/material/CardContent'
 import { toast } from 'react-toastify'
 import { useForm } from 'react-hook-form'
 
-import { useDispatch, useSelector } from 'react-redux'
-
+import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
 import { fetchRoleById, postRole, postRoleUpdate, resetRedux } from '../slice/index'
 import { field, fieldBuildSubmit, formColumn } from '@views/onevour/form/AppFormBuilder'
 
@@ -32,19 +31,6 @@ const statusOption = {
   ]
 }
 
-const freeOption = {
-  values: [
-    {
-      label: 'Ya',
-      value: true
-    },
-    {
-      label: 'Tidak',
-      value: false
-    }
-  ]
-}
-
 const FormValidationBasic = () => {
   const router = useRouter()
 
@@ -52,11 +38,27 @@ const FormValidationBasic = () => {
   const id = searchParams.get('id')
   const view = searchParams.get('view')
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
-  const store = useSelector(state => state.role)
+  const store = useAppSelector(state => state.role)
 
-  const [state, setState] = useState({})
+  interface FormData {
+    role_name: string
+    status: {
+      value: number
+      label: string
+    }
+  }
+
+  const defaultValues = {
+    role_name: '',
+    status: {
+      value: 1,
+      label: 'Aktif'
+    }
+  }
+
+  const [state, setState] = useState<FormData>(defaultValues)
 
   const [loading, setLoading] = useState(false)
 
@@ -65,7 +67,7 @@ const FormValidationBasic = () => {
     handleSubmit,
     formState: { errors },
     reset
-  } = useForm()
+  } = useForm({defaultValues})
 
   useEffect(() => {
 
@@ -75,7 +77,9 @@ const FormValidationBasic = () => {
 
         if (datas) {
           datas.status = statusOption.values.find(r => r.value === datas.status)
-          console.log('prament', datas)
+
+          //console.log('prament', datas)
+
           setState(datas)
           reset(datas)
         }
@@ -90,13 +94,7 @@ const FormValidationBasic = () => {
       toast.success('Success saved')
       onCancel()
     } else {
-      if (store.crud?.errors) {
-        store.crud?.errors?.forEach(e => {
-          toast.error(e)
-        })
-      } else {
-        toast.error('Error saved: ' + store.crud.message)
-      }
+      toast.error('Error saved: ' + store.crud.message)
 
       setLoading(false)
     }
