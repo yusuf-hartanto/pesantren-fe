@@ -1,82 +1,180 @@
 module.exports = {
-  env: {
-    node: true,
-    es6: true,
-    browser: true
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/recommended",
+    "prettier"
+  ],
+  "rules": {
+    "jsx-a11y/alt-text": "off",
+    "react/display-name": "off",
+    "react/no-children-prop": "off",
+    "@next/next/no-img-element": "off",
+    "@next/next/no-page-custom-font": "off",
+    "@typescript-eslint/consistent-type-imports": "error",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "lines-around-comment": [
+      "error",
+      {
+        "beforeBlockComment": true,
+        "beforeLineComment": true,
+        "allowBlockStart": true,
+        "allowObjectStart": true,
+        "allowArrayStart": true
+      }
+    ],
+    "padding-line-between-statements": [
+      "error",
+      {
+        "blankLine": "any",
+        "prev": "export",
+        "next": "export"
+      },
+      {
+        "blankLine": "always",
+        "prev": [
+          "const",
+          "let",
+          "var"
+        ],
+        "next": "*"
+      },
+      {
+        "blankLine": "any",
+        "prev": [
+          "const",
+          "let",
+          "var"
+        ],
+        "next": [
+          "const",
+          "let",
+          "var"
+        ]
+      },
+      {
+        "blankLine": "always",
+        "prev": "*",
+        "next": [
+          "function",
+          "multiline-const",
+          "multiline-block-like"
+        ]
+      },
+      {
+        "blankLine": "always",
+        "prev": [
+          "function",
+          "multiline-const",
+          "multiline-block-like"
+        ],
+        "next": "*"
+      }
+    ],
+    "newline-before-return": "error",
+    "import/newline-after-import": [
+      "error",
+      {
+        "count": 1
+      }
+    ],
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          [
+            "internal",
+            "parent",
+            "sibling",
+            "index"
+          ],
+          [
+            "object",
+            "unknown"
+          ]
+        ],
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "external",
+            "position": "before"
+          },
+          {
+            "pattern": "next/**",
+            "group": "external",
+            "position": "before"
+          },
+          {
+            "pattern": "~/**",
+            "group": "external",
+            "position": "before"
+          },
+          {
+            "pattern": "@/**",
+            "group": "internal"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": [
+          "react",
+          "type"
+        ],
+        "newlines-between": "always-and-inside-groups"
+      }
+    ],
+    "@typescript-eslint/ban-types": [
+      "error",
+      {
+        "extendDefaults": true,
+        "types": {
+          "Function": "Use a specific function type instead",
+          "Object": "Use object instead",
+          "Boolean": "Use boolean instead",
+          "Number": "Use number instead",
+          "String": "Use string instead",
+          "Symbol": "Use symbol instead",
+          "any": false,
+          "{}": false
+        }
+      }
+    ],
+    "unused-imports/no-unused-imports": "error"
   },
-
-  parserOptions: {
-    ecmaVersion: 6,
-    sourceType: 'module',
-    ecmaFeatures: {
-      jsx: true,
-      modules: true,
-      experimentalObjectRestSpread: true
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "import/parsers": {
+      "@typescript-eslint/parser": [
+        ".ts",
+        ".tsx"
+      ]
+    },
+    "import/resolver": {
+      "node": {},
+      "typescript": {
+        "project": "./tsconfig.json"
+      }
     }
   },
-  rules: {
-    'no-console': 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-
-    // Best Practices
-    eqeqeq: 'error',
-    'no-invalid-this': 'error',
-    'no-return-assign': 'error',
-    'no-unused-expressions': ['error', { allowTernary: true }],
-    'no-useless-concat': 'error',
-    'no-useless-return': 'error',
-
-    // Variable
-    // 'init-declarations': 'error',
-    'no-use-before-define': 'error',
-
-    // Stylistic Issues
-    'array-bracket-newline': ['error', { multiline: true, minItems: null }],
-    'array-bracket-spacing': 'error',
-    'brace-style': ['error', '1tbs', { allowSingleLine: true }],
-    'block-spacing': 'error',
-    'comma-dangle': 'error',
-    'comma-spacing': 'error',
-    'comma-style': 'error',
-    'computed-property-spacing': 'error',
-    'func-call-spacing': 'error',
-    'implicit-arrow-linebreak': ['error', 'beside'],
-    // indent: ['error', 4],
-    'keyword-spacing': 'error',
-    'multiline-ternary': ['error', 'never'],
-    // 'no-lonely-if': 'error',
-    'no-mixed-operators': 'error',
-    'no-multiple-empty-lines': ['error', { max: 2, maxEOF: 1 }],
-    'no-tabs': 'error',
-    'no-unneeded-ternary': 'error',
-    'no-whitespace-before-property': 'error',
-    'nonblock-statement-body-position': 'error',
-    'object-property-newline': ['error', { allowAllPropertiesOnSameLine: true }],
-    'quote-props': ['error', 'as-needed'],
-    // quotes: ['error', 'prefer-single'],
-    semi: ['error', 'never'],
-    'semi-spacing': 'error',
-    'space-before-blocks': 'error',
-    // 'space-before-function-paren': 'error',
-    'space-in-parens': 'error',
-    'space-infix-ops': 'error',
-    'space-unary-ops': 'error',
-
-    // ES6
-    'arrow-spacing': 'error',
-    'no-confusing-arrow': 'error',
-    'no-duplicate-imports': 'error',
-    'no-var': 'error',
-    'object-shorthand': 'error',
-    'prefer-const': 'error',
-    'prefer-template': 'error'
-  }
-
-  // rules: {
-  //   'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-  //   'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-  //   semi: ['error', 'never'],
-  //   'max-len': 'off',
-  //   camelcase: ['error', { properties: 'never', ignoreDestructuring: true, ignoreImports: true }]
-  // }
+  "overrides": [
+    {
+      "files": [
+        "*.ts",
+        "*.tsx",
+        "src/iconify-bundle/*"
+      ],
+      "rules": {
+        "@typescript-eslint/explicit-module-boundary-types": "off",
+        "@typescript-eslint/no-var-requires": "off"
+      }
+    }
+  ],
+  "plugins": [
+    "unused-imports"
+  ]
 }
