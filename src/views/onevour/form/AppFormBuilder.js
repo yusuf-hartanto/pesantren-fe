@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React, { Fragment, useEffect } from 'react'
 
 import Grid from '@mui/material/Grid2'
 import FormControl from '@mui/material/FormControl'
@@ -13,6 +13,15 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Button from '@mui/material/Button'
 import FormHelperText from '@mui/material/FormHelperText'
 import CircularProgress from '@mui/material/CircularProgress'
+
+// Tiptap Imports
+import { useEditor, EditorContent } from '@tiptap/react'
+import { StarterKit } from '@tiptap/starter-kit'
+import { Underline } from '@tiptap/extension-underline'
+import { Placeholder } from '@tiptap/extension-placeholder'
+import { TextAlign } from '@tiptap/extension-text-align'
+import IconButton from '@mui/material/IconButton'
+import Tooltip from '@mui/material/Tooltip'
 
 // numeral
 import Cleave from 'cleave.js/react'
@@ -244,7 +253,7 @@ export function formColumnSingleDetailField(state, o, i) {
     <>
       <label>{o?.label}</label>
       {'text' === o?.type ? textField(state, o?.control, o?.label, o?.type, o?.key, o?.option, o?.placeholder) : null}
-      {'editor' === o?.type ? textFieldEditor(state, o?.control, o?.key, o?.placeholder, o.ref) : null}
+      {'editor' === o?.type ? TextFieldEditor(state, o?.control, o?.key, o?.placeholder, o.ref) : null}
       {'select' === o?.type
         ? selectField(state, o?.control, o?.key, o?.option?.is_number, o?.placeholder, o?.options, o.callback)
         : null}
@@ -742,7 +751,7 @@ export function formColumnDetailField(form) {
     return (
       <Grid item size={{ xs: 12, sm: 12 }} key={index}>
         <FormControl fullWidth size='small'>
-          {textFieldEditor(form)}
+          {TextFieldEditor(form)}
         </FormControl>
       </Grid>
     )
@@ -908,11 +917,12 @@ const textField = form => {
                 shrink: true,
                 readOnly: props.readOnly
               }
-            }} />
-        );
+            }}
+          />
+        )
       }}
     />
-  );
+  )
 }
 
 const checkboxField = form => {
@@ -1034,11 +1044,12 @@ const numeralField = form => {
               inputLabel: {
                 shrink: true
               }
-            }} />
-        );
+            }}
+          />
+        )
       }}
     />
-  );
+  )
 }
 
 export function editorStateHtml(text) {
@@ -1051,35 +1062,147 @@ export function editorStateHtml(text) {
   )
 }
 
-const textFieldEditor = form => {
-  let session = form.session
-  let props = form.props
+// Toolbar Component
+const EditorToolbar = ({ editor }) => {
+  if (!editor) return null
 
-  // let {control, session, props} = form
-  const { options, key } = props
+  const getColor = active => (active ? 'primary' : 'default')
 
-  const onUpdateText = result => {
-    let store = { ...session.state }
+  return (
+    <div className='flex flex-wrap gap-2 p-3'>
+      <Tooltip title='Bold'>
+        <IconButton
+          type='button'
+          color={getColor(editor.isActive('bold'))}
+          onClick={() => editor.chain().focus().toggleBold().run()}
+        >
+          <i className='tabler-bold' />
+        </IconButton>
+      </Tooltip>
 
-    store[key] = result
-    session.setState(store)
-    console.log('update', key, result)
-  }
+      <Tooltip title='Underline'>
+        <IconButton
+          type='button'
+          color={getColor(editor.isActive('underline'))}
+          onClick={() => editor.chain().focus().toggleUnderline().run()}
+        >
+          <i className='tabler-underline' />
+        </IconButton>
+      </Tooltip>
+
+      <Tooltip title='Italic'>
+        <IconButton
+          type='button'
+          color={getColor(editor.isActive('italic'))}
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+        >
+          <i className='tabler-italic' />
+        </IconButton>
+      </Tooltip>
+
+      <Tooltip title='Strikethrough'>
+        <IconButton
+          type='button'
+          color={getColor(editor.isActive('strike'))}
+          onClick={() => editor.chain().focus().toggleStrike().run()}
+        >
+          <i className='tabler-strikethrough' />
+        </IconButton>
+      </Tooltip>
+
+      {/* Alignment */}
+      <Tooltip title='Align Left'>
+        <IconButton
+          type='button'
+          color={getColor(editor.isActive({ textAlign: 'left' }))}
+          onClick={() => editor.chain().focus().setTextAlign('left').run()}
+        >
+          <i className='tabler-align-left' />
+        </IconButton>
+      </Tooltip>
+
+      <Tooltip title='Align Center'>
+        <IconButton
+          type='button'
+          color={getColor(editor.isActive({ textAlign: 'center' }))}
+          onClick={() => editor.chain().focus().setTextAlign('center').run()}
+        >
+          <i className='tabler-align-center' />
+        </IconButton>
+      </Tooltip>
+
+      <Tooltip title='Align Right'>
+        <IconButton
+          type='button'
+          color={getColor(editor.isActive({ textAlign: 'right' }))}
+          onClick={() => editor.chain().focus().setTextAlign('right').run()}
+        >
+          <i className='tabler-align-right' />
+        </IconButton>
+      </Tooltip>
+
+      <Tooltip title='Justify'>
+        <IconButton
+          type='button'
+          color={getColor(editor.isActive({ textAlign: 'justify' }))}
+          onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+        >
+          <i className='tabler-align-justified' />
+        </IconButton>
+      </Tooltip>
+    </div>
+  )
+}
+
+const TextFieldEditor = form => {
+  const { session, props } = form
+  const { key, label, options } = props
+
+  // Editor instance
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure(),
+      Underline,
+      Placeholder.configure({
+        placeholder: 'Write something here...'
+      }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph']
+      })
+    ],
+    content: options?.default || '',
+    onUpdate({ editor }) {
+      const html = editor.getHTML()
+
+      let store = { ...session.state }
+
+      store[key] = html
+      session.setState(store)
+
+      console.log('update', key, html)
+    }
+  })
+
+  // If incoming value changes → update editor
+  useEffect(() => {
+    if (editor && session.state[key] !== undefined) {
+      editor.commands.setContent(session.state[key])
+    }
+  }, [session.state[key]])
 
   return (
     <>
-      <FormHelperText id='validation-basic-last-name'>{props.label}</FormHelperText>
-      <EditorWrapper>
-        <ReactDraftWysiwyg
-          editorState={options.editor}
-          onEditorStateChange={data => {
-            let resultData = draftToHtml(convertToRaw(data.getCurrentContent()))
+      <FormHelperText>{label}</FormHelperText>
 
-            onUpdateText(resultData)
-            options.setEditor(data)
-          }}
-        />
-      </EditorWrapper>
+      <div className='border rounded-md mt-2'>
+        <EditorToolbar editor={editor} />
+
+        <div className='border-t p-3'>
+          <div className='min-h-[180px]'>
+            <EditorContent editor={editor} className='min-h-[180px] w-full focus:outline-none' />
+          </div>
+        </div>
+      </div>
     </>
   )
 }
@@ -1155,7 +1278,8 @@ const selectField = form => {
                   inputLabel: {
                     shrink: true
                   }
-                }} />
+                }}
+              />
             )}
             renderOption={(props, option) => (
               <Box
@@ -1179,10 +1303,10 @@ const selectField = form => {
             )}
             disabled={props.readOnly}
           />
-        );
+        )
       }}
     />
-  );
+  )
 }
 
 const selectMultiField = form => {
@@ -1257,13 +1381,14 @@ const selectMultiField = form => {
                   inputLabel: {
                     shrink: true
                   }
-                }} />
+                }}
+              />
             )}
           />
-        );
+        )
       }}
     />
-  );
+  )
 }
 
 const selectDate = form => {
@@ -1425,11 +1550,12 @@ export function textareaField(form) {
               inputLabel: {
                 shrink: true
               }
-            }} />
-        );
+            }}
+          />
+        )
       }}
     />
-  );
+  )
 }
 
 export function textFieldFile(state, key, placeholder, ref) {
