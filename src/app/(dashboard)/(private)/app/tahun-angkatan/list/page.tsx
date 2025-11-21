@@ -20,7 +20,7 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import { deleteTingkat, fetchTingkatPage, resetRedux } from '../slice/index'
+import { deleteTahunAngkatan, fetchTahunAngkatanPage, resetRedux } from '../slice/index'
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
 import DialogDelete from '@views/onevour/components/dialog-delete'
@@ -59,7 +59,7 @@ function RowAction(data: any) {
   }
 
   const handleDelete = (id: string) => {
-    dispatch(deleteTingkat(id))
+    dispatch(deleteTahunAngkatan(id))
     optionsOnClose()
   }
 
@@ -82,7 +82,7 @@ function RowAction(data: any) {
         <MenuItem
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
-          href={`/app/tingkat/form?id=${data.row.id_tingkat}&view=true`}
+          href={`/app/tahun-angkatan/form?id=${data.row.id_angkatan}&view=true`}
           onClick={handleView}
         >
           <i className='tabler-eye' />
@@ -92,7 +92,7 @@ function RowAction(data: any) {
         <MenuItem
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
-          href={`/app/tingkat/form?id=${data.row.id_tingkat}`}
+          href={`/app/tahun-angkatan/form?id=${data.row.id_angkatan}`}
           onClick={handleView}
         >
           <i className='tabler-edit' />
@@ -104,7 +104,7 @@ function RowAction(data: any) {
           Delete
         </MenuItem>
         <DialogDelete
-          id={data.row.tingkat}
+          id={data.row.tahun_angkatan}
           open={openConfirm}
           onClose={(event: any, reason: any) => {
             if (reason !== 'backdropClick') {
@@ -112,7 +112,7 @@ function RowAction(data: any) {
             }
           }}
           handleOk={() => {
-            handleDelete(data.row.id_tingkat)
+            handleDelete(data.row.id_angkatan)
             setOpenConfirm(false)
           }}
           handleClose={() => {
@@ -131,7 +131,7 @@ const Table = () => {
 
   const dispatch = useAppDispatch()
 
-  const store = useAppSelector(state => state.tingkat)
+  const store = useAppSelector(state => state.tahun_angkatan)
 
   const [filter, setFilter] = useState('')
 
@@ -141,7 +141,7 @@ const Table = () => {
 
   useEffect(() => {
     if (store.delete) {
-      dispatch(fetchTingkatPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(fetchTahunAngkatanPage({ page: 1, perPage: perPage, q: filter }))
 
       dispatch(resetRedux())
     }
@@ -151,14 +151,14 @@ const Table = () => {
     const timer = setTimeout(() => {
       setPage(1)
 
-      dispatch(fetchTingkatPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(fetchTahunAngkatanPage({ page: 1, perPage: perPage, q: filter }))
     }, 500)
 
     return () => clearTimeout(timer)
   }, [filter])
 
   const onSubmit = () => {
-    router.replace('/app/tingkat/form')
+    router.replace('/app/tahun-angkatan/form')
   }
 
   const handleFilter = (event: any) => {
@@ -167,7 +167,7 @@ const Table = () => {
 
   const handleChangePage = (event: any, newPage: number) => {
     setPage(newPage)
-    dispatch(fetchTingkatPage({ page: newPage, perPage: perPage, q: filter }))
+    dispatch(fetchTahunAngkatanPage({ page: newPage, perPage: perPage, q: filter }))
   }
 
   const handleChangePerPage = (event: any) => {
@@ -175,7 +175,7 @@ const Table = () => {
 
     setPage(1)
     setPerPage(newPerPage)
-    dispatch(fetchTingkatPage({ page: 1, perPage: newPerPage, q: filter }))
+    dispatch(fetchTahunAngkatanPage({ page: 1, perPage: newPerPage, q: filter }))
   }
 
   const renderOption = (row: any) => {
@@ -192,7 +192,7 @@ const Table = () => {
         page: page,
         fields: [
           tableColumn('OPTION', 'act-x', 'left', renderOption as any),
-          tableColumn('TINGKAT', 'tingkat'),
+          tableColumn('TAHUN ANGKATAN', 'tahun_angkatan'),
           tableColumn('KETERANGAN', 'keterangan'),
           tableColumn('NOMOR URUT', 'nomor_urut')
         ],
@@ -217,7 +217,7 @@ const Table = () => {
     <Grid container spacing={6} sx={{ width: '100%' }}>
       <Grid size={12}>
         <Card>
-          <CardHeader title='Tingkat' sx={{ paddingBottom: 0 }} />
+          <CardHeader title='Tahun Angkatan' sx={{ paddingBottom: 0 }} />
           <Toolbar sx={{ paddingLeft: '1.5rem !important', paddingRight: '1.5rem !important' }}>
             <Tooltip title='Add'>
               <Button size='medium' variant='outlined' onClick={onSubmit}>

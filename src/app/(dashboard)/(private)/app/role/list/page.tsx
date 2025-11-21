@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
 import React, { useEffect, useState } from 'react'
 
-import Link, { } from 'next/link'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 // ** MUI Imports
@@ -76,7 +76,9 @@ function RowAction(data: any) {
         onClose={optionsOnClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{ style: { minWidth: '8rem' } }}
+        slotProps={{
+          paper: { style: { minWidth: '8rem' } }
+        }}
       >
         <MenuItem
           component={Link}
@@ -109,15 +111,16 @@ function RowAction(data: any) {
             if (reason !== 'backdropClick') {
               setOpenConfirm(false)
             }
-          } }
+          }}
           handleOk={() => {
             handleDelete(data.row.role_id)
             setOpenConfirm(false)
-          } }
+          }}
           handleClose={() => {
             setOpenConfirm(false)
-          } }
-          disableEscapeKeyDown={true} />
+          }}
+          disableEscapeKeyDown={true}
+        />
       </Menu>
     </TableCell>
   )
@@ -138,12 +141,10 @@ const Table = () => {
   const [perPage, setPerPage] = useState(15)
 
   useEffect(() => {
-
     if (store.delete) {
       dispatch(fetchRolePage({ page: 1, perPage: perPage, q: filter }))
 
       dispatch(resetRedux())
-
     }
   }, [dispatch, store.delete])
 
@@ -152,7 +153,6 @@ const Table = () => {
       setPage(1)
 
       dispatch(fetchRolePage({ page: 1, perPage: perPage, q: filter }))
-
     }, 500)
 
     return () => clearTimeout(timer)
@@ -240,7 +240,7 @@ const Table = () => {
               <TextField id='outlined-basic' fullWidth label='Search' size='small' onChange={handleFilter} />
             </Tooltip>
           </Toolbar>
-          <TableView model={buildTable()} changeSort={null}/>
+          <TableView model={buildTable()} changeSort={null} />
         </Card>
       </Grid>
     </Grid>

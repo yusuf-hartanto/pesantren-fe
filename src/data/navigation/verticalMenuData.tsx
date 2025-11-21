@@ -69,6 +69,11 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
         label: 'Tingkat',
         icon: 'tabler-circle',
         href: '/app/tingkat/list'
+      },
+      {
+        label: 'Tahun Angkatan',
+        icon: 'tabler-circle',
+        href: '/app/tahun-angkatan/list'
       }
     ]
   }

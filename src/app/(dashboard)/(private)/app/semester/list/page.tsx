@@ -76,7 +76,9 @@ function RowAction(data: any) {
         onClose={optionsOnClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        PaperProps={{ style: { minWidth: '8rem' } }}
+        slotProps={{
+          paper: { style: { minWidth: '8rem' } }
+        }}
       >
         <MenuItem
           component={Link}
