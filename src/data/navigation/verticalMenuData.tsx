@@ -74,21 +74,6 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
         label: 'Tahun Angkatan',
         icon: 'tabler-circle',
         href: '/app/tahun-angkatan/list'
-      },
-      {
-        label: 'Status Awal Santri',
-        icon: 'tabler-circle',
-        href: '/app/status-awal-santri/list'
-      },
-      {
-        label: 'Jenis Beasiswa',
-        icon: 'tabler-circle',
-        href: '/app/jenis-beasiswa/list'
-      },
-      {
-        label: 'Program Pesantren',
-        icon: 'tabler-circle',
-        href: '/app/program-pesantren/list'
       }
     ]
   }

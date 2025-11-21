@@ -908,12 +908,11 @@ const textField = form => {
                 shrink: true,
                 readOnly: props.readOnly
               }
-            }}
-          />
-        )
+            }} />
+        );
       }}
     />
-  )
+  );
 }
 
 const checkboxField = form => {
@@ -1035,12 +1034,11 @@ const numeralField = form => {
               inputLabel: {
                 shrink: true
               }
-            }}
-          />
-        )
+            }} />
+        );
       }}
     />
-  )
+  );
 }
 
 export function editorStateHtml(text) {
@@ -1157,8 +1155,7 @@ const selectField = form => {
                   inputLabel: {
                     shrink: true
                   }
-                }}
-              />
+                }} />
             )}
             renderOption={(props, option) => (
               <Box
@@ -1182,10 +1179,10 @@ const selectField = form => {
             )}
             disabled={props.readOnly}
           />
-        )
+        );
       }}
     />
-  )
+  );
 }
 
 const selectMultiField = form => {
@@ -1260,14 +1257,13 @@ const selectMultiField = form => {
                   inputLabel: {
                     shrink: true
                   }
-                }}
-              />
+                }} />
             )}
           />
-        )
+        );
       }}
     />
-  )
+  );
 }
 
 const selectDate = form => {
@@ -1429,12 +1425,11 @@ export function textareaField(form) {
               inputLabel: {
                 shrink: true
               }
-            }}
-          />
-        )
+            }} />
+        );
       }}
     />
-  )
+  );
 }
 
 export function textFieldFile(state, key, placeholder, ref) {
