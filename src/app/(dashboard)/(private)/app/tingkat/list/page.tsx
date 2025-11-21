@@ -20,10 +20,9 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import { deleteTahunAjaran, fetchTahunAjaranPage, resetRedux } from '../slice/index'
+import { deleteTingkat, fetchTingkatPage, resetRedux } from '../slice/index'
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
-import CustomChip from '@core/components/mui/Chip'
 import DialogDelete from '@views/onevour/components/dialog-delete'
 
 // Generated Icon CSS Imports
@@ -60,7 +59,7 @@ function RowAction(data: any) {
   }
 
   const handleDelete = (id: string) => {
-    dispatch(deleteTahunAjaran(id))
+    dispatch(deleteTingkat(id))
     optionsOnClose()
   }
 
@@ -81,7 +80,7 @@ function RowAction(data: any) {
         <MenuItem
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
-          href={`/app/tahun-ajaran/form?id=${data.row.id_tahunajaran}&view=true`}
+          href={`/app/tingkat/form?id=${data.row.id_tingkat}&view=true`}
           onClick={handleView}
         >
           <i className='tabler-eye' />
@@ -91,7 +90,7 @@ function RowAction(data: any) {
         <MenuItem
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
-          href={`/app/tahun-ajaran/form?id=${data.row.id_tahunajaran}`}
+          href={`/app/tingkat/form?id=${data.row.id_tingkat}`}
           onClick={handleView}
         >
           <i className='tabler-edit' />
@@ -103,7 +102,7 @@ function RowAction(data: any) {
           Delete
         </MenuItem>
         <DialogDelete
-          id={data.row.tahun_ajaran}
+          id={data.row.tingkat}
           open={openConfirm}
           onClose={(event: any, reason: any) => {
             if (reason !== 'backdropClick') {
@@ -111,7 +110,7 @@ function RowAction(data: any) {
             }
           }}
           handleOk={() => {
-            handleDelete(data.row.id_tahunajaran)
+            handleDelete(data.row.id_tingkat)
             setOpenConfirm(false)
           }}
           handleClose={() => {
@@ -130,7 +129,7 @@ const Table = () => {
 
   const dispatch = useAppDispatch()
 
-  const store = useAppSelector(state => state.tahun_ajaran)
+  const store = useAppSelector(state => state.tingkat)
 
   const [filter, setFilter] = useState('')
 
@@ -140,7 +139,7 @@ const Table = () => {
 
   useEffect(() => {
     if (store.delete) {
-      dispatch(fetchTahunAjaranPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(fetchTingkatPage({ page: 1, perPage: perPage, q: filter }))
 
       dispatch(resetRedux())
     }
@@ -150,14 +149,14 @@ const Table = () => {
     const timer = setTimeout(() => {
       setPage(1)
 
-      dispatch(fetchTahunAjaranPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(fetchTingkatPage({ page: 1, perPage: perPage, q: filter }))
     }, 500)
 
     return () => clearTimeout(timer)
   }, [filter])
 
   const onSubmit = () => {
-    router.replace('/app/tahun-ajaran/form')
+    router.replace('/app/tingkat/form')
   }
 
   const handleFilter = (event: any) => {
@@ -166,7 +165,7 @@ const Table = () => {
 
   const handleChangePage = (event: any, newPage: number) => {
     setPage(newPage)
-    dispatch(fetchTahunAjaranPage({ page: newPage, perPage: perPage, q: filter }))
+    dispatch(fetchTingkatPage({ page: newPage, perPage: perPage, q: filter }))
   }
 
   const handleChangePerPage = (event: any) => {
@@ -174,7 +173,7 @@ const Table = () => {
 
     setPage(1)
     setPerPage(newPerPage)
-    dispatch(fetchTahunAjaranPage({ page: 1, perPage: newPerPage, q: filter }))
+    dispatch(fetchTingkatPage({ page: 1, perPage: newPerPage, q: filter }))
   }
 
   const renderOption = (row: any) => {
@@ -191,23 +190,13 @@ const Table = () => {
         page: page,
         fields: [
           tableColumn('OPTION', 'act-x', 'left', renderOption as any),
-          tableColumn('TAHUN AJARAN', 'tahun_ajaran'),
-          tableColumn('STATUS', 'status'),
+          tableColumn('TINGKAT', 'tingkat'),
           tableColumn('KETERANGAN', 'keterangan'),
           tableColumn('NOMOR URUT', 'nomor_urut')
         ],
         values: values?.map((row: any) => {
           return {
-            ...row,
-            status: (
-              <CustomChip
-                round='true'
-                size='small'
-                label={statusObj[row.status]?.value}
-                color={statusObj[row.status]?.color}
-                sx={{ textTransform: 'capitalize' }}
-              />
-            )
+            ...row
           }
         }),
         count: total,
@@ -226,7 +215,7 @@ const Table = () => {
     <Grid container spacing={6} sx={{ width: '100%' }}>
       <Grid size={12}>
         <Card>
-          <CardHeader title='Tahun Ajaran' sx={{ paddingBottom: 0 }} />
+          <CardHeader title='Tingkat' sx={{ paddingBottom: 0 }} />
           <Toolbar sx={{ paddingLeft: '1.5rem !important', paddingRight: '1.5rem !important' }}>
             <Tooltip title='Add'>
               <Button size='medium' variant='outlined' onClick={onSubmit}>

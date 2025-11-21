@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
 import React, { useEffect, useState } from 'react'
 
-import Link, { } from 'next/link'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 // ** MUI Imports
@@ -103,21 +103,22 @@ function RowAction(data: any) {
           Delete
         </MenuItem>
         <DialogDelete
-          id={data.row.role_name}
+          id={data.row.nama_semester}
           open={openConfirm}
           onClose={(event: any, reason: any) => {
             if (reason !== 'backdropClick') {
               setOpenConfirm(false)
             }
-          } }
+          }}
           handleOk={() => {
             handleDelete(data.row.id_semester)
             setOpenConfirm(false)
-          } }
+          }}
           handleClose={() => {
             setOpenConfirm(false)
-          } }
-          disableEscapeKeyDown={true} />
+          }}
+          disableEscapeKeyDown={true}
+        />
       </Menu>
     </TableCell>
   )
@@ -138,12 +139,10 @@ const Table = () => {
   const [perPage, setPerPage] = useState(15)
 
   useEffect(() => {
-
     if (store.delete) {
       dispatch(fetchSemesterPage({ page: 1, perPage: perPage, q: filter }))
 
       dispatch(resetRedux())
-
     }
   }, [dispatch, store.delete])
 
@@ -152,7 +151,6 @@ const Table = () => {
       setPage(1)
 
       dispatch(fetchSemesterPage({ page: 1, perPage: perPage, q: filter }))
-
     }, 500)
 
     return () => clearTimeout(timer)
@@ -242,7 +240,7 @@ const Table = () => {
               <TextField id='outlined-basic' fullWidth label='Search' size='small' onChange={handleFilter} />
             </Tooltip>
           </Toolbar>
-          <TableView model={buildTable()} changeSort={null}/>
+          <TableView model={buildTable()} changeSort={null} />
         </Card>
       </Grid>
     </Grid>

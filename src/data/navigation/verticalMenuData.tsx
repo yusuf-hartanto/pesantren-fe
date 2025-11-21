@@ -21,7 +21,7 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
         label: 'analytics',
         icon: 'tabler-circle',
         href: '/dashboards/analytics'
-      },
+      }
 
       // {
       //   label: 'eCommerce',
@@ -48,7 +48,7 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
         label: 'Role',
         icon: 'tabler-circle',
         href: '/app/role/list'
-      },
+      }
     ]
   },
   {
@@ -65,8 +65,13 @@ const verticalMenuData = (): VerticalMenuDataType[] => [
         icon: 'tabler-circle',
         href: '/app/semester/list'
       },
+      {
+        label: 'Tingkat',
+        icon: 'tabler-circle',
+        href: '/app/tingkat/list'
+      }
     ]
-  },
+  }
 
   // {
   //   label: 'frontPages',

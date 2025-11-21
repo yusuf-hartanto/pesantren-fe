@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from 'react'
+import React, { Fragment } from 'react'
 
 import Grid from '@mui/material/Grid2'
 import FormControl from '@mui/material/FormControl'
@@ -27,12 +27,9 @@ import Box from '@mui/material/Box'
 import {
   updateFile,
   updateValueDate,
-  updateValueEditor,
   updateValueMaskingThousand,
   updateValueNumber,
   updateValueSelect,
-  updateValueSelected,
-  updateValueSelectedDate,
   updateValueSelectMulti,
   updateValueText
 } from './AppFormInputCommons'
@@ -223,7 +220,6 @@ export function formColumnSingleDetailField(state, o, i) {
   }
 
   if ('submit-cancel' === o?.type) {
-
     return (
       <Fragment>
         <button type='submit' className='btn btn-success mr-2'>
@@ -237,7 +233,6 @@ export function formColumnSingleDetailField(state, o, i) {
   }
 
   if ('space' === o?.type) {
-
     return (
       <Fragment>
         <Grid item size={{ xs: 12, sm: 6 }} key={index} />
@@ -892,30 +887,32 @@ const textField = form => {
               }
             }}
             onClick={props?.options?.onClick}
-            InputLabelProps={{
-              shrink: true,
-              readOnly: props.readOnly
-            }}
-            InputProps={{
-              inputProps: {
-                readOnly: props.readOnly,
-                inputRef: props.ref
-              },
-              startAdornment: props.startAdornment ? (
-                <InputAdornment position='start'>{props.startAdornment}</InputAdornment>
-              ) : null,
-              endAdornment: props.endAdornment ? (
-                <InputAdornment position='end'>{props.endAdornment}</InputAdornment>
-              ) : null,
-              className: props.readOnly ? 'Mui-disabled' : ''
-            }}
             autoFocus={props.autoFocus}
             {...(errors[props.key] && { helperText: errors[props.key].message })}
-          />
-        )
+            slotProps={{
+              input: {
+                inputProps: {
+                  readOnly: props.readOnly,
+                  inputRef: props.ref
+                },
+                startAdornment: props.startAdornment ? (
+                  <InputAdornment position='start'>{props.startAdornment}</InputAdornment>
+                ) : null,
+                endAdornment: props.endAdornment ? (
+                  <InputAdornment position='end'>{props.endAdornment}</InputAdornment>
+                ) : null,
+                className: props.readOnly ? 'Mui-disabled' : ''
+              },
+
+              inputLabel: {
+                shrink: true,
+                readOnly: props.readOnly
+              }
+            }} />
+        );
       }}
     />
-  )
+  );
 }
 
 const checkboxField = form => {
@@ -1013,33 +1010,35 @@ const numeralField = form => {
                 props?.options?.onChange(e.target.value)
               }
             }}
-            InputProps={{
-              inputComponent: MaskedTextField,
-              inputProps: {
-                inputRef: props.ref,
-                options: {
-                  numeral: true,
-                  numeralThousandsGroupStyle: 'thousand'
-                },
-                readOnly: props.readOnly
-              },
-              startAdornment: props.startAdornment ? (
-                <InputAdornment position='start'>{props.startAdornment}</InputAdornment>
-              ) : null,
-              endAdornment: props.endAdornment ? (
-                <InputAdornment position='end'>{props.endAdornment}</InputAdornment>
-              ) : null,
-              className: props.readOnly ? 'Mui-disabled' : ''
-            }}
-            InputLabelProps={{
-              shrink: true
-            }}
             autoFocus={props.autoFocus}
-          />
-        )
+            slotProps={{
+              input: {
+                inputComponent: MaskedTextField,
+                inputProps: {
+                  inputRef: props.ref,
+                  options: {
+                    numeral: true,
+                    numeralThousandsGroupStyle: 'thousand'
+                  },
+                  readOnly: props.readOnly
+                },
+                startAdornment: props.startAdornment ? (
+                  <InputAdornment position='start'>{props.startAdornment}</InputAdornment>
+                ) : null,
+                endAdornment: props.endAdornment ? (
+                  <InputAdornment position='end'>{props.endAdornment}</InputAdornment>
+                ) : null,
+                className: props.readOnly ? 'Mui-disabled' : ''
+              },
+
+              inputLabel: {
+                shrink: true
+              }
+            }} />
+        );
       }}
     />
-  )
+  );
 }
 
 export function editorStateHtml(text) {
@@ -1146,15 +1145,17 @@ const selectField = form => {
                 label={props.label}
                 error={Boolean(errors[props.key])}
                 placeholder={props.placeholder}
-                inputProps={{
-                  ...params.inputProps,
-                  autoComplete: 'new-password', // disable autocomplete and autofill,
-                  inputRef: props.ref
-                }}
-                InputLabelProps={{
-                  shrink: true
-                }}
-              />
+                slotProps={{
+                  htmlInput: {
+                    ...params.inputProps,
+                    autoComplete: 'new-password', // disable autocomplete and autofill,
+                    inputRef: props.ref
+                  },
+
+                  inputLabel: {
+                    shrink: true
+                  }
+                }} />
             )}
             renderOption={(props, option) => (
               <Box
@@ -1178,10 +1179,10 @@ const selectField = form => {
             )}
             disabled={props.readOnly}
           />
-        )
+        );
       }}
     />
-  )
+  );
 }
 
 const selectMultiField = form => {
@@ -1247,20 +1248,22 @@ const selectMultiField = form => {
                 label={props.label}
                 error={Boolean(errors[props.key])}
                 placeholder={props.placeholder}
-                inputProps={{
-                  ...params.inputProps,
-                  autoComplete: 'new-password' // disable autocomplete and autofill
-                }}
-                InputLabelProps={{
-                  shrink: true
-                }}
-              />
+                slotProps={{
+                  htmlInput: {
+                    ...params.inputProps,
+                    autoComplete: 'new-password' // disable autocomplete and autofill
+                  },
+
+                  inputLabel: {
+                    shrink: true
+                  }
+                }} />
             )}
           />
-        )
+        );
       }}
     />
-  )
+  );
 }
 
 const selectDate = form => {
@@ -1317,7 +1320,6 @@ const selectDate = form => {
               }
             }}
             placeholderText='Click to select a date'
-
             //customInput={<PickersCustomInput label={props.label} />}
             disabled={props.readOnly}
             portalId={props.portalId}
@@ -1411,21 +1413,23 @@ export function textareaField(form) {
               onChange(e) // trigger for default value useForm
               updateValueText(session, props, e)
             }}
-            InputLabelProps={{
-              shrink: true
-            }}
-            InputProps={{
-              inputProps: {
-                readOnly: props.readOnly,
-                inputRef: props.ref
-              }
-            }}
             onClick={props?.options?.onClick}
-          />
-        )
+            slotProps={{
+              input: {
+                inputProps: {
+                  readOnly: props.readOnly,
+                  inputRef: props.ref
+                }
+              },
+
+              inputLabel: {
+                shrink: true
+              }
+            }} />
+        );
       }}
     />
-  )
+  );
 }
 
 export function textFieldFile(state, key, placeholder, ref) {
