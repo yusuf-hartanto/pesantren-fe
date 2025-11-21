@@ -132,7 +132,12 @@ code {
   border: 0;
 }
 
-.demo-space-x>* {
+.demo-space-x > * {
   margin-top: 1rem !important;
   margin-right: 1rem !important;
+}
+
+.ProseMirror {
+  min-height: 180px !important;
+  padding: 12px;
 }

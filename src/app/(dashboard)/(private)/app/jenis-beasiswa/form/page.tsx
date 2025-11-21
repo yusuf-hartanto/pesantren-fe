@@ -151,7 +151,7 @@ const FormValidationBasic = () => {
         readOnly: Boolean(view)
       }),
       field({
-        type: 'textarea',
+        type: 'text',
         key: 'keterangan',
         label: 'Keterangan',
         placeholder: 'Input Keterangan',
