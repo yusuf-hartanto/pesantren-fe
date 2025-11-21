@@ -1,7 +1,7 @@
 {
-  "name": "vuexy-mui-nextjs-admin-template",
+  "name": "pesantren",
   "version": "4.0.0",
-  "license": "Commercial",
+  "license": "ISC",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
