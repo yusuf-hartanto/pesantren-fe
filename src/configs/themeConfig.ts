@@ -51,10 +51,12 @@ export type Config = {
   footer: Footer
   disableRipple: boolean
   toastPosition: ToastPosition
+  sada: string
+  logo: string
 }
 
 const themeConfig: Config = {
-  templateName: 'Pesantren',
+  templateName: 'SADA',
   homePageUrl: '/dashboards/analytics',
   settingsCookieName: 'pesantren-cookie',
   mode: 'light', // 'system', 'light', 'dark'
@@ -77,7 +79,9 @@ const themeConfig: Config = {
     detached: true //! true, false (This will not work in the Horizontal Layout)
   },
   disableRipple: false, // true, false
-  toastPosition: 'top-right' // 'top-right', 'top-center', 'top-left', 'bottom-right', 'bottom-center', 'bottom-left'
+  toastPosition: 'top-right', // 'top-right', 'top-center', 'top-left', 'bottom-right', 'bottom-center', 'bottom-left'
+  sada: '/sada/sada.png',
+  logo: '/sada/sada-logo.png',
 }
 
 export default themeConfig

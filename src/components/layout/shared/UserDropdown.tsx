@@ -5,7 +5,7 @@ import { useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
 
 // Next Imports
-import { useParams, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 // MUI Imports
 import { styled } from '@mui/material/styles'
@@ -47,7 +47,7 @@ const UserDropdown = () => {
   // Hooks
   const router = useRouter()
   const { data: session } = useSession()
-  const { settings } = useSettings()
+  const { updateSettings, settings } = useSettings()
 
   const handleDropdownOpen = () => {
     !open ? setOpen(true) : setOpen(false)
@@ -69,11 +69,9 @@ const UserDropdown = () => {
     try {
       // Sign out from the app
       await signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+      updateSettings({ layout: 'vertical' })
     } catch (error) {
       console.error(error)
-
-      // Show above error in a toast like following
-      // toastService.error((err as Error).message)
     }
   }
 

@@ -11,7 +11,6 @@ import styled from '@emotion/styled'
 import type { VerticalNavContextProps } from '@menu/contexts/verticalNavContext'
 
 // Component Imports
-import VuexyLogo from '@core/svg/Logo'
 
 // Config Imports
 import themeConfig from '@configs/themeConfig'
@@ -68,10 +67,14 @@ const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isHovered, layout, isBreakpointReached])
-
+  
   return (
     <div className='flex items-center'>
-      <VuexyLogo className='text-2xl text-primary' />
+      <img
+        src={layout === 'collapsed' ? themeConfig.logo : themeConfig.sada}
+        alt='logo'
+        width={layout === 'collapsed' ? 50 : 175}
+      />
       <LogoText
         color={color}
         ref={logoTextRef}
@@ -80,7 +83,6 @@ const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
         transitionDuration={transitionDuration}
         isBreakpointReached={isBreakpointReached}
       >
-        {themeConfig.templateName}
       </LogoText>
     </div>
   )

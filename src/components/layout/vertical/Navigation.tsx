@@ -5,7 +5,6 @@ import { useEffect, useRef } from 'react'
 
 // Next Imports
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
 
 // MUI Imports
 import { styled, useColorScheme, useTheme } from '@mui/material/styles'
