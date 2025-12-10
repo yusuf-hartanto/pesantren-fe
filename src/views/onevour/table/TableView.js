@@ -10,21 +10,6 @@ import TableBody from '@mui/material/TableBody'
 import TablePagination from '@mui/material/TablePagination'
 import TableSortLabel from '@mui/material/TableSortLabel'
 
-/*
-* = {
-    fields: [],
-    values: [],
-    count: 0,
-    rowsPerPage: 0,
-    changePage: (row, o) => {
-        console.warn("not implement paging callback")
-    },
-    changePerPage: (row, o) => {
-        console.warn("not implement paging callback")
-    }
-}
-* */
-
 const TableView = ({ model, changeSort, ...res }) => {
   const [order, setOrder] = useState('asc') // "asc" | "desc"
   const [orderBy, setOrderBy] = useState('') // field name
@@ -33,7 +18,7 @@ const TableView = ({ model, changeSort, ...res }) => {
     if (changeSort) {
       changeSort({ order, orderBy })
     }
-  }, [order, orderBy])
+  }, [changeSort, order, orderBy])
 
   const renderTableHeader = (model = [], { order, orderBy, onSort }) => {
     if (!model.fields) {

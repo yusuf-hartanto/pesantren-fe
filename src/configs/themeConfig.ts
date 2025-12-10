@@ -38,6 +38,7 @@ type Footer = {
 
 export type Config = {
   templateName: string
+  templateFullName: string
   homePageUrl: string
   settingsCookieName: string
   mode: Mode
@@ -57,6 +58,7 @@ export type Config = {
 
 const themeConfig: Config = {
   templateName: 'SADA',
+  templateFullName: 'Sistem Administrasi<br/>Digital Asshiddiqiyah',
   homePageUrl: '/dashboards/analytics',
   settingsCookieName: 'pesantren-cookie',
   mode: 'light', // 'system', 'light', 'dark'
@@ -81,7 +83,7 @@ const themeConfig: Config = {
   disableRipple: false, // true, false
   toastPosition: 'top-right', // 'top-right', 'top-center', 'top-left', 'bottom-right', 'bottom-center', 'bottom-left'
   sada: '/sada/sada.png',
-  logo: '/sada/sada-logo.png',
+  logo: '/sada/sada.png',
 }
 
 export default themeConfig

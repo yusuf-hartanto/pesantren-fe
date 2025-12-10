@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from 'axios'
-import { getSession } from 'next-auth/react'
+
+import api from '@/libs/axios'
 
 /* --------------------------
    1. Types
@@ -45,16 +45,8 @@ const initialState: InitialState = {
 export const fetchTahunAjaranAll = createAsyncThunk<any>(
   'tahun-ajaran/fetchAll',
   async (params, thunkAPI) => {
-    const session = await getSession()
-
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/tahun-ajaran/all-data`,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-          params
-        },
-      )
+      const response = await api.post(`/app/tahun-ajaran/all-data`, { params })
 
       return response.data
     } catch (e: any) {
@@ -66,16 +58,8 @@ export const fetchTahunAjaranAll = createAsyncThunk<any>(
 export const fetchTahunAjaranPage = createAsyncThunk<any, FetchParams>(
   'tahun-ajaran/fetchPage',
   async (params, thunkAPI) => {
-    const session = await getSession()
-
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/tahun-ajaran`,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-          params
-        }
-      )
+      const response = await api.get(`/app/tahun-ajaran`, { params })
 
       return response.data
     } catch (e: any) {
@@ -87,15 +71,8 @@ export const fetchTahunAjaranPage = createAsyncThunk<any, FetchParams>(
 export const fetchTahunAjaranById = createAsyncThunk<any, string>(
   'tahun-ajaran/fetchById',
   async (id, thunkAPI) => {
-    const session = await getSession()
-
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/tahun-ajaran/${id}`,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-        }
-      )
+      const response = await api.get(`/app/tahun-ajaran/${id}`)
 
       return response.data
     } catch (e: any) {
@@ -107,16 +84,8 @@ export const fetchTahunAjaranById = createAsyncThunk<any, string>(
 export const postTahunAjaran = createAsyncThunk<any, any>(
   'tahun-ajaran/create',
   async (params, thunkAPI) => {
-    const session = await getSession()
-
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/tahun-ajaran`,
-        params,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-        }
-      )
+      const response = await api.post(`/app/tahun-ajaran`, params)
 
       return response.data
     } catch (e: any) {
@@ -125,19 +94,11 @@ export const postTahunAjaran = createAsyncThunk<any, any>(
   }
 )
 
-export const postTahunAjaranUpdate = createAsyncThunk<any, { id: string; param: any }>(
+export const postTahunAjaranUpdate = createAsyncThunk<any, { id: string; params: any }>(
   'tahun-ajaran/update',
-  async ({ id, param }, thunkAPI) => {
-    const session = await getSession()
-
+  async ({ id, params }, thunkAPI) => {
     try {
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/tahun-ajaran/${id}`,
-        param,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-        }
-      )
+      const response = await api.put(`/app/tahun-ajaran/${id}`, params)
 
       return response.data
     } catch (e: any) {
@@ -149,15 +110,8 @@ export const postTahunAjaranUpdate = createAsyncThunk<any, { id: string; param: 
 export const deleteTahunAjaran = createAsyncThunk<any, string>(
   'tahun-ajaran/delete',
   async (id, thunkAPI) => {
-    const session = await getSession()
-
     try {
-      const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/tahun-ajaran/${id}`,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-        }
-      )
+      const response = await api.delete(`/app/tahun-ajaran/${id}`)
 
       return response.data
     } catch (e: any) {

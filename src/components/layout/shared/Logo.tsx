@@ -8,6 +8,8 @@ import type { CSSProperties } from 'react'
 import styled from '@emotion/styled'
 
 // Type Imports
+import { useSession } from 'next-auth/react'
+
 import type { VerticalNavContextProps } from '@menu/contexts/verticalNavContext'
 
 // Component Imports
@@ -18,6 +20,7 @@ import themeConfig from '@configs/themeConfig'
 // Hook Imports
 import useVerticalNav from '@menu/hooks/useVerticalNav'
 import { useSettings } from '@core/hooks/useSettings'
+import HtmlViewer from '@/libs/styles/HtmlViewer'
 
 type LogoTextProps = {
   isHovered?: VerticalNavContextProps['isHovered']
@@ -45,6 +48,8 @@ const LogoText = styled.span<LogoTextProps>`
 const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
   // Refs
   const logoTextRef = useRef<HTMLSpanElement>(null)
+  const { status } = useSession()
+  const isLogin = status == 'authenticated';
 
   // Hooks
   const { isHovered, transitionDuration, isBreakpointReached } = useVerticalNav()
@@ -73,7 +78,7 @@ const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
       <img
         src={layout === 'collapsed' ? themeConfig.logo : themeConfig.sada}
         alt='logo'
-        width={layout === 'collapsed' ? 50 : 175}
+        width={layout === 'collapsed' ? 40 : (isLogin ? 50 : 75)}
       />
       <LogoText
         color={color}
@@ -83,6 +88,7 @@ const Logo = ({ color }: { color?: CSSProperties['color'] }) => {
         transitionDuration={transitionDuration}
         isBreakpointReached={isBreakpointReached}
       >
+        <HtmlViewer className={isLogin ? 'text-xs' : ''} value={themeConfig.templateFullName} />
       </LogoText>
     </div>
   )

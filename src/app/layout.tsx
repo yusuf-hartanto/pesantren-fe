@@ -1,5 +1,4 @@
 // Next Imports
-import { headers } from 'next/headers'
 
 // MUI Imports
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
@@ -18,6 +17,7 @@ import '@/app/globals.css'
 
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
+import TopProgressBar from '@/components/Loading'
 
 export const metadata = {
   title: 'Pesantren',
@@ -26,24 +26,19 @@ export const metadata = {
 }
 
 const RootLayout = async (props: ChildrenType ) => {
-
-
   const { children } = props
-
-  // Vars
 
   const systemMode = await getSystemMode()
   const direction = 'ltr'
 
   return (
-
-      <html id='__next' lang='en' dir={direction} suppressHydrationWarning>
-        <body className='flex is-full min-bs-full flex-auto flex-col'>
-          <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
-          {children}
-        </body>
-      </html>
-
+    <html id='__next' lang='en' dir={direction} suppressHydrationWarning>
+      <body className='flex is-full min-bs-full flex-auto flex-col'>
+        <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
+        <TopProgressBar />
+        {children}
+      </body>
+    </html>
   )
 }
 

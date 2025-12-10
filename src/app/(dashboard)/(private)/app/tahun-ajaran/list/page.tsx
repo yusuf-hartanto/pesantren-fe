@@ -129,34 +129,28 @@ function RowAction(data: any) {
 const Table = () => {
   // ** Hooks
   const router = useRouter()
-
   const dispatch = useAppDispatch()
-
   const store = useAppSelector(state => state.tahun_ajaran)
 
   const [filter, setFilter] = useState('')
-
   const [page, setPage] = useState(1)
-
   const [perPage, setPerPage] = useState(15)
 
   useEffect(() => {
     if (store.delete) {
       dispatch(fetchTahunAjaranPage({ page: 1, perPage: perPage, q: filter }))
-
       dispatch(resetRedux())
     }
-  }, [dispatch, store.delete])
+  }, [dispatch, filter, perPage, store.delete])
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setPage(1)
-
       dispatch(fetchTahunAjaranPage({ page: 1, perPage: perPage, q: filter }))
     }, 500)
 
     return () => clearTimeout(timer)
-  }, [filter])
+  }, [dispatch, filter, perPage])
 
   const onSubmit = () => {
     router.replace('/app/tahun-ajaran/form')
