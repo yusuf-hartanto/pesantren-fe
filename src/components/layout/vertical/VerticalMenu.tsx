@@ -1,6 +1,3 @@
-// Next Imports
-import { useParams } from 'next/navigation'
-
 // MUI Imports
 import { useTheme } from '@mui/material/styles'
 
@@ -11,8 +8,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar'
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
 // Component Imports
-import { Menu, SubMenu, MenuItem, MenuSection } from '@menu/vertical-menu'
-import CustomChip from '@core/components/mui/Chip'
+import { Menu } from '@menu/vertical-menu'
 
 import { GenerateVerticalMenu } from '@components/GenerateMenu'
 

@@ -52,7 +52,11 @@ export const confirmUrlInChildren = (children: ChildrenType['children'], url: st
     }
 
     if (href) {
-      return exactMatch === true || exactMatch === undefined ? href === url : activeUrl && url.includes(activeUrl)
+      let status = exactMatch === true || exactMatch === undefined ? href === url : activeUrl && url.includes(activeUrl)
+
+      if (!status) status = url && url.includes(href.replace('/list',''))
+
+      return status
     }
 
     if (subChildren) {

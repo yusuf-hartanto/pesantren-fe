@@ -1,9 +1,6 @@
 // React Imports
 import type { ReactNode } from 'react'
 
-// Next Imports
-import { useParams } from 'next/navigation'
-
 // MUI Imports
 import type { ChipProps } from '@mui/material/Chip'
 
