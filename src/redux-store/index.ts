@@ -2,6 +2,8 @@
 import { configureStore } from '@reduxjs/toolkit'
 
 // Slice Imports
+import emailReducer from './slices/email'
+import kanbanReducer from './slices/kanban'
 import role from '@/app/(dashboard)/(private)/app/role/slice/index'
 import tahun_ajaran from '@/app/(dashboard)/(private)/app/tahun-ajaran/slice/index'
 import semester from '@/app/(dashboard)/(private)/app/semester/slice/index'
@@ -10,8 +12,6 @@ import tahun_angkatan from '@/app/(dashboard)/(private)/app/tahun-angkatan/slice
 import status_awal_santri from '@/app/(dashboard)/(private)/app/status-awal-santri/slice/index'
 import jenis_beasiswa from '@/app/(dashboard)/(private)/app/jenis-beasiswa/slice/index'
 import program_pesantren from '@/app/(dashboard)/(private)/app/program-pesantren/slice/index'
-import emailReducer from './slices/email'
-import kanbanReducer from './slices/kanban'
 
 export const store = configureStore({
   reducer: {
