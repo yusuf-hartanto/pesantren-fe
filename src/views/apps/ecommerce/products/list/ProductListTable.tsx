@@ -41,7 +41,7 @@ import type { RankingInfo } from '@tanstack/match-sorter-utils'
 
 // Type Imports
 import type { ThemeColor } from '@core/types'
-import type { Locale } from '@configs/i18n'
+
 import type { ProductType } from '@/types/apps/ecommerceTypes'
 
 // Component Imports
@@ -52,7 +52,6 @@ import OptionMenu from '@core/components/option-menu'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
 // Util Imports
-import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
@@ -153,7 +152,6 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
   const [globalFilter, setGlobalFilter] = useState('')
 
   // Hooks
-  
 
   const columns = useMemo<ColumnDef<ProductWithActionsType, any>[]>(
     () => [

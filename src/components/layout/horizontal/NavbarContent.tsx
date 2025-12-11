@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation'
 import classnames from 'classnames'
 
 // Type Imports
-import type { Locale } from '@configs/i18n'
+
 import type { ShortcutsType } from '@components/layout/shared/ShortcutsDropdown'
 import type { NotificationsType } from '@components/layout/shared/NotificationsDropdown'
 
@@ -25,7 +25,6 @@ import useHorizontalNav from '@menu/hooks/useHorizontalNav'
 
 // Util Imports
 import { horizontalLayoutClasses } from '@layouts/utils/layoutClasses'
-import { getLocalizedUrl } from '@/utils/i18n'
 
 // Vars
 const shortcuts: ShortcutsType[] = [
@@ -118,7 +117,6 @@ const notifications: NotificationsType[] = [
 const NavbarContent = () => {
   // Hooks
   const { isBreakpointReached } = useHorizontalNav()
-  
 
   return (
     <div

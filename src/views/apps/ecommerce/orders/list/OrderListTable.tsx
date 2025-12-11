@@ -37,7 +37,6 @@ import type { RankingInfo } from '@tanstack/match-sorter-utils'
 // Type Imports
 import type { ThemeColor } from '@core/types'
 import type { OrderType } from '@/types/apps/ecommerceTypes'
-import type { Locale } from '@configs/i18n'
 
 // Component Imports
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -47,7 +46,6 @@ import TablePaginationComponent from '@components/TablePaginationComponent'
 
 // Util Imports
 import { getInitials } from '@/utils/getInitials'
-import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
@@ -141,7 +139,6 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
   const [globalFilter, setGlobalFilter] = useState('')
 
   // Hooks
-  
 
   // Vars
   const paypal = '/images/apps/ecommerce/paypal.png'

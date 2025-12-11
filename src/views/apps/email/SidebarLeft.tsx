@@ -19,14 +19,12 @@ import PerfectScrollbar from 'react-perfect-scrollbar'
 // Types Imports
 import type { Email, EmailState } from '@/types/apps/emailTypes'
 import type { ThemeColor } from '@core/types'
-import type { Locale } from '@/configs/i18n'
 
 // Components Imports
 import ComposeMail from './ComposeMail'
 import CustomChip from '@core/components/mui/Chip'
 
 // Util Imports
-import { getLocalizedUrl } from '@/utils/i18n'
 
 // Styles Imports
 import styles from './styles.module.css'
@@ -91,7 +89,6 @@ const SidebarLeft = (props: Props) => {
   const [openCompose, setOpenCompose] = useState(false)
 
   // Hooks
-  
 
   const folderCounts = store.emails.reduce((counts: Record<string, number>, email: Email) => {
     if (!email.isRead && email.folder !== 'trash') {

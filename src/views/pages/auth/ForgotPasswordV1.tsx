@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 
 // Type Imports
-import type { Locale } from '@configs/i18n'
 
 // Component Imports
 import DirectionalIcon from '@components/DirectionalIcon'
@@ -19,14 +18,12 @@ import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
 
 // Util Imports
-import { getLocalizedUrl } from '@/utils/i18n'
 
 // Styled Component Imports
 import AuthIllustrationWrapper from './AuthIllustrationWrapper'
 
 const ForgotPasswordV1 = () => {
   // Hooks
-  
 
   return (
     <AuthIllustrationWrapper>
@@ -45,10 +42,7 @@ const ForgotPasswordV1 = () => {
               Send Reset Link
             </Button>
             <Typography className='flex justify-center items-center' color='primary.main'>
-              <Link
-                href={'/pages/auth/login-v1'}
-                className='flex items-center gap-1.5'
-              >
+              <Link href={'/pages/auth/login-v1'} className='flex items-center gap-1.5'>
                 <DirectionalIcon
                   ltrIconClass='tabler-chevron-left'
                   rtlIconClass='tabler-chevron-right'

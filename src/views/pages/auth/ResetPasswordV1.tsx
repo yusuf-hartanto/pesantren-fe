@@ -16,7 +16,6 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Button from '@mui/material/Button'
 
 // Type Imports
-import type { Locale } from '@configs/i18n'
 
 // Component Imports
 import DirectionalIcon from '@components/DirectionalIcon'
@@ -24,7 +23,6 @@ import Logo from '@components/layout/shared/Logo'
 import CustomTextField from '@core/components/mui/TextField'
 
 // Util Imports
-import { getLocalizedUrl } from '@/utils/i18n'
 
 // Styled Component Imports
 import AuthIllustrationWrapper from './AuthIllustrationWrapper'
@@ -35,7 +33,6 @@ const ResetPasswordV1 = () => {
   const [isConfirmPasswordShown, setIsConfirmPasswordShown] = useState(false)
 
   // Hooks
-  
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
@@ -96,10 +93,7 @@ const ResetPasswordV1 = () => {
               Set New Password
             </Button>
             <Typography className='flex justify-center items-center' color='primary.main'>
-              <Link
-                href={'/pages/auth/login-v1'}
-                className='flex items-center gap-1.5'
-              >
+              <Link href={'/pages/auth/login-v1'} className='flex items-center gap-1.5'>
                 <DirectionalIcon
                   ltrIconClass='tabler-chevron-left'
                   rtlIconClass='tabler-chevron-right'

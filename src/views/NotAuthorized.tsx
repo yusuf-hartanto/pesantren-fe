@@ -15,13 +15,11 @@ import classnames from 'classnames'
 
 // Type Imports
 import type { SystemMode } from '@core/types'
-import type { Locale } from '@/configs/i18n'
 
 // Hook Imports
 import { useImageVariant } from '@core/hooks/useImageVariant'
 
 // Util Imports
-import { getLocalizedUrl } from '@/utils/i18n'
 
 // Styled Components
 const MaskImg = styled('img')({
@@ -40,7 +38,7 @@ const NotAuthorized = ({ mode }: { mode: SystemMode }) => {
 
   // Hooks
   const theme = useTheme()
-  
+
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
   const miscBackground = useImageVariant(mode, lightImg, darkImg)
 

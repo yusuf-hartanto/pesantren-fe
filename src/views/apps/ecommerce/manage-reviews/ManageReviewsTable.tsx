@@ -38,7 +38,6 @@ import type { RankingInfo } from '@tanstack/match-sorter-utils'
 
 // Type Imports
 import type { ReviewType } from '@/types/apps/ecommerceTypes'
-import type { Locale } from '@configs/i18n'
 
 // Component Imports
 import CustomAvatar from '@core/components/mui/Avatar'
@@ -47,7 +46,6 @@ import CustomTextField from '@core/components/mui/TextField'
 import TablePaginationComponent from '@components/TablePaginationComponent'
 
 // Util Imports
-import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
@@ -119,7 +117,6 @@ const ManageReviewsTable = ({ reviewsData }: { reviewsData?: ReviewType[] }) => 
   const [globalFilter, setGlobalFilter] = useState('')
 
   // Hooks
-  
 
   const columns = useMemo<ColumnDef<ReviewWithActionsType, any>[]>(
     () => [

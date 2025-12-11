@@ -23,14 +23,13 @@ import Typography from '@mui/material/Typography'
 
 // Type Imports
 import type { Course } from '@/types/apps/academyTypes'
-import type { Locale } from '@configs/i18n'
+
 import type { ThemeColor } from '@core/types'
 
 // Component Imports
 import DirectionalIcon from '@components/DirectionalIcon'
 
 // Util Imports
-import { getLocalizedUrl } from '@/utils/i18n'
 
 type ChipColorType = {
   color: ThemeColor
@@ -60,7 +59,6 @@ const Courses = (props: Props) => {
   const [activePage, setActivePage] = useState(0)
 
   // Hooks
-  
 
   useEffect(() => {
     let newData =

@@ -6,10 +6,8 @@ import { useParams } from 'next/navigation'
 import classnames from 'classnames'
 
 // Type Imports
-import type { Locale } from '@configs/i18n'
 
 // Util Imports
-import { getLocalizedUrl } from '@/utils/i18n'
 
 type NoResultData = {
   label: string
@@ -37,7 +35,6 @@ const noResultData: NoResultData[] = [
 
 const NoResult = ({ searchValue, setOpen }: { searchValue: string; setOpen: (value: boolean) => void }) => {
   // Hooks
-  
 
   return (
     <div className='flex items-center justify-center grow flex-wrap plb-14 pli-16 overflow-y-auto overflow-x-hidden bs-full'>

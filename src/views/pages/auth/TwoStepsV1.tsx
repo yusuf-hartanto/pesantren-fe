@@ -18,14 +18,12 @@ import type { SlotProps } from 'input-otp'
 import classnames from 'classnames'
 
 // Type Imports
-import type { Locale } from '@configs/i18n'
 
 // Component Imports
 import Link from '@components/Link'
 import Logo from '@components/layout/shared/Logo'
 
 // Util Imports
-import { getLocalizedUrl } from '@/utils/i18n'
 
 // Styled Component Imports
 import AuthIllustrationWrapper from './AuthIllustrationWrapper'
@@ -55,7 +53,6 @@ const TwoStepsV1 = () => {
   const [otp, setOtp] = useState<string | null>(null)
 
   // Hooks
-  
 
   return (
     <AuthIllustrationWrapper>

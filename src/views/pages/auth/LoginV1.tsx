@@ -18,7 +18,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import Divider from '@mui/material/Divider'
 
 // Type Imports
-// import type { Locale } from '@configs/i18n'
+//
 
 // Component Imports
 import Logo from '@components/layout/shared/Logo'
@@ -28,7 +28,7 @@ import CustomTextField from '@core/components/mui/TextField'
 import themeConfig from '@configs/themeConfig'
 
 // Util Imports
-// import { getLocalizedUrl } from '@/utils/i18n'
+//
 
 // Styled Component Imports
 import AuthIllustrationWrapper from './AuthIllustrationWrapper'
@@ -38,7 +38,6 @@ const LoginV1 = () => {
   const [isPasswordShown, setIsPasswordShown] = useState(false)
 
   // Hooks
-  
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
@@ -89,11 +88,7 @@ const LoginV1 = () => {
             </Button>
             <div className='flex justify-center items-center flex-wrap gap-2'>
               <Typography>New on our platform?</Typography>
-              <Typography
-                component={Link}
-                href={'/pages/auth/register-v1'}
-                color='primary.main'
-              >
+              <Typography component={Link} href={'/pages/auth/register-v1'} color='primary.main'>
                 Create an account
               </Typography>
             </div>

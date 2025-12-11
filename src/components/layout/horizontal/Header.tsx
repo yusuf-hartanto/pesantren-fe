@@ -1,7 +1,6 @@
 'use client'
 
 // Type Imports
-import type { getDictionary } from '@/utils/getDictionary'
 
 // Component Imports
 import Navigation from './Navigation'
@@ -22,9 +21,9 @@ const Header = () => {
         <Navbar>
           <NavbarContent />
         </Navbar>
-        {!isBreakpointReached && <Navigation  />}
+        {!isBreakpointReached && <Navigation />}
       </LayoutHeader>
-      {isBreakpointReached && <Navigation  />}
+      {isBreakpointReached && <Navigation />}
     </>
   )
 }

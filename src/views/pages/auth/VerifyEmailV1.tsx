@@ -10,21 +10,18 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 
 // Type Imports
-import type { Locale } from '@configs/i18n'
 
 // Component Imports
 import Logo from '@components/layout/shared/Logo'
 import Link from '@components/Link'
 
 // Util Imports
-import { getLocalizedUrl } from '@/utils/i18n'
 
 // Styled Component Imports
 import AuthIllustrationWrapper from './AuthIllustrationWrapper'
 
 const VerifyEmailV1 = () => {
   // Hooks
-  
 
   return (
     <AuthIllustrationWrapper>

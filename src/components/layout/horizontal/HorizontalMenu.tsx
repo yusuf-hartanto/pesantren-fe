@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'
 import { useTheme } from '@mui/material/styles'
 
 // Type Imports
-import type { getDictionary } from '@/utils/getDictionary'
+
 import type { VerticalMenuContextProps } from '@menu/components/vertical-menu/Menu'
 
 // Component Imports
@@ -57,11 +57,9 @@ const HorizontalMenu = () => {
   // Hooks
   const verticalNavOptions = useVerticalNav()
   const theme = useTheme()
-  
 
   // Vars
   const { transitionDuration } = verticalNavOptions
-  
 
   return (
     <HorizontalNav
@@ -113,9 +111,7 @@ const HorizontalMenu = () => {
             <SubMenu label='products'>
               <MenuItem href='/apps/ecommerce/products/list'>list</MenuItem>
               <MenuItem href='/apps/ecommerce/products/add'>add</MenuItem>
-              <MenuItem href='/apps/ecommerce/products/category'>
-                category
-              </MenuItem>
+              <MenuItem href='/apps/ecommerce/products/category'>category</MenuItem>
             </SubMenu>
             <SubMenu label='orders'>
               <MenuItem href='/apps/ecommerce/orders/list'>list</MenuItem>
@@ -137,29 +133,20 @@ const HorizontalMenu = () => {
                 details
               </MenuItem>
             </SubMenu>
-            <MenuItem href='/apps/ecommerce/manage-reviews'>
-              manageReviews
-            </MenuItem>
+            <MenuItem href='/apps/ecommerce/manage-reviews'>manageReviews</MenuItem>
             <MenuItem href='/apps/ecommerce/referrals'>referrals</MenuItem>
             <MenuItem href='/apps/ecommerce/settings'>settings</MenuItem>
           </SubMenu>
           <SubMenu label='academy' icon={<i className='tabler-school' />}>
             <MenuItem href='/apps/academy/dashboard'>dashboard</MenuItem>
             <MenuItem href='/apps/academy/my-courses'>myCourses</MenuItem>
-            <MenuItem href='/apps/academy/course-details'>
-              courseDetails
-            </MenuItem>
+            <MenuItem href='/apps/academy/course-details'>courseDetails</MenuItem>
           </SubMenu>
           <SubMenu label='logistics' icon={<i className='tabler-truck' />}>
             <MenuItem href='/apps/logistics/dashboard'>dashboard</MenuItem>
             <MenuItem href='/apps/logistics/fleet'>fleet</MenuItem>
           </SubMenu>
-          <MenuItem
-            href='/apps/email'
-            icon={<i className='tabler-mail' />}
-            exactMatch={false}
-            activeUrl='/apps/email'
-          >
+          <MenuItem href='/apps/email' icon={<i className='tabler-mail' />} exactMatch={false} activeUrl='/apps/email'>
             email
           </MenuItem>
           <MenuItem href='/apps/chat' icon={<i className='tabler-message-circle-2' />}>
@@ -173,11 +160,7 @@ const HorizontalMenu = () => {
           </MenuItem>
           <SubMenu label='invoice' icon={<i className='tabler-file-description' />}>
             <MenuItem href='/apps/invoice/list'>list</MenuItem>
-            <MenuItem
-              href='/apps/invoice/preview/4987'
-              exactMatch={false}
-              activeUrl='/apps/invoice/preview'
-            >
+            <MenuItem href='/apps/invoice/preview/4987' exactMatch={false} activeUrl='/apps/invoice/preview'>
               preview
             </MenuItem>
             <MenuItem href='/apps/invoice/edit/4987' exactMatch={false} activeUrl='/apps/invoice/edit'>
@@ -276,12 +259,8 @@ const HorizontalMenu = () => {
           </SubMenu>
           <SubMenu label='wizardExamples' icon={<i className='tabler-dots' />}>
             <MenuItem href='/pages/wizard-examples/checkout'>checkout</MenuItem>
-            <MenuItem href='/pages/wizard-examples/property-listing'>
-              propertyListing
-            </MenuItem>
-            <MenuItem href='/pages/wizard-examples/create-deal'>
-              createDeal
-            </MenuItem>
+            <MenuItem href='/pages/wizard-examples/property-listing'>propertyListing</MenuItem>
+            <MenuItem href='/pages/wizard-examples/create-deal'>createDeal</MenuItem>
           </SubMenu>
           <MenuItem href='/pages/dialog-examples' icon={<i className='tabler-square' />}>
             dialogExamples
@@ -289,9 +268,7 @@ const HorizontalMenu = () => {
           <SubMenu label='widgetExamples' icon={<i className='tabler-chart-bar' />}>
             <MenuItem href='/pages/widget-examples/basic'>basic</MenuItem>
             <MenuItem href='/pages/widget-examples/advanced'>advanced</MenuItem>
-            <MenuItem href='/pages/widget-examples/statistics'>
-              statistics
-            </MenuItem>
+            <MenuItem href='/pages/widget-examples/statistics'>statistics</MenuItem>
             <MenuItem href='/pages/widget-examples/charts'>charts</MenuItem>
             <MenuItem href='/pages/widget-examples/actions'>actions</MenuItem>
           </SubMenu>
