@@ -146,7 +146,7 @@ const Table = () => {
 
       dispatch(resetRedux())
     }
-  }, [dispatch, store.delete])
+  }, [dispatch, filter, perPage, store.delete])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -156,7 +156,7 @@ const Table = () => {
     }, 500)
 
     return () => clearTimeout(timer)
-  }, [filter])
+  }, [dispatch, filter, perPage])
 
   const onSubmit = () => {
     router.replace('/app/role/form')
@@ -195,8 +195,7 @@ const Table = () => {
           tableColumn('OPTION', 'act-x', 'left', renderOption as any),
           tableColumn('NAME', 'role_name'),
           tableColumn('STATUS', 'status'),
-          tableColumn('CREATED BY', 'created_by'),
-          tableColumn('UPDATED BY', 'modified_by')
+          tableColumn('TERAKHIR DIUBAH', 'updated_at'),
         ],
         values: values?.map((row: any) => {
           return {

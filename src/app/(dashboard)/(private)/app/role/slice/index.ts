@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from 'axios'
-import { getSession } from 'next-auth/react'
+
+import api from '@/libs/axios'
 
 /* --------------------------
    1. Types
@@ -45,16 +45,9 @@ const initialState: InitialState = {
 export const fetchRoleAll = createAsyncThunk<any>(
   'role/fetchAll',
   async (params, thunkAPI) => {
-    const session = await getSession()
 
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/role/all-data`,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-          params
-        },
-      )
+      const response = await api.get(`/app/role/all-data`, { params })
 
       return response.data
     } catch (e: any) {
@@ -66,16 +59,9 @@ export const fetchRoleAll = createAsyncThunk<any>(
 export const fetchRolePage = createAsyncThunk<any, FetchParams>(
   'role/fetchPage',
   async (params, thunkAPI) => {
-    const session = await getSession()
 
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/role`,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-          params
-        }
-      )
+      const response = await api.get(`/app/role`, { params })
 
       return response.data
     } catch (e: any) {
@@ -87,15 +73,9 @@ export const fetchRolePage = createAsyncThunk<any, FetchParams>(
 export const fetchRoleById = createAsyncThunk<any, string>(
   'role/fetchById',
   async (id, thunkAPI) => {
-    const session = await getSession()
 
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/role/${id}`,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-        }
-      )
+      const response = await api.get(`/app/role/${id}`)
 
       return response.data
     } catch (e: any) {
@@ -107,16 +87,9 @@ export const fetchRoleById = createAsyncThunk<any, string>(
 export const postRole = createAsyncThunk<any, any>(
   'role/create',
   async (params, thunkAPI) => {
-    const session = await getSession()
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/role`,
-        params,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-        }
-      )
+      const response = await api.post(`/app/role`, params)
 
       return response.data
     } catch (e: any) {
@@ -125,19 +98,12 @@ export const postRole = createAsyncThunk<any, any>(
   }
 )
 
-export const postRoleUpdate = createAsyncThunk<any, { id: string; param: any }>(
+export const postRoleUpdate = createAsyncThunk<any, { id: string; params: any }>(
   'role/update',
-  async ({ id, param }, thunkAPI) => {
-    const session = await getSession()
+  async ({ id, params }, thunkAPI) => {
 
     try {
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/role/${id}`,
-        param,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-        }
-      )
+      const response = await api.put(`/app/role/${id}`, params)
 
       return response.data
     } catch (e: any) {
@@ -149,15 +115,9 @@ export const postRoleUpdate = createAsyncThunk<any, { id: string; param: any }>(
 export const deleteRole = createAsyncThunk<any, string>(
   'role/delete',
   async (id, thunkAPI) => {
-    const session = await getSession()
 
     try {
-      const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/role/${id}`,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-        }
-      )
+      const response = await api.delete(`/app/role/${id}`)
 
       return response.data
     } catch (e: any) {

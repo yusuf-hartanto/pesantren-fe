@@ -10,9 +10,12 @@ import TableBody from '@mui/material/TableBody'
 import TablePagination from '@mui/material/TablePagination'
 import TableSortLabel from '@mui/material/TableSortLabel'
 
+import { useIsMobile } from "@core/hooks/useIsMobile"
+
 const TableView = ({ model, changeSort, ...res }) => {
   const [order, setOrder] = useState('asc') // "asc" | "desc"
   const [orderBy, setOrderBy] = useState('') // field name
+  const isMobile = useIsMobile(1000);
 
   useEffect(() => {
     if (changeSort) {
@@ -98,11 +101,85 @@ const TableView = ({ model, changeSort, ...res }) => {
     )
   }
 
+  const renderMobileRows = (model) => {
+    return (
+      <div>
+        {model.values?.map((row, i) => {
+          const statusField = model.fields.find(f => f.key === "status");
+          const updatedField = model.fields.find(f => f.key === "updated_at");
+          const actionField = model.fields.find(f => f.key === "act-x");
+          const descriptionFields = model.fields.filter(f => ["keterangan", "description"].includes(f.key));
+
+          const otherFields = model.fields.filter(
+            f => !["status", "updated_at", "act-x", "keterangan", "description"].includes(f.key)
+          );
+
+          return (
+            <div
+              key={i}
+              className="border rounded-xl p-4 mb-3 bg-white shadow-sm relative"
+            >
+              {statusField && (
+                <div className="absolute top-2 right-2 text-xs px-2 py-1 rounded">
+                  {statusField.format ? statusField.format(row, row[statusField.key]) : row[statusField.key]}
+                </div>
+              )}
+
+              <div className="flex-1 grid grid-cols-2 gap-3 mt-2">
+                {otherFields.map((f, idx) => {
+                  return (
+                    <div
+                      key={idx}
+                      className="text-sm col-span-1"
+                    >
+                      <div className="text-gray-500 text-xs">{f.title}</div>
+                      <div className="font-medium">
+                        {f.format ? f.format(row, row[f.key]) : row[f.key]}
+                      </div>
+                    </div>
+                  );
+                })}
+                {descriptionFields.map((f, idx) => (
+                  <div key={`desc-${idx}`} className="text-sm col-span-2">
+                    <div className="text-gray-500 text-xs">{f.title}</div>
+                    <div className="font-medium">
+                      {f.format ? f.format(row, row[f.key]) : row[f.key]}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-200">
+                {updatedField ? (
+                  <div className="text-xs text-gray-500">
+                    <div className="text-gray-500 text-xs">{updatedField.title}</div>
+                    {updatedField.format
+                      ? updatedField.format(row, row[updatedField.key])
+                      : row[updatedField.key]
+                    }
+                  </div>
+                ) : (
+                  <div></div>
+                )}
+
+                {actionField && (
+                  <div className="shrink-0">
+                    {actionField.format(row, row[actionField.key])}
+                  </div>
+                )}
+              </div>
+
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   const handleSort = fieldName => {
     const isAsc = orderBy === fieldName && order === 'asc'
 
     setOrder(isAsc ? 'desc' : 'asc')
-
     setOrderBy(fieldName)
   }
 
@@ -110,13 +187,17 @@ const TableView = ({ model, changeSort, ...res }) => {
     <>
       {model ? (
         <>
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label='simple table'>
-              <TableHead>{renderTableHeader(model, { order, orderBy, onSort: handleSort })}</TableHead>
+          {isMobile ? (
+            renderMobileRows(model)
+          ) : (
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} aria-label='simple table'>
+                <TableHead>{renderTableHeader(model, { order, orderBy, onSort: handleSort })}</TableHead>
 
-              <TableBody>{renderTableRows(model)}</TableBody>
-            </Table>
-          </TableContainer>
+                <TableBody>{renderTableRows(model)}</TableBody>
+              </Table>
+            </TableContainer>
+          )}
 
           <TablePagination
             page={model.page - 1}

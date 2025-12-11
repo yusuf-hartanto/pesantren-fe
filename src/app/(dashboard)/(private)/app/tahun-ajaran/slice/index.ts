@@ -46,7 +46,7 @@ export const fetchTahunAjaranAll = createAsyncThunk<any>(
   'tahun-ajaran/fetchAll',
   async (params, thunkAPI) => {
     try {
-      const response = await api.post(`/app/tahun-ajaran/all-data`, { params })
+      const response = await api.get(`/app/tahun-ajaran/all-data`, { params })
 
       return response.data
     } catch (e: any) {

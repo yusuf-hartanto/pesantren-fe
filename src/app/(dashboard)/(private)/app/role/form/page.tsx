@@ -1,7 +1,7 @@
 "use client"
 
 // ** React Imports
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import { useSearchParams, useRouter } from 'next/navigation'
 
@@ -59,7 +59,6 @@ const FormValidationBasic = () => {
   }
 
   const [state, setState] = useState<FormData>(defaultValues)
-
   const [loading, setLoading] = useState(false)
 
   const {
@@ -69,8 +68,12 @@ const FormValidationBasic = () => {
     reset
   } = useForm({defaultValues})
 
-  useEffect(() => {
+  const onCancel = useCallback(() => {
+    dispatch(resetRedux())
+    router.replace('/app/role/list')
+  }, [dispatch, router])
 
+  useEffect(() => {
     if (id) {
       dispatch(fetchRoleById(id)).then(res => {
         const datas = { ...res?.payload?.data }
@@ -78,14 +81,12 @@ const FormValidationBasic = () => {
         if (datas) {
           datas.status = statusOption.values.find(r => r.value === datas.status)
 
-          //console.log('prament', datas)
-
           setState(datas)
           reset(datas)
         }
       })
     }
-  }, [dispatch, reset])
+  }, [dispatch, id, reset])
 
   useEffect(() => {
     if (!store.crud) return
@@ -98,7 +99,7 @@ const FormValidationBasic = () => {
 
       setLoading(false)
     }
-  }, [store])
+  }, [onCancel, store])
 
   const onSubmit = () => {
     if (loading) return
@@ -109,7 +110,7 @@ const FormValidationBasic = () => {
       dispatch(
         postRoleUpdate({
           id: id,
-          param: { ...state, status: state.status.value }
+          params: { ...state, status: state.status.value }
         })
       )
     } else {
@@ -120,11 +121,6 @@ const FormValidationBasic = () => {
         })
       )
     }
-  }
-
-  const onCancel = () => {
-    dispatch(resetRedux())
-    router.replace('/app/role/list')
   }
 
   const fields = () => {

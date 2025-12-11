@@ -188,9 +188,10 @@ const Table = () => {
         fields: [
           tableColumn('OPTION', 'act-x', 'left', renderOption as any),
           tableColumn('TAHUN AJARAN', 'tahun_ajaran'),
-          tableColumn('STATUS', 'status'),
           tableColumn('KETERANGAN', 'keterangan'),
-          tableColumn('NOMOR URUT', 'nomor_urut')
+          tableColumn('STATUS', 'status'),
+          tableColumn('NOMOR URUT', 'nomor_urut'),
+          tableColumn('TERAKHIR DIUBAH', 'updated_at'),
         ],
         values: values?.map((row: any) => {
           return {
