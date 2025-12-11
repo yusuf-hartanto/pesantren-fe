@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 // ** React Imports
 import React, { useCallback, useEffect, useState } from 'react'
@@ -69,7 +69,7 @@ const FormValidationBasic = () => {
     handleSubmit,
     formState: { errors },
     reset
-  } = useForm({defaultValues})
+  } = useForm({ defaultValues })
 
   const onCancel = useCallback(() => {
     dispatch(resetRedux())
@@ -92,7 +92,6 @@ const FormValidationBasic = () => {
   }, [dispatch, id, reset])
 
   useEffect(() => {
-
     if (!store.crud) return
 
     if (store.crud.status) {
@@ -143,14 +142,6 @@ const FormValidationBasic = () => {
         label: 'Keterangan',
         placeholder: 'Input Keterangan',
         required: false,
-        readOnly: Boolean(view)
-      }),
-      field({
-        type: 'numeral',
-        key: 'nomor_urut',
-        label: 'Nomor Urut',
-        placeholder: 'Input Nomor Urut',
-        required: true,
         readOnly: Boolean(view)
       }),
       field({

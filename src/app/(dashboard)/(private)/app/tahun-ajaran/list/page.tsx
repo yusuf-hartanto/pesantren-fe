@@ -190,8 +190,7 @@ const Table = () => {
           tableColumn('TAHUN AJARAN', 'tahun_ajaran'),
           tableColumn('KETERANGAN', 'keterangan'),
           tableColumn('STATUS', 'status'),
-          tableColumn('NOMOR URUT', 'nomor_urut'),
-          tableColumn('TERAKHIR DIUBAH', 'updated_at'),
+          tableColumn('TERAKHIR DIUBAH', 'updated_at')
         ],
         values: values?.map((row: any) => {
           return {
