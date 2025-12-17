@@ -21,6 +21,8 @@ export interface InitialState {
   datas: any[]
   crud: any
   delete: string | null
+
+  navigation: any[]
 }
 
 /* --------------------------
@@ -36,6 +38,8 @@ const initialState: InitialState = {
   datas: [],
   crud: null,
   delete: null,
+
+  navigation: []
 }
 
 /* --------------------------
@@ -126,6 +130,51 @@ export const deleteRole = createAsyncThunk<any, string>(
   }
 )
 
+export const fetchRoleMenuById = createAsyncThunk<any, string>(
+  'role/fetchRoleMenuById',
+  async (id, thunkAPI) => {
+
+    try {
+      const response = await api.get(`/app/role-menu/${id}`)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postRoleMenu = createAsyncThunk<any, any>(
+  'role/postRoleMenu',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/role-menu`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const fetchNavigation = createAsyncThunk<any>(
+  'role/fetchNavigation',
+  async (_, thunkAPI) => {
+    try {
+      const response = await api.get('/navigation', {
+        headers: {
+          Authorization: undefined,
+        },
+      })
+      
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
 /* --------------------------
    4. Slice + Reducers
 --------------------------- */
@@ -135,6 +184,9 @@ export const slice = createSlice({
   initialState,
   reducers: {
     resetRedux: () => initialState,
+    setNavigation: (state, action) => {
+      state.navigation = action.payload
+    },
   },
   extraReducers: builder => {
     builder.addCase(fetchRoleAll.fulfilled, (state, action) => {
@@ -163,8 +215,16 @@ export const slice = createSlice({
     builder.addCase(postRoleUpdate.fulfilled, (state, action) => {
       state.crud = action.payload
     })
+
+    builder.addCase(postRoleMenu.fulfilled, (state, action) => {
+      state.crud = action.payload
+    })
+
+    builder.addCase(fetchNavigation.fulfilled, (state, action) => {
+      state.navigation = action.payload.data || []
+    })
   },
 })
 
-export const { resetRedux } = slice.actions
+export const { resetRedux, setNavigation } = slice.actions
 export default slice.reducer

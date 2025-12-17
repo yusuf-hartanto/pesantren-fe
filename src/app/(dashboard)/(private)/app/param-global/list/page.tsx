@@ -10,17 +10,15 @@ import Grid from '@mui/material/Grid2'
 import Card from '@mui/material/Card'
 
 import CardHeader from '@mui/material/CardHeader'
-import { TextField, Toolbar } from '@mui/material'
+import { Menu, MenuItem, TextField, Toolbar } from '@mui/material'
 import Tooltip from '@mui/material/Tooltip'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import TableCell from '@mui/material/TableCell'
 import IconButton from '@mui/material/IconButton'
-import Menu from '@mui/material/Menu'
-import MenuItem from '@mui/material/MenuItem'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import { deleteSemester, fetchSemesterPage, resetRedux } from '../slice/index'
+import { deleteParamGlobal, fetchParamGlobalPage, resetRedux } from '../slice/index'
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
 import CustomChip from '@core/components/mui/Chip'
@@ -29,12 +27,12 @@ import DialogDelete from '@views/onevour/components/dialog-delete'
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
 
-const statusObj: Record<string, { color: any; value: string }> = {
-  Aktif: {
+const statusObj: Record<number, { color: any; value: string }> = {
+  1: {
     color: 'success',
     value: 'Aktif'
   },
-  Nonaktif: {
+  2: {
     color: 'secondary',
     value: 'Nonaktif'
   }
@@ -44,8 +42,6 @@ function RowAction(data: any) {
   const [anchorEl, setAnchorEl] = useState(null)
   const [openConfirm, setOpenConfirm] = useState(false)
   const dispatch = useAppDispatch()
-
-  const rowOptionsOpen = Boolean(anchorEl)
 
   const setOpen = (event: any) => {
     setAnchorEl(event.currentTarget)
@@ -60,7 +56,7 @@ function RowAction(data: any) {
   }
 
   const handleDelete = (id: string) => {
-    dispatch(deleteSemester(id))
+    dispatch(deleteParamGlobal(id))
     optionsOnClose()
   }
 
@@ -83,7 +79,7 @@ function RowAction(data: any) {
         <MenuItem
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
-          href={`/app/semester/form?id=${data.row.id_semester}&view=true`}
+          href={`/app/param-global/form?id=${data.row.id}&view=true`}
           onClick={handleView}
         >
           <i className='tabler-eye' />
@@ -93,7 +89,7 @@ function RowAction(data: any) {
         <MenuItem
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
-          href={`/app/semester/form?id=${data.row.id_semester}`}
+          href={`/app/param-global/form?id=${data.row.id}`}
           onClick={handleView}
         >
           <i className='tabler-edit' />
@@ -105,7 +101,7 @@ function RowAction(data: any) {
           Delete
         </MenuItem>
         <DialogDelete
-          id={data.row.nama_semester}
+          id={data.row.menu_name}
           open={openConfirm}
           onClose={(event: any, reason: any) => {
             if (reason !== 'backdropClick') {
@@ -113,7 +109,7 @@ function RowAction(data: any) {
             }
           }}
           handleOk={() => {
-            handleDelete(data.row.id_semester)
+            handleDelete(data.row.id)
             setOpenConfirm(false)
           }}
           handleClose={() => {
@@ -132,7 +128,7 @@ const Table = () => {
 
   const dispatch = useAppDispatch()
 
-  const store = useAppSelector(state => state.semester)
+  const store = useAppSelector(state => state.param_global)
 
   const [filter, setFilter] = useState('')
 
@@ -142,24 +138,24 @@ const Table = () => {
 
   useEffect(() => {
     if (store.delete) {
-      dispatch(fetchSemesterPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(fetchParamGlobalPage({ page: 1, perPage: perPage, q: filter }))
 
       dispatch(resetRedux())
     }
-  }, [dispatch, store.delete])
+  }, [dispatch, filter, perPage, store.delete])
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setPage(1)
 
-      dispatch(fetchSemesterPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(fetchParamGlobalPage({ page: 1, perPage: perPage, q: filter }))
     }, 500)
 
     return () => clearTimeout(timer)
-  }, [filter])
+  }, [dispatch, filter, perPage])
 
   const onSubmit = () => {
-    router.replace('/app/semester/form')
+    router.replace('/app/param-global/form')
   }
 
   const handleFilter = (event: any) => {
@@ -168,7 +164,7 @@ const Table = () => {
 
   const handleChangePage = (event: any, newPage: number) => {
     setPage(newPage)
-    dispatch(fetchSemesterPage({ page: newPage, perPage: perPage, q: filter }))
+    dispatch(fetchParamGlobalPage({ page: newPage, perPage: perPage, q: filter }))
   }
 
   const handleChangePerPage = (event: any) => {
@@ -176,7 +172,7 @@ const Table = () => {
 
     setPage(1)
     setPerPage(newPerPage)
-    dispatch(fetchSemesterPage({ page: 1, perPage: newPerPage, q: filter }))
+    dispatch(fetchParamGlobalPage({ page: 1, perPage: newPerPage, q: filter }))
   }
 
   const renderOption = (row: any) => {
@@ -189,20 +185,21 @@ const Table = () => {
     if (dataPage) {
       const { values, total } = dataPage
 
+      console.warn(values, total)
+
       return {
         page: page,
         fields: [
           tableColumn('OPTION', 'act-x', 'left', renderOption as any),
-          tableColumn('TAHUN AJARAN', 'tahun_ajaran'),
-          tableColumn('SEMESTER', 'nama_semester'),
+          tableColumn('KEY', 'param_key'),
+          tableColumn('VALUE', 'param_value'),
+          tableColumn('DESKRIPSI', 'param_desc'),
           tableColumn('STATUS', 'status'),
-          tableColumn('KETERANGAN', 'keterangan'),
-          tableColumn('NOMOR URUT', 'nomor_urut')
+          tableColumn('TERAKHIR DIUBAH', 'updated_at'),
         ],
         values: values?.map((row: any) => {
           return {
             ...row,
-            tahun_ajaran: row.tahun_ajaran.tahun_ajaran,
             status: (
               <CustomChip
                 round='true'
@@ -230,7 +227,7 @@ const Table = () => {
     <Grid container spacing={6} sx={{ width: '100%' }}>
       <Grid size={12}>
         <Card>
-          <CardHeader title='Semester' sx={{ paddingBottom: 0 }} />
+          <CardHeader title='ParamGlobal' sx={{ paddingBottom: 0 }} />
           <Toolbar sx={{ paddingLeft: '1.5rem !important', paddingRight: '1.5rem !important' }}>
             <Tooltip title='Add'>
               <Button size='medium' variant='outlined' onClick={onSubmit}>

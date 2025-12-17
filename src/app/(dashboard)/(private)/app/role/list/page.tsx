@@ -100,6 +100,16 @@ function RowAction(data: any) {
           Edit
         </MenuItem>
 
+        <MenuItem
+          component={Link}
+          sx={{ '& svg': { mr: 2 } }}
+          href={`/app/role/access?id=${data.row.role_id}`}
+          onClick={handleView}
+        >
+          <i className='tabler-lock-access' />
+          Role Access
+        </MenuItem>
+
         <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}>
           <i className='tabler-trash' />
           Delete
@@ -138,7 +148,7 @@ const Table = () => {
 
   const [page, setPage] = useState(1)
 
-  const [perPage, setPerPage] = useState(15)
+  const [perPage, setPerPage] = useState(10)
 
   useEffect(() => {
     if (store.delete) {

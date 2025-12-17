@@ -13,6 +13,7 @@ import tahun_angkatan from '@/app/(dashboard)/(private)/app/tahun-angkatan/slice
 import status_awal_santri from '@/app/(dashboard)/(private)/app/status-awal-santri/slice/index'
 import jenis_beasiswa from '@/app/(dashboard)/(private)/app/jenis-beasiswa/slice/index'
 import program_pesantren from '@/app/(dashboard)/(private)/app/program-pesantren/slice/index'
+import param_global from '@/app/(dashboard)/(private)/app/param-global/slice/index'
 
 export const store = configureStore({
   reducer: {
@@ -26,7 +27,8 @@ export const store = configureStore({
     tahun_angkatan,
     status_awal_santri,
     jenis_beasiswa,
-    program_pesantren
+    program_pesantren,
+    param_global,
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false })
 })

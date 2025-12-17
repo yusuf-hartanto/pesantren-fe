@@ -138,7 +138,7 @@ const Table = () => {
 
   const [page, setPage] = useState(1)
 
-  const [perPage, setPerPage] = useState(15)
+  const [perPage, setPerPage] = useState(10)
 
   useEffect(() => {
     if (store.delete) {

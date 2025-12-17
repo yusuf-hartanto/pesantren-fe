@@ -81,7 +81,8 @@ export function field(props) {
     variant = null,
     color = null,
     autoFocus = false,
-    urlImage = null
+    urlImage = null,
+    render
   } = props
 
   return {
@@ -102,7 +103,8 @@ export function field(props) {
     variant: variant,
     color: color,
     autoFocus: autoFocus,
-    urlImage: urlImage
+    urlImage: urlImage,
+    render
   }
 }
 
@@ -263,6 +265,7 @@ export function formColumnSingleDetailField(state, o, i) {
       {'textarea' === o?.type ? textareaField(state, o?.control, o?.key, o?.option?.is_number, o?.placeholder) : null}
       {'date' === o?.type ? textFieldDate(state, o?.control, o?.key, o?.placeholder, o.ref) : null}
       {'file' === o?.type ? textFieldFile(state, o?.control, o?.key, o?.placeholder, o.ref) : null}
+      {'custom' === o?.type ? formSingleColumn(state, o?.control, o?.key, o?.placeholder, o.ref) : null}
 
       {error(state, o?.key)}
     </>
@@ -273,14 +276,10 @@ export function formColumnSingleDetailField(state, o, i) {
  * 2 column
  * */
 export function formColumnDetailField(form) {
-  // form = {
-  //     control: undefined, errors: undefined, session: undefined, props: undefined, index: 0,
-  // }
   const { props, index = 0 } = form
 
   if (undefined === props || null === props) return
 
-  // console.log("type", props.type, props.label)
   if ('submit' === props.type) {
     return (
       <Grid item size={12} key={index}>
@@ -789,6 +788,14 @@ export function formColumnDetailField(form) {
       </Grid>
     )
   }
+
+  if ('custom' === props.type) {
+    return (
+      <Grid item size={{ xs: 12 }} key={index}>
+        {typeof props.render === 'function' ? props.render() : null}
+      </Grid>
+    )
+  }
 }
 
 const formColumnDetailSingleField = form => {
@@ -868,6 +875,14 @@ const formColumnDetailSingleField = form => {
           }}
           gridProps={{ sm: 4, md: 2, xs: 12 }}
         />
+      </Grid>
+    )
+  }
+
+  if ('custom' === props.type) {
+    return (
+      <Grid item size={{ xs: 12 }} key={index}>
+        {typeof props.render === 'function' ? props.render() : null}
       </Grid>
     )
   }
