@@ -205,7 +205,7 @@ const TableView = ({ model, changeSort, ...res }) => {
             count={model.count}
             rowsPerPage={model.perPage}
             onPageChange={model.changePage}
-            rowsPerPageOptions={[15, 30, 50]}
+            rowsPerPageOptions={[10, 15, 25, 30, 50, 100]}
             onRowsPerPageChange={model.changePerPage}
           />
         </>

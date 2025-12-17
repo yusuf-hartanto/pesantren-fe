@@ -5,6 +5,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import emailReducer from './slices/email'
 import kanbanReducer from './slices/kanban'
 import role from '@/app/(dashboard)/(private)/app/role/slice/index'
+import menu from '@/app/(dashboard)/(private)/app/menu/slice/index'
 import tahun_ajaran from '@/app/(dashboard)/(private)/app/tahun-ajaran/slice/index'
 import semester from '@/app/(dashboard)/(private)/app/semester/slice/index'
 import tingkat from '@/app/(dashboard)/(private)/app/tingkat/slice/index'
@@ -18,6 +19,7 @@ export const store = configureStore({
     emailReducer,
     kanbanReducer,
     role,
+    menu,
     tahun_ajaran,
     semester,
     tingkat,

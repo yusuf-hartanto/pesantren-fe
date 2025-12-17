@@ -180,10 +180,6 @@ export function formColumnSingle(state, values) {
 
 // render column
 export const formColumn = param => {
-  // const param = {
-  //     control: control, errors: errors, state: state, setState: setState, fields: fields, count: count
-  // }
-
   const { control, errors, state, setState, fields, count = 2 } = param
 
   // 1 column
@@ -756,6 +752,43 @@ export function formColumnDetailField(form) {
       </Grid>
     )
   }
+
+  if ('icon-picker' === props.type) {
+    const session = form.session
+    const value = session.state[props.key] || ''
+
+    return (
+      <Grid item size={{ xs: 12, sm: 6 }} key={index}>
+        <FormControl fullWidth size="small">
+          <TextField
+            size="small"
+            label={props.label}
+            value={value}
+            placeholder={props.placeholder}
+            InputProps={{
+              readOnly: true,
+              startAdornment: value ? (
+                <InputAdornment position="start">
+                  <i className={value} />
+                </InputAdornment>
+              ) : null,
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={props.options?.onClick}
+                  >
+                    Pilih
+                  </Button>
+                </InputAdornment>
+              )
+            }}
+          />
+        </FormControl>
+      </Grid>
+    )
+  }
 }
 
 const formColumnDetailSingleField = form => {
@@ -853,14 +886,6 @@ export function error(state, key) {
   )
 }
 
-/**
- *             {errors[props.key] && (
- *                 <FormHelperText sx={{color: 'error.main'}} id='validation-basic-last-name'>
- *                     This field is required
- *                 </FormHelperText>
- *             )}
- */
-//export function textField(form = {control: control, errors: errors, session: session, props: props}) {
 const textField = form => {
   const { control, errors, session, props } = form
 
@@ -1188,7 +1213,7 @@ const TextFieldEditor = form => {
     if (editor && session.state[key] !== undefined) {
       editor.commands.setContent(session.state[key])
     }
-  }, [session.state[key]])
+  }, [editor, key, session.state])
 
   return (
     <>
@@ -1322,10 +1347,6 @@ const selectMultiField = form => {
 
   let selected = session.state[props.key]
 
-  // let selected = valueTmp ? props.options.values.find(e => e.value === valueTmp) : {value: null, label: ''}
-
-  console.log('selected', props.key, selected)
-
   return (
     <Controller
       control={control}
@@ -1333,16 +1354,7 @@ const selectMultiField = form => {
       value={selected ?? []}
       defaultValue={[]}
       rules={{ required: props.required }}
-      render={({ field: { value, onChange } }) => {
-        if (value && value?.value) {
-          // console.log('selected-render change', props.key, selected, value)
-          // selected = value
-        } else {
-          // console.log('selected-render change', props.key, selected, value)
-        }
-
-        // value={value ? selected : value}
-        // defaultValue={null}
+      render={({ field: { value, onChange } }) => {        
         return (
           <Autocomplete
             size='small'
@@ -1394,12 +1406,6 @@ const selectMultiField = form => {
 const selectDate = form => {
   const { control, errors, session, props } = form
 
-  // const theme = useTheme()
-
-  // const {direction} = theme
-
-  // const popperPlacement = direction === 'ltr' ? 'bottom-start' : 'bottom-end'
-
   const popperPlacement = 'bottom-start'
 
   if (undefined === props.options || null === props.options) {
@@ -1414,8 +1420,6 @@ const selectDate = form => {
 
   let selected = valueTmp ? props.options.values.find(e => e.value === valueTmp) : { label: '', value: null }
 
-  // console.log('selected', valueTmp, props.key, selected)
-
   return (
     <Controller
       control={control}
@@ -1425,10 +1429,7 @@ const selectDate = form => {
       rules={{ required: props.required }}
       render={({ field: { value, onChange } }) => {
         if (value && value?.value) {
-          // console.log('selected-render change', props.key, selected, value)
           selected = value
-        } else {
-          // console.log('selected-render change', props.key, selected, value)
         }
 
         return (
@@ -1445,7 +1446,6 @@ const selectDate = form => {
               }
             }}
             placeholderText='Click to select a date'
-            //customInput={<PickersCustomInput label={props.label} />}
             disabled={props.readOnly}
             portalId={props.portalId}
             minDate={props.minDate}
@@ -1458,12 +1458,6 @@ const selectDate = form => {
 
 const selectTime = form => {
   const { control, errors, session, props } = form
-
-  // const theme = useTheme()
-
-  // const {direction} = theme
-
-  // const popperPlacement = direction === 'ltr' ? 'bottom-start' : 'bottom-end'
 
   const popperPlacement = 'bottom-start'
 
@@ -1506,8 +1500,6 @@ const selectTime = form => {
               updateValueDate(session, props, date)
             }}
             placeholderText='Click to select a time'
-
-            //customInput={<PickersCustomInput label={props.label} />}
           />
         )
       }}

@@ -1,12 +1,36 @@
-import DOMPurify from "dompurify";
+"use client";
 
-interface HtmlViewerProps {
-  className?: string | null;
-  value?: string | null;
-}
+import { useEffect, useState } from "react";
 
-export default function HtmlViewer({ className, value }: HtmlViewerProps) {
-  const clean = DOMPurify.sanitize(value || "");
+type HtmlViewerProps = {
+  value?: string;
+  className?: string;
+};
 
-  return <div className={className || ""} dangerouslySetInnerHTML={{ __html: clean }} />;
+export default function HtmlViewer({ value = "", className }: HtmlViewerProps) {
+  const [clean, setClean] = useState("");
+
+  useEffect(() => {
+    let mounted = true;
+
+    import("dompurify").then((mod) => {
+      if (!mounted) return;
+      const DOMPurify = mod.default;
+
+      setClean(DOMPurify.sanitize(value));
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, [value]);
+
+  if (!clean) return null;
+
+  return (
+    <div
+      className={className ?? ""}
+      dangerouslySetInnerHTML={{ __html: clean }}
+    />
+  );
 }
