@@ -31,6 +31,19 @@ const statusOption = {
   ]
 }
 
+const typeOption = {
+  values: [
+    {
+      label: 'PESANTREN',
+      value: 'PESANTREN'
+    },
+    {
+      label: 'FORMAL',
+      value: 'FORMAL'
+    }
+  ]
+}
+
 const FormValidationBasic = () => {
   const router = useRouter()
 
@@ -46,12 +59,20 @@ const FormValidationBasic = () => {
     tingkat: string
     keterangan: string
     nomor_urut: any
+    tingkat_type: {
+      value: string
+      label: string
+    }
   }
 
   const defaultValues = {
     tingkat: '',
     keterangan: '',
-    nomor_urut: ''
+    nomor_urut: '',
+    tingkat_type: {
+      value: '',
+      label: ''
+    }
   }
 
   const [state, setState] = useState<FormData>(defaultValues)
@@ -72,7 +93,7 @@ const FormValidationBasic = () => {
 
         if (datas) {
           //console.log('prament', datas)
-
+          datas.tingkat_type = typeOption.values.find(r => r.value === datas.tingkat_type)
           setState(datas)
           reset(datas)
         }
@@ -102,13 +123,19 @@ const FormValidationBasic = () => {
       dispatch(
         postTingkatUpdate({
           id: id,
-          param: { ...state }
+          param: {
+            ...state,
+            tingkat_type: state.tingkat_type.value,
+            nomor_urut: parseInt(state.nomor_urut)
+          }
         })
       )
     } else {
       dispatch(
         postTingkat({
-          ...state
+          ...state,
+          tingkat_type: state.tingkat_type.value,
+          nomor_urut: parseInt(state.nomor_urut)
         })
       )
     }
@@ -127,6 +154,15 @@ const FormValidationBasic = () => {
         label: 'Tingkat',
         placeholder: 'Input Tingkat',
         required: true,
+        readOnly: Boolean(view)
+      }),
+      field({
+        type: 'select',
+        key: 'tingkat_type',
+        label: 'Tipe Lembaga',
+        placeholder: 'Pilih Tipe Lembaga',
+        required: true,
+        options: typeOption,
         readOnly: Boolean(view)
       }),
       field({

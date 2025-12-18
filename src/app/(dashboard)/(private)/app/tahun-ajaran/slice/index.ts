@@ -35,25 +35,22 @@ const initialState: InitialState = {
   data: {},
   datas: [],
   crud: null,
-  delete: null,
+  delete: null
 }
 
 /* --------------------------
    3. Async Thunks (typed)
 --------------------------- */
 
-export const fetchTahunAjaranAll = createAsyncThunk<any>(
-  'tahun-ajaran/fetchAll',
-  async (params, thunkAPI) => {
-    try {
-      const response = await api.get(`/app/tahun-ajaran/all-data`, { params })
+export const fetchTahunAjaranAll = createAsyncThunk<any>('tahun-ajaran/fetchAll', async (params, thunkAPI) => {
+  try {
+    const response = await api.get(`/app/tahun-ajaran/all-data`, { params })
 
-      return response.data
-    } catch (e: any) {
-      return thunkAPI.fulfillWithValue(e.response?.data)
-    }
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
   }
-)
+})
 
 export const fetchTahunAjaranPage = createAsyncThunk<any, FetchParams>(
   'tahun-ajaran/fetchPage',
@@ -68,31 +65,25 @@ export const fetchTahunAjaranPage = createAsyncThunk<any, FetchParams>(
   }
 )
 
-export const fetchTahunAjaranById = createAsyncThunk<any, string>(
-  'tahun-ajaran/fetchById',
-  async (id, thunkAPI) => {
-    try {
-      const response = await api.get(`/app/tahun-ajaran/${id}`)
+export const fetchTahunAjaranById = createAsyncThunk<any, string>('tahun-ajaran/fetchById', async (id, thunkAPI) => {
+  try {
+    const response = await api.get(`/app/tahun-ajaran/${id}`)
 
-      return response.data
-    } catch (e: any) {
-      return thunkAPI.fulfillWithValue(e.response?.data)
-    }
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
   }
-)
+})
 
-export const postTahunAjaran = createAsyncThunk<any, any>(
-  'tahun-ajaran/create',
-  async (params, thunkAPI) => {
-    try {
-      const response = await api.post(`/app/tahun-ajaran`, params)
+export const postTahunAjaran = createAsyncThunk<any, any>('tahun-ajaran/create', async (params, thunkAPI) => {
+  try {
+    const response = await api.post(`/app/tahun-ajaran`, params)
 
-      return response.data
-    } catch (e: any) {
-      return thunkAPI.fulfillWithValue(e.response?.data)
-    }
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
   }
-)
+})
 
 export const postTahunAjaranUpdate = createAsyncThunk<any, { id: string; params: any }>(
   'tahun-ajaran/update',
@@ -107,18 +98,15 @@ export const postTahunAjaranUpdate = createAsyncThunk<any, { id: string; params:
   }
 )
 
-export const deleteTahunAjaran = createAsyncThunk<any, string>(
-  'tahun-ajaran/delete',
-  async (id, thunkAPI) => {
-    try {
-      const response = await api.delete(`/app/tahun-ajaran/${id}`)
+export const deleteTahunAjaran = createAsyncThunk<any, string>('tahun-ajaran/delete', async (id, thunkAPI) => {
+  try {
+    const response = await api.delete(`/app/tahun-ajaran/${id}`)
 
-      return response.data
-    } catch (e: any) {
-      return thunkAPI.fulfillWithValue(e.response?.data)
-    }
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
   }
-)
+})
 
 /* --------------------------
    4. Slice + Reducers
@@ -128,7 +116,7 @@ export const slice = createSlice({
   name: 'tahun_ajaran',
   initialState,
   reducers: {
-    resetRedux: () => initialState,
+    resetRedux: () => initialState
   },
   extraReducers: builder => {
     builder.addCase(fetchTahunAjaranAll.fulfilled, (state, action) => {
@@ -136,7 +124,7 @@ export const slice = createSlice({
     })
 
     builder.addCase(fetchTahunAjaranPage.fulfilled, (state, action) => {
-       state.dataPage = {
+      state.dataPage = {
         values: action.payload.data?.values || [],
         total: action.payload.data?.total || 0
       }
@@ -157,7 +145,7 @@ export const slice = createSlice({
     builder.addCase(postTahunAjaranUpdate.fulfilled, (state, action) => {
       state.crud = action.payload
     })
-  },
+  }
 })
 
 export const { resetRedux } = slice.actions

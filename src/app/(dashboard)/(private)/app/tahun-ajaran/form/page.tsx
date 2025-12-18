@@ -132,7 +132,7 @@ const FormValidationBasic = () => {
         type: 'text',
         key: 'tahun_ajaran',
         label: 'Tahun Ajaran',
-        placeholder: 'Input Tahun Ajaran',
+        placeholder: 'xxxx/xxxx',
         required: true,
         readOnly: Boolean(view)
       }),

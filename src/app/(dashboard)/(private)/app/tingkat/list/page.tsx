@@ -193,8 +193,10 @@ const Table = () => {
         fields: [
           tableColumn('OPTION', 'act-x', 'left', renderOption as any),
           tableColumn('TINGKAT', 'tingkat'),
+          tableColumn('TIPE', 'tingkat_type'),
+          tableColumn('NOMOR URUT', 'nomor_urut'),
           tableColumn('KETERANGAN', 'keterangan'),
-          tableColumn('NOMOR URUT', 'nomor_urut')
+          tableColumn('TERAKHIR DIUBAH', 'updated_at')
         ],
         values: values?.map((row: any) => {
           return {
