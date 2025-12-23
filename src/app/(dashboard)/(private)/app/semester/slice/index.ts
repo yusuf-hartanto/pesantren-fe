@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from 'axios'
 import { getSession } from 'next-auth/react'
+
+import api from '@/libs/axios'
 
 /* --------------------------
    1. Types
@@ -35,109 +36,80 @@ const initialState: InitialState = {
   data: {},
   datas: [],
   crud: null,
-  delete: null,
+  delete: null
 }
 
 /* --------------------------
    3. Async Thunks (typed)
 --------------------------- */
 
-export const fetchSemesterAll = createAsyncThunk<any>(
-  'semester/fetchAll',
-  async (params, thunkAPI) => {
-    const session = await getSession()
+export const fetchSemesterAll = createAsyncThunk<any>('semester/fetchAll', async (params, thunkAPI) => {
+  const session = await getSession()
 
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/semester/all-data`,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-          params
-        },
-      )
+  try {
+    const response = await api.get(`/app/semester/all-data`, {
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+      params
+    })
 
-      return response.data
-    } catch (e: any) {
-      return thunkAPI.fulfillWithValue(e.response?.data)
-    }
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
   }
-)
+})
 
-export const fetchSemesterPage = createAsyncThunk<any, FetchParams>(
-  'semester/fetchPage',
-  async (params, thunkAPI) => {
-    const session = await getSession()
+export const fetchSemesterPage = createAsyncThunk<any, FetchParams>('semester/fetchPage', async (params, thunkAPI) => {
+  const session = await getSession()
 
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/semester`,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-          params
-        }
-      )
+  try {
+    const response = await api.get(`/app/semester`, {
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+      params
+    })
 
-      return response.data
-    } catch (e: any) {
-      return thunkAPI.fulfillWithValue(e.response?.data)
-    }
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
   }
-)
+})
 
-export const fetchSemesterById = createAsyncThunk<any, string>(
-  'semester/fetchById',
-  async (id, thunkAPI) => {
-    const session = await getSession()
+export const fetchSemesterById = createAsyncThunk<any, string>('semester/fetchById', async (id, thunkAPI) => {
+  const session = await getSession()
 
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/semester/${id}`,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-        }
-      )
+  try {
+    const response = await api.get(`/app/semester/${id}`, {
+      headers: { Authorization: `Bearer ${session?.access_token}` }
+    })
 
-      return response.data
-    } catch (e: any) {
-      return thunkAPI.fulfillWithValue(e.response?.data)
-    }
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
   }
-)
+})
 
-export const postSemester = createAsyncThunk<any, any>(
-  'semester/create',
-  async (params, thunkAPI) => {
-    const session = await getSession()
+export const postSemester = createAsyncThunk<any, any>('semester/create', async (params, thunkAPI) => {
+  const session = await getSession()
 
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/semester`,
-        params,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-        }
-      )
+  try {
+    const response = await api.post(`/app/semester`, params, {
+      headers: { Authorization: `Bearer ${session?.access_token}` }
+    })
 
-      return response.data
-    } catch (e: any) {
-      return thunkAPI.fulfillWithValue(e.response?.data)
-    }
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
   }
-)
+})
 
-export const postSemesterUpdate = createAsyncThunk<any, { id: string; param: any }>(
+export const postSemesterUpdate = createAsyncThunk<any, { id: string; params: any }>(
   'semester/update',
-  async ({ id, param }, thunkAPI) => {
+  async ({ id, params }, thunkAPI) => {
     const session = await getSession()
 
     try {
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/semester/${id}`,
-        param,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-        }
-      )
+      const response = await api.put(`/app/semester/${id}`, params, {
+        headers: { Authorization: `Bearer ${session?.access_token}` }
+      })
 
       return response.data
     } catch (e: any) {
@@ -146,25 +118,19 @@ export const postSemesterUpdate = createAsyncThunk<any, { id: string; param: any
   }
 )
 
-export const deleteSemester = createAsyncThunk<any, string>(
-  'semester/delete',
-  async (id, thunkAPI) => {
-    const session = await getSession()
+export const deleteSemester = createAsyncThunk<any, string>('semester/delete', async (id, thunkAPI) => {
+  const session = await getSession()
 
-    try {
-      const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/app/semester/${id}`,
-        {
-          headers: { Authorization: `Bearer ${session?.access_token}` },
-        }
-      )
+  try {
+    const response = await api.delete(`/app/semester/${id}`, {
+      headers: { Authorization: `Bearer ${session?.access_token}` }
+    })
 
-      return response.data
-    } catch (e: any) {
-      return thunkAPI.fulfillWithValue(e.response?.data)
-    }
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
   }
-)
+})
 
 /* --------------------------
    4. Slice + Reducers
@@ -174,7 +140,7 @@ export const slice = createSlice({
   name: 'semester',
   initialState,
   reducers: {
-    resetRedux: () => initialState,
+    resetRedux: () => initialState
   },
   extraReducers: builder => {
     builder.addCase(fetchSemesterAll.fulfilled, (state, action) => {
@@ -203,7 +169,7 @@ export const slice = createSlice({
     builder.addCase(postSemesterUpdate.fulfilled, (state, action) => {
       state.crud = action.payload
     })
-  },
+  }
 })
 
 export const { resetRedux } = slice.actions

@@ -82,7 +82,7 @@ const FormValidationBasic = () => {
         const datas = { ...res?.payload?.data }
 
         if (datas) {
-          datas.status = statusOption.values.find(r => r.value === datas.status)
+          datas.status = statusOption.values.find(r => r.value === datas.status) || { label: 'Arsip', value: 'Arsip' }
 
           setState(datas)
           reset(datas)

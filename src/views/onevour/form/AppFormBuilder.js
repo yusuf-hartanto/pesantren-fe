@@ -758,26 +758,22 @@ export function formColumnDetailField(form) {
 
     return (
       <Grid item size={{ xs: 12, sm: 6 }} key={index}>
-        <FormControl fullWidth size="small">
+        <FormControl fullWidth size='small'>
           <TextField
-            size="small"
+            size='small'
             label={props.label}
             value={value}
             placeholder={props.placeholder}
             InputProps={{
               readOnly: true,
               startAdornment: value ? (
-                <InputAdornment position="start">
+                <InputAdornment position='start'>
                   <i className={value} />
                 </InputAdornment>
               ) : null,
               endAdornment: (
-                <InputAdornment position="end">
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={props.options?.onClick}
-                  >
+                <InputAdornment position='end'>
+                  <Button size='small' variant='outlined' onClick={props.options?.onClick}>
                     Pilih
                   </Button>
                 </InputAdornment>
@@ -1369,7 +1365,7 @@ const selectMultiField = form => {
       value={selected ?? []}
       defaultValue={[]}
       rules={{ required: props.required }}
-      render={({ field: { value, onChange } }) => {        
+      render={({ field: { value, onChange } }) => {
         return (
           <Autocomplete
             size='small'

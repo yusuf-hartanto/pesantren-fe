@@ -19,8 +19,10 @@ import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 
+import { toast } from 'react-toastify'
+
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import { deleteSemester, fetchSemesterPage, resetRedux } from '../slice/index'
+import { deleteSemester, fetchSemesterPage, postSemesterUpdate, resetRedux } from '../slice/index'
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
 import CustomChip from '@core/components/mui/Chip'
@@ -37,6 +39,10 @@ const statusObj: Record<string, { color: any; value: string }> = {
   Nonaktif: {
     color: 'secondary',
     value: 'Nonaktif'
+  },
+  Arsip: {
+    color: 'secondary',
+    value: 'Arsip'
   }
 }
 
@@ -100,6 +106,20 @@ function RowAction(data: any) {
           Edit
         </MenuItem>
 
+        {data.row.status == 'Nonaktif' && (
+          <MenuItem onClick={() => data.handleAktifOrArsip(data.row, 'Aktif')} sx={{ '& svg': { mr: 2 } }}>
+            <i className='tabler-toggle-right' />
+            Set Aktif
+          </MenuItem>
+        )}
+
+        {data.row.status == 'Nonaktif' && (
+          <MenuItem onClick={() => data.handleAktifOrArsip(data.row, 'Arsip')} sx={{ '& svg': { mr: 2 } }}>
+            <i className='tabler-archive' />
+            Arsip
+          </MenuItem>
+        )}
+
         <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}>
           <i className='tabler-trash' />
           Delete
@@ -158,8 +178,36 @@ const Table = () => {
     return () => clearTimeout(timer)
   }, [filter])
 
+  useEffect(() => {
+    if (!store.crud) return
+
+    if (store.crud.status) {
+      toast.success('Success saved')
+      handleChangePage(null, page)
+      dispatch(resetRedux())
+    } else {
+      toast.error('Error saved: ' + store.crud.message)
+    }
+  }, [store.crud])
+
   const onSubmit = () => {
     router.replace('/app/semester/form')
+  }
+
+  const handleAktifOrArsip = (data: any, status: string) => {
+    delete data.status_custom
+    dispatch(
+      postSemesterUpdate({
+        id: data.id_semester,
+        params: {
+          ...data,
+          status: status,
+          id_tahunajaran: {
+            value: data.id_tahunajaran
+          }
+        }
+      })
+    )
   }
 
   const handleFilter = (event: any) => {
@@ -180,7 +228,7 @@ const Table = () => {
   }
 
   const renderOption = (row: any) => {
-    return <RowAction row={row} />
+    return <RowAction row={row} handleAktifOrArsip={handleAktifOrArsip} />
   }
 
   const buildTable = () => {
@@ -195,15 +243,16 @@ const Table = () => {
           tableColumn('OPTION', 'act-x', 'left', renderOption as any),
           tableColumn('TAHUN AJARAN', 'tahun_ajaran'),
           tableColumn('SEMESTER', 'nama_semester'),
-          tableColumn('STATUS', 'status'),
+          tableColumn('STATUS', 'status_custom'),
+          tableColumn('NOMOR URUT', 'nomor_urut'),
           tableColumn('KETERANGAN', 'keterangan'),
-          tableColumn('NOMOR URUT', 'nomor_urut')
+          tableColumn('TERAKHIR DIUBAH', 'updated_at')
         ],
         values: values?.map((row: any) => {
           return {
             ...row,
             tahun_ajaran: row.tahun_ajaran.tahun_ajaran,
-            status: (
+            status_custom: (
               <CustomChip
                 round='true'
                 size='small'

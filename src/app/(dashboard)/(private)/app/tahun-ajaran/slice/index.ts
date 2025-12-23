@@ -42,15 +42,22 @@ const initialState: InitialState = {
    3. Async Thunks (typed)
 --------------------------- */
 
-export const fetchTahunAjaranAll = createAsyncThunk<any>('tahun-ajaran/fetchAll', async (params, thunkAPI) => {
-  try {
-    const response = await api.get(`/app/tahun-ajaran/all-data`, { params })
+export interface FetchParamAlls {
+  status: string
+}
 
-    return response.data
-  } catch (e: any) {
-    return thunkAPI.fulfillWithValue(e.response?.data)
+export const fetchTahunAjaranAll = createAsyncThunk<any, FetchParamAlls>(
+  'tahun-ajaran/fetchAll',
+  async (params, thunkAPI) => {
+    try {
+      const response = await api.get(`/app/tahun-ajaran/all-data`, { params })
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
   }
-})
+)
 
 export const fetchTahunAjaranPage = createAsyncThunk<any, FetchParams>(
   'tahun-ajaran/fetchPage',

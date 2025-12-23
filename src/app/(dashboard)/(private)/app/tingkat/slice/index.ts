@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from 'axios'
 import { getSession } from 'next-auth/react'
+
+import api from '@/libs/axios'
 
 /* --------------------------
    1. Types
@@ -46,7 +47,7 @@ export const fetchTingkatAll = createAsyncThunk<any>('tingkat/fetchAll', async (
   const session = await getSession()
 
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/app/tingkat/all-data`, {
+    const response = await api.get(`/app/tingkat/all-data`, {
       headers: { Authorization: `Bearer ${session?.access_token}` },
       params
     })
@@ -61,7 +62,7 @@ export const fetchTingkatPage = createAsyncThunk<any, FetchParams>('tingkat/fetc
   const session = await getSession()
 
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/app/tingkat`, {
+    const response = await api.get(`/app/tingkat`, {
       headers: { Authorization: `Bearer ${session?.access_token}` },
       params
     })
@@ -76,7 +77,7 @@ export const fetchTingkatById = createAsyncThunk<any, string>('tingkat/fetchById
   const session = await getSession()
 
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/app/tingkat/${id}`, {
+    const response = await api.get(`/app/tingkat/${id}`, {
       headers: { Authorization: `Bearer ${session?.access_token}` }
     })
 
@@ -90,7 +91,7 @@ export const postTingkat = createAsyncThunk<any, any>('tingkat/create', async (p
   const session = await getSession()
 
   try {
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/app/tingkat`, params, {
+    const response = await api.post(`/app/tingkat`, params, {
       headers: { Authorization: `Bearer ${session?.access_token}` }
     })
 
@@ -106,7 +107,7 @@ export const postTingkatUpdate = createAsyncThunk<any, { id: string; param: any 
     const session = await getSession()
 
     try {
-      const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/app/tingkat/${id}`, param, {
+      const response = await api.put(`/app/tingkat/${id}`, param, {
         headers: { Authorization: `Bearer ${session?.access_token}` }
       })
 
@@ -121,7 +122,7 @@ export const deleteTingkat = createAsyncThunk<any, string>('tingkat/delete', asy
   const session = await getSession()
 
   try {
-    const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/app/tingkat/${id}`, {
+    const response = await api.delete(`/app/tingkat/${id}`, {
       headers: { Authorization: `Bearer ${session?.access_token}` }
     })
 

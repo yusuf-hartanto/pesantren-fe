@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 // ** React Imports
 import React, { useEffect, useState } from 'react'
@@ -32,6 +32,19 @@ const statusOption = {
   ]
 }
 
+const semesterOption = [
+  {
+    label: 'Ganjil',
+    value: 'Ganjil',
+    nomor: 1
+  },
+  {
+    label: 'Genap',
+    value: 'Genap',
+    nomor: 2
+  }
+]
+
 const FormValidationBasic = () => {
   const router = useRouter()
 
@@ -45,7 +58,10 @@ const FormValidationBasic = () => {
   const storeTahunAjaran = useAppSelector(state => state.tahun_ajaran)
 
   interface FormData {
-    nama_semester: string
+    nama_semester: {
+      value: string
+      label: string
+    }
     keterangan: string
     nomor_urut: any
     status: {
@@ -59,7 +75,10 @@ const FormValidationBasic = () => {
   }
 
   const defaultValues = {
-    nama_semester: '',
+    nama_semester: {
+      value: '',
+      label: ''
+    },
     keterangan: '',
     nomor_urut: '',
     status: {
@@ -80,18 +99,28 @@ const FormValidationBasic = () => {
     control,
     handleSubmit,
     formState: { errors },
-    reset
-  } = useForm({defaultValues})
+    reset,
+    setValue
+  } = useForm({ defaultValues })
 
   useEffect(() => {
-    dispatch(fetchTahunAjaranAll())
+    dispatch(
+      fetchTahunAjaranAll({
+        status: 'Aktif'
+      })
+    )
 
     if (id) {
       dispatch(fetchSemesterById(id)).then(res => {
         const datas = { ...res?.payload?.data }
 
         if (datas) {
-          datas.status = statusOption.values.find(r => r.value === datas.status)
+          datas.nama_semester = semesterOption.find(r => r.value === datas.nama_semester)
+          datas.status = statusOption.values.find(r => r.value === datas.status) || { label: 'Arsip', value: 'Arsip' }
+          datas.id_tahunajaran = {
+            value: datas.tahun_ajaran.id_tahunajaran,
+            label: datas.tahun_ajaran.tahun_ajaran
+          }
 
           //console.log('prament', datas)
 
@@ -103,7 +132,6 @@ const FormValidationBasic = () => {
   }, [dispatch, reset])
 
   useEffect(() => {
-
     if (!store.crud) return
 
     if (store.crud.status) {
@@ -125,14 +153,21 @@ const FormValidationBasic = () => {
       dispatch(
         postSemesterUpdate({
           id: id,
-          param: { ...state, status: state.status.value }
+          params: {
+            ...state,
+            status: state.status.value,
+            nomor_urut: parseInt(state.nomor_urut),
+            nama_semester: state.nama_semester.value
+          }
         })
       )
     } else {
       dispatch(
         postSemester({
           ...state,
-          status: state.status.value
+          status: state.status.value,
+          nomor_urut: parseInt(state.nomor_urut),
+          nama_semester: state.nama_semester.value
         })
       )
     }
@@ -157,17 +192,29 @@ const FormValidationBasic = () => {
               label: r.tahun_ajaran,
               value: r.id_tahunajaran
             }
-          }),
+          })
         },
         readOnly: Boolean(view)
       }),
       field({
-        type: 'text',
+        type: 'select',
         key: 'nama_semester',
         label: 'Semester',
         placeholder: 'Input Semester',
         required: true,
-        readOnly: Boolean(view)
+        readOnly: Boolean(view),
+        options: {
+          values: semesterOption,
+          onChange: (e: any) => {
+            setValue('nomor_urut', e.nomor)
+            setState(prevState => {
+              return {
+                ...prevState,
+                nomor_urut: e.nomor
+              }
+            })
+          }
+        }
       }),
       field({
         type: 'textarea',
