@@ -65,6 +65,7 @@ export const mapMenu = (menu: ApiMenu): VerticalMenuDataType => {
   const hasChildren = menu.children && menu.children.length > 0
 
   return {
+    id: menu.menu_id,
     label: menu.menu_name,
     icon: menu.menu_icon ?? 'tabler-circle',
     ...(menu.module_name !== '#' && !hasChildren

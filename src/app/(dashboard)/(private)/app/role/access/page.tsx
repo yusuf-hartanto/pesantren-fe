@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -9,11 +9,14 @@ import { useForm } from 'react-hook-form'
 
 import { toast } from 'react-toastify'
 
+import { useSession } from 'next-auth/react'
+
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
 import { fetchRoleMenuById, postRoleMenu, resetRedux, setNavigation } from '../slice'
 import { field, fieldBuildSubmit, formColumn } from '@/views/onevour/form/AppFormBuilder'
 import { fetchMenuAll } from '../../menu/slice'
 import { buildMenuTree } from '@/@core/utils/menuHelpers'
+import { normalizeResource } from '@/libs/permission'
 
 const actions = ['view', 'create', 'edit', 'delete', 'import', 'export'] as const
 
@@ -22,12 +25,14 @@ type ActionType = (typeof actions)[number]
 interface MenuItem {
   menu_id: string
   menu_name: string
+  module_name: string
   menu_icon: string
   children?: MenuItem[]
 }
 
 interface MenuPermission {
   menu_id: string
+  module_name: string
   view: number
   create: number
   edit: number
@@ -36,6 +41,16 @@ interface MenuPermission {
   export: number
   status: number
   children?: MenuPermission[]
+}
+
+interface RoleOption {
+  value: string
+  label: string
+}
+
+interface RoleMenuUpdate {
+  role_id: RoleOption
+  menu: MenuPermission[]
 }
 
 type PermissionMap = Record<string, MenuPermission>
@@ -54,6 +69,13 @@ const defaultValues: FormData = {
 
 const FormValidationBasic = () => {
   const router = useRouter()
+
+  const { update } = useSession()
+
+  const submittedMenuRef = useRef<RoleMenuUpdate>({
+    role_id: { value: "", label: "" },
+    menu: [],
+  })
 
   const searchParams = useSearchParams()
   const id = searchParams.get('id')
@@ -95,6 +117,7 @@ const FormValidationBasic = () => {
       menus.forEach(menu => {
         result.push({
           menu_id: menu.menu_id,
+          module_name: menu.module_name,
           view: 0,
           create: 0,
           edit: 0,
@@ -160,13 +183,31 @@ const FormValidationBasic = () => {
 
     if (store.crud.status) {
       toast.success('Success saved')
+
+      update({
+        permissions: submittedMenuRef?.current?.menu.reduce((acc, m) => {
+          const key = normalizeResource(m.module_name)
+
+          acc[key] = {
+            view: m.view === 1,
+            create: m.create === 1,
+            edit: m.edit === 1,
+            delete: m.delete === 1,
+            import: m.import === 1,
+            export: m.export === 1,
+          }
+          
+          return acc
+        }, {} as Record<string, any>)
+      })
+
       onCancel()
     } else {
       toast.error('Error saved: ' + store.crud.message)
 
       setLoading(false)
     }
-  }, [onCancel, store])
+  }, [onCancel, store, update])
 
   const mergePermissions = (
     defaults: MenuPermission[],
@@ -336,6 +377,8 @@ const FormValidationBasic = () => {
         actions.some(action => menu[action] === 1)
       ),
     }
+
+    submittedMenuRef.current = payload
 
     dispatch(postRoleMenu([payload]))
   }

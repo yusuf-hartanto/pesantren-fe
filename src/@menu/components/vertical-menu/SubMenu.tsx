@@ -1,7 +1,7 @@
 'use client'
 
 // React Imports
-import { Children, cloneElement, forwardRef, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { Children, cloneElement, forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type {
   AnchorHTMLAttributes,
   ForwardRefRenderFunction,
@@ -66,6 +66,7 @@ import StyledVerticalNavExpandIcon, {
 export type SubMenuProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'prefix'> &
   RootStylesType &
   Partial<ChildrenType> & {
+    id: string
     label: ReactNode
     icon?: ReactElement
     prefix?: ReactNode
@@ -120,6 +121,7 @@ const StyledSubMenu = styled.li<StyledSubMenuProps>`
 const SubMenu: ForwardRefRenderFunction<HTMLLIElement, SubMenuProps> = (props, ref) => {
   // Props
   const {
+    id,
     children,
     className,
     contentClassName,
@@ -147,7 +149,6 @@ const SubMenu: ForwardRefRenderFunction<HTMLLIElement, SubMenuProps> = (props, r
   const contentRef = useRef<HTMLDivElement>(null)
 
   // Hooks
-  const id = useId()
   const pathname = usePathname()
   const { isCollapsed, isPopoutWhenCollapsed, isHovered, isBreakpointReached } = useVerticalNav()
   const tree = useFloatingTree()

@@ -127,35 +127,33 @@ const Menu: ForwardRefRenderFunction<HTMLMenuElement, MenuProps> = (props, ref) 
     (...submenus: { level: number; label: ReactNode; active?: boolean; id: string }[]): void => {
       if (!submenus.length) return
 
-      const openSubmenuCopy = [...openSubmenu]
+      const openSubmenuCopy: OpenSubmenu[] = [...openSubmenu]
+      const isAccordion = subMenuOpenBehavior === 'accordion'
 
       submenus.forEach(({ level, label, active = false, id }) => {
+        if (!id) return
+        
         const submenuIndex = openSubmenuCopy.findIndex(submenu => submenu.id === id)
         const submenuExists = submenuIndex >= 0
-        const isAccordion = subMenuOpenBehavior === 'accordion'
-
-        const inactiveSubmenuIndex = openSubmenuCopy.findIndex(submenu => !submenu.active && submenu.level === 0)
 
         // Delete submenu if it exists
         if (submenuExists) {
           openSubmenuCopy.splice(submenuIndex, 1)
+
+          return
         }
 
+          // ✅ ACCORDION: close sibling (LEVEL SAMA)
         if (isAccordion) {
-          // Add submenu if it doesn't exist
-          if (!submenuExists) {
-            if (inactiveSubmenuIndex >= 0 && !active && level === 0) {
-              openSubmenuCopy.splice(inactiveSubmenuIndex, 1, { level, label, active, id })
-            } else {
-              openSubmenuCopy.push({ level, label, active, id })
+          for (let i = openSubmenuCopy.length - 1; i >= 0; i--) {
+            if (openSubmenuCopy[i].level === level) {
+              openSubmenuCopy.splice(i, 1)
             }
           }
-        } else {
-          // Add submenu if it doesn't exist
-          if (!submenuExists) {
-            openSubmenuCopy.push({ level, label, active, id })
-          }
         }
+
+        // ✅ OPEN
+        openSubmenuCopy.push({ level, label, active, id })
       })
 
       setOpenSubmenu(openSubmenuCopy)
@@ -163,10 +161,53 @@ const Menu: ForwardRefRenderFunction<HTMLMenuElement, MenuProps> = (props, ref) 
     [openSubmenu, subMenuOpenBehavior]
   )
 
-  useEffect(() => {
-    setOpenSubmenu([...openSubmenusRef.current])
-    openSubmenusRef.current = []
+  const menuData = useMemo(() => {
+    if (!children || typeof children !== 'object') return []
+    const el = children as any
+
+    return  Array.isArray(el.props?.menuData)
+      ? el.props.menuData
+      : []
+  }, [children])
+
+  const isPathMatch = useCallback(
+  (itemPath?: string) => {
+    if (!itemPath) return false
+
+    return pathname.startsWith(itemPath)
   }, [pathname])
+
+  useEffect(() => {
+    const nextOpen: OpenSubmenu[] = []
+
+    const walk = (items: any[], level = 0) => {
+      items.forEach(item => {
+        if (Array.isArray(item.children) && item.children.length > 0) {
+          const activeChild = item.children.some((child: any) =>
+            isPathMatch(child.href)
+          )
+
+          if (activeChild && item.id != null) {
+            nextOpen.push({
+              id: item.id,
+              label: item.label,
+              level,
+              active: true
+            })
+
+            walk(item.children, level + 1)
+          }
+        }
+      })
+    }
+
+    if (menuData.length > 0) {
+      walk(menuData)
+    }
+
+    setOpenSubmenu(nextOpen)
+
+  }, [pathname, menuData, isPathMatch])
 
   // UseEffect, update verticalNav state to set initial values and update values on change
   useEffect(() => {

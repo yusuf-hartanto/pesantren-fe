@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -30,6 +30,7 @@ import DialogDelete from '@views/onevour/components/dialog-delete'
 
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
+import { useCan } from '@/hooks/useCan'
 
 const statusObj: Record<string, { color: any; value: string }> = {
   Aktif: {
@@ -50,6 +51,9 @@ function RowAction(data: any) {
   const [anchorEl, setAnchorEl] = useState(null)
   const [openConfirm, setOpenConfirm] = useState(false)
   const dispatch = useAppDispatch()
+
+  const canEdit = useCan('edit')
+  const canDelete = useCan('delete')
 
   const rowOptionsOpen = Boolean(anchorEl)
 
@@ -96,34 +100,39 @@ function RowAction(data: any) {
           View
         </MenuItem>
 
-        <MenuItem
-          component={Link}
-          sx={{ '& svg': { mr: 2 } }}
-          href={`/app/tahun-ajaran/form?id=${data.row.id_tahunajaran}`}
-          onClick={handleView}
-        >
-          <i className='tabler-edit' />
-          Edit
-        </MenuItem>
+        {canEdit && [
+          <MenuItem
+            key="edit"
+            component={Link}
+            sx={{ '& svg': { mr: 2 } }}
+            href={`/app/tahun-ajaran/form?id=${data.row.id_tahunajaran}`}
+            onClick={handleView}
+          >
+            <i className='tabler-edit' />
+            Edit
+          </MenuItem>,
 
-        {data.row.status == 'Nonaktif' && (
-          <MenuItem onClick={() => data.handleAktifOrArsip(data.row, 'Aktif')} sx={{ '& svg': { mr: 2 } }}>
-            <i className='tabler-toggle-right' />
-            Set Aktif
+          data.row.status == 'Nonaktif' && (
+            <MenuItem onClick={() => data.handleAktifOrArsip(data.row, 'Aktif')} sx={{ '& svg': { mr: 2 } }}>
+              <i className='tabler-toggle-right' />
+              Set Aktif
+            </MenuItem>
+          ),
+
+          data.row.status == 'Nonaktif' && (
+            <MenuItem onClick={() => data.handleAktifOrArsip(data.row, 'Arsip')} sx={{ '& svg': { mr: 2 } }}>
+              <i className='tabler-archive' />
+              Arsip
+            </MenuItem>
+          ),
+        ]}
+
+        {canDelete && (
+          <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}>
+            <i className='tabler-trash' />
+            Delete
           </MenuItem>
         )}
-
-        {data.row.status == 'Nonaktif' && (
-          <MenuItem onClick={() => data.handleAktifOrArsip(data.row, 'Arsip')} sx={{ '& svg': { mr: 2 } }}>
-            <i className='tabler-archive' />
-            Arsip
-          </MenuItem>
-        )}
-
-        <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}>
-          <i className='tabler-trash' />
-          Delete
-        </MenuItem>
         <DialogDelete
           id={data.row.tahun_ajaran}
           open={openConfirm}
@@ -152,6 +161,8 @@ const Table = () => {
   const dispatch = useAppDispatch()
   const store = useAppSelector(state => state.tahun_ajaran)
 
+  const canCreate = useCan('create')
+
   const [filter, setFilter] = useState('')
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
@@ -172,6 +183,11 @@ const Table = () => {
     return () => clearTimeout(timer)
   }, [dispatch, filter, perPage])
 
+  const handleChangePage = useCallback((event: any, newPage: number) => {
+    setPage(newPage)
+    dispatch(fetchTahunAjaranPage({ page: newPage, perPage: perPage, q: filter }))
+  }, [dispatch, perPage, filter])
+
   useEffect(() => {
     if (!store.crud) return
 
@@ -182,7 +198,7 @@ const Table = () => {
     } else {
       toast.error('Error saved: ' + store.crud.message)
     }
-  }, [store.crud])
+  }, [dispatch, handleChangePage, page, store.crud])
 
   const onSubmit = () => {
     router.replace('/app/tahun-ajaran/form')
@@ -200,11 +216,6 @@ const Table = () => {
 
   const handleFilter = (event: any) => {
     setFilter(event.target.value)
-  }
-
-  const handleChangePage = (event: any, newPage: number) => {
-    setPage(newPage)
-    dispatch(fetchTahunAjaranPage({ page: newPage, perPage: perPage, q: filter }))
   }
 
   const handleChangePerPage = (event: any) => {
@@ -266,11 +277,13 @@ const Table = () => {
         <Card>
           <CardHeader title='Tahun Ajaran' sx={{ paddingBottom: 0 }} />
           <Toolbar sx={{ paddingLeft: '1.5rem !important', paddingRight: '1.5rem !important' }}>
-            <Tooltip title='Add'>
-              <Button size='medium' variant='outlined' onClick={onSubmit}>
-                Add
-              </Button>
-            </Tooltip>
+            {canCreate &&
+              <Tooltip title='Add'>
+                <Button size='medium' variant='outlined' onClick={onSubmit}>
+                  Add
+                </Button>
+              </Tooltip>
+            }
             <Typography sx={{ flex: '1 1 100%' }} variant='h6' id='tableTitle' component='div'></Typography>
             <Tooltip title='Search'>
               <TextField id='outlined-basic' fullWidth label='Search' size='small' onChange={handleFilter} />
