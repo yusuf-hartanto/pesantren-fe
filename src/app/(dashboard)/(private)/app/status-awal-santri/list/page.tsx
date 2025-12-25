@@ -28,6 +28,7 @@ import DialogDelete from '@views/onevour/components/dialog-delete'
 
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
+import { useCan } from '@/hooks/useCan'
 
 const statusObj: Record<string, { color: any; value: string }> = {
   Aktif: {
@@ -44,6 +45,9 @@ function RowAction(data: any) {
   const [anchorEl, setAnchorEl] = useState(null)
   const [openConfirm, setOpenConfirm] = useState(false)
   const dispatch = useAppDispatch()
+
+  const canEdit = useCan('edit')
+  const canDelete = useCan('delete')
 
   const rowOptionsOpen = Boolean(anchorEl)
 
@@ -90,20 +94,24 @@ function RowAction(data: any) {
           View
         </MenuItem>
 
-        <MenuItem
-          component={Link}
-          sx={{ '& svg': { mr: 2 } }}
-          href={`/app/status-awal-santri/form?id=${data.row.id_status_awal_santri}`}
-          onClick={handleView}
-        >
-          <i className='tabler-edit' />
-          Edit
-        </MenuItem>
+        {canEdit && (
+          <MenuItem
+            component={Link}
+            sx={{ '& svg': { mr: 2 } }}
+            href={`/app/status-awal-santri/form?id=${data.row.id_status_awal_santri}`}
+            onClick={handleView}
+          >
+            <i className='tabler-edit' />
+            Edit
+          </MenuItem>
+        )}
 
-        <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}>
-          <i className='tabler-trash' />
-          Delete
-        </MenuItem>
+        {canDelete && (
+          <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}>
+            <i className='tabler-trash' />
+            Delete
+          </MenuItem>
+        )}
         <DialogDelete
           id={data.row.nama_status_awal}
           open={openConfirm}
@@ -133,6 +141,8 @@ const Table = () => {
   const dispatch = useAppDispatch()
 
   const store = useAppSelector(state => state.status_awal_santri)
+
+  const canCreate = useCan('create')
 
   const [filter, setFilter] = useState('')
 
@@ -231,11 +241,13 @@ const Table = () => {
         <Card>
           <CardHeader title='Status Awal Santri' sx={{ paddingBottom: 0 }} />
           <Toolbar sx={{ paddingLeft: '1.5rem !important', paddingRight: '1.5rem !important' }}>
-            <Tooltip title='Add'>
-              <Button size='medium' variant='outlined' onClick={onSubmit}>
-                Add
-              </Button>
-            </Tooltip>
+            {canCreate && (
+              <Tooltip title='Add'>
+                <Button size='medium' variant='outlined' onClick={onSubmit}>
+                  Add
+                </Button>
+              </Tooltip>
+            )}
             <Typography sx={{ flex: '1 1 100%' }} variant='h6' id='tableTitle' component='div'></Typography>
             <Tooltip title='Search'>
               <TextField id='outlined-basic' fullWidth label='Search' size='small' onChange={handleFilter} />

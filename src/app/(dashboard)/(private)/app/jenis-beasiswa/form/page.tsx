@@ -46,7 +46,6 @@ const FormValidationBasic = () => {
     kode_beasiswa: string
     nama_beasiswa: string
     keterangan: string
-    nomor_urut: any
     status: {
       value: string
       label: string
@@ -57,7 +56,6 @@ const FormValidationBasic = () => {
     kode_beasiswa: '',
     nama_beasiswa: '',
     keterangan: '',
-    nomor_urut: '',
     status: {
       value: 'Aktif',
       label: 'Aktif'
@@ -72,6 +70,7 @@ const FormValidationBasic = () => {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
     reset
   } = useForm({ defaultValues })
 
@@ -140,7 +139,18 @@ const FormValidationBasic = () => {
         label: 'Kode Beasiswa',
         placeholder: 'Input Kode Beasiswa',
         required: true,
-        readOnly: Boolean(view)
+        readOnly: Boolean(view),
+        options: {
+          onChange(e: any) {
+            setValue('kode_beasiswa', e.trim())
+            setState(prevState => {
+              return {
+                ...prevState,
+                kode_beasiswa: e.trim()
+              }
+            })
+          }
+        }
       }),
       field({
         type: 'text',
@@ -151,19 +161,11 @@ const FormValidationBasic = () => {
         readOnly: Boolean(view)
       }),
       field({
-        type: 'text',
+        type: 'textarea',
         key: 'keterangan',
         label: 'Keterangan',
         placeholder: 'Input Keterangan',
         required: false,
-        readOnly: Boolean(view)
-      }),
-      field({
-        type: 'numeral',
-        key: 'nomor_urut',
-        label: 'Nomor Urut',
-        placeholder: 'Input Nomor Urut',
-        required: true,
         readOnly: Boolean(view)
       }),
       field({
