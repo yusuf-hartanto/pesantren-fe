@@ -14,6 +14,7 @@ import status_awal_santri from '@/app/(dashboard)/(private)/app/status-awal-sant
 import jenis_beasiswa from '@/app/(dashboard)/(private)/app/jenis-beasiswa/slice/index'
 import program_pesantren from '@/app/(dashboard)/(private)/app/program-pesantren/slice/index'
 import param_global from '@/app/(dashboard)/(private)/app/param-global/slice/index'
+import kelompok_pelajaran from '@/app/(dashboard)/(private)/app/kelompok-pelajaran/slice/index'
 
 export const store = configureStore({
   reducer: {
@@ -29,6 +30,7 @@ export const store = configureStore({
     jenis_beasiswa,
     program_pesantren,
     param_global,
+    kelompok_pelajaran,
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false })
 })

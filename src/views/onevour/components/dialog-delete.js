@@ -1,5 +1,5 @@
 // ** React Imports
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 
 // ** MUI Imports
 import Button from '@mui/material/Button'
@@ -15,7 +15,7 @@ const DialogConfirmation = ({ ...res }) => {
       <Dialog {...res} aria-labelledby='alert-dialog-title' aria-describedby='alert-dialog-description'>
         <DialogTitle id='alert-dialog-title'>Hapus</DialogTitle>
         <DialogContent>
-          <DialogContentText id='alert-dialog-description'>Apakah yakin menghapus data {res.id} ?</DialogContentText>
+          <DialogContentText id='alert-dialog-description'>Apakah yakin menghapus data {res.id}?</DialogContentText>
         </DialogContent>
         <DialogActions className='dialog-actions-dense'>
           <Button onClick={res.handleClose}>Tidak</Button>

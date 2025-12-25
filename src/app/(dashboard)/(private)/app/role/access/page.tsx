@@ -184,22 +184,30 @@ const FormValidationBasic = () => {
     if (store.crud.status) {
       toast.success('Success saved')
 
-      update({
-        permissions: submittedMenuRef?.current?.menu.reduce((acc, m) => {
-          const key = normalizeResource(m.module_name)
+      const permissions = submittedMenuRef.current?.menu.reduce((acc, m) => {
+        const key = normalizeResource(m.module_name)
 
-          acc[key] = {
-            view: m.view === 1,
-            create: m.create === 1,
-            edit: m.edit === 1,
-            delete: m.delete === 1,
-            import: m.import === 1,
-            export: m.export === 1,
-          }
-          
-          return acc
-        }, {} as Record<string, any>)
-      })
+        acc[key] = {
+          view: m.view === 1,
+          create: m.create === 1,
+          edit: m.edit === 1,
+          delete: m.delete === 1,
+          import: m.import === 1,
+          export: m.export === 1,
+        }
+
+        return acc
+      }, {} as Record<string, any>)
+
+      const hasViewDisabled = Object.values(permissions).some(
+        p => p.view === false
+      )
+
+      update({ permissions })
+
+      if (hasViewDisabled) {
+        window.location.reload()
+      }
 
       onCancel()
     } else {

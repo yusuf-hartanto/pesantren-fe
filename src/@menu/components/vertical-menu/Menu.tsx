@@ -35,6 +35,7 @@ import styles from '../../styles/styles.module.css'
 
 // Default Config Imports
 import { verticalSubMenuToggleDuration } from '../../defaultConfigs'
+import { normalizeResource } from '@/libs/permission'
 
 export type MenuSectionStyles = {
   root?: CSSObject
@@ -174,7 +175,9 @@ const Menu: ForwardRefRenderFunction<HTMLMenuElement, MenuProps> = (props, ref) 
   (itemPath?: string) => {
     if (!itemPath) return false
 
-    return pathname.startsWith(itemPath)
+    const resource = normalizeResource(pathname);
+    
+    return itemPath.includes(resource)
   }, [pathname])
 
   useEffect(() => {
