@@ -197,7 +197,7 @@ const Table = () => {
           tableColumn('NAMA STATUS AWAL', 'nama_status_awal'),
           tableColumn('STATUS', 'status'),
           tableColumn('KETERANGAN', 'keterangan'),
-          tableColumn('NOMOR URUT', 'nomor_urut')
+          tableColumn('TERAKHIR DIUBAH', 'updated_at')
         ],
         values: values?.map((row: any) => {
           return {

@@ -46,7 +46,6 @@ const FormValidationBasic = () => {
     kode_status_awal: string
     nama_status_awal: string
     keterangan: string
-    nomor_urut: any
     status: {
       value: string
       label: string
@@ -57,7 +56,6 @@ const FormValidationBasic = () => {
     kode_status_awal: '',
     nama_status_awal: '',
     keterangan: '',
-    nomor_urut: '',
     status: {
       value: 'Aktif',
       label: 'Aktif'
@@ -72,6 +70,7 @@ const FormValidationBasic = () => {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
     reset
   } = useForm({ defaultValues })
 
@@ -140,7 +139,18 @@ const FormValidationBasic = () => {
         label: 'Kode Status Awal',
         placeholder: 'Input Kode Status Awal',
         required: true,
-        readOnly: Boolean(view)
+        readOnly: Boolean(view),
+        options: {
+          onChange(e: any) {
+            setValue('kode_status_awal', e.trim())
+            setState(prevState => {
+              return {
+                ...prevState,
+                kode_status_awal: e.trim()
+              }
+            })
+          }
+        }
       }),
       field({
         type: 'text',
@@ -156,14 +166,6 @@ const FormValidationBasic = () => {
         label: 'Keterangan',
         placeholder: 'Input Keterangan',
         required: false,
-        readOnly: Boolean(view)
-      }),
-      field({
-        type: 'numeral',
-        key: 'nomor_urut',
-        label: 'Nomor Urut',
-        placeholder: 'Input Nomor Urut',
-        required: true,
         readOnly: Boolean(view)
       }),
       field({
