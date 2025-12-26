@@ -19,8 +19,10 @@ import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 
+import { toast } from 'react-toastify'
+
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import { deleteJenisBeasiswa, fetchJenisBeasiswaPage, resetRedux } from '../slice/index'
+import { deleteJenisBeasiswa, fetchJenisBeasiswaPage, postExport, resetRedux } from '../slice/index'
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
 import CustomChip from '@core/components/mui/Chip'
@@ -143,12 +145,16 @@ const Table = () => {
   const store = useAppSelector(state => state.jenis_beasiswa)
 
   const canCreate = useCan('create')
+  const canImport = useCan('import')
+  const canExport = useCan('export')
 
   const [filter, setFilter] = useState('')
 
   const [page, setPage] = useState(1)
 
   const [perPage, setPerPage] = useState(10)
+
+  const [loadingExport, setLoadingExport] = useState(false)
 
   useEffect(() => {
     if (store.delete) {
@@ -168,8 +174,34 @@ const Table = () => {
     return () => clearTimeout(timer)
   }, [filter])
 
-  const onSubmit = () => {
+  const onAddForm = () => {
     router.replace('/app/jenis-beasiswa/form')
+  }
+
+  const onImport = () => {
+    router.replace('/app/jenis-beasiswa/import')
+  }
+
+  const onExport = async () => {
+    try {
+      setLoadingExport(true)
+      const res = await dispatch(postExport({ q: filter })).unwrap()
+
+      if (res?.status && res?.data) {
+        const url = `${process.env.NEXT_PUBLIC_API_URL}${res.data}`
+        const link = document.createElement('a')
+
+        link.href = url
+        link.download = ''
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+    } catch {
+      toast.error('Gagal export data')
+    } finally {
+      setLoadingExport(false)
+    }
   }
 
   const handleFilter = (event: any) => {
@@ -240,17 +272,61 @@ const Table = () => {
       <Grid size={12}>
         <Card>
           <CardHeader title='Jenis Beasiswa' sx={{ paddingBottom: 0 }} />
-          <Toolbar sx={{ paddingLeft: '1.5rem !important', paddingRight: '1.5rem !important' }}>
+          <Toolbar
+            sx={{
+              px: '1.5rem !important',
+              minHeight: 'auto',
+              gap: 2,
+              flexWrap: 'wrap',
+              mb: '10px'
+            }}
+          >
             {canCreate && (
-              <Tooltip title='Add'>
-                <Button size='medium' variant='outlined' onClick={onSubmit}>
-                  Add
+              <Tooltip title='Tambah'>
+                <Button
+                  size='small'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onAddForm}
+                  startIcon={<i className='tabler-plus' />}
+                >
+                  Tambah
                 </Button>
               </Tooltip>
             )}
-            <Typography sx={{ flex: '1 1 100%' }} variant='h6' id='tableTitle' component='div'></Typography>
+
+            {canImport && (
+              <Tooltip title='Import CSV'>
+                <Button
+                  size='small'
+                  color='success'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onImport}
+                  startIcon={<i className='tabler-file-import' />}
+                >
+                  Import CSV
+                </Button>
+              </Tooltip>
+            )}
+
+            {canExport && (
+              <Tooltip title='Export CSV'>
+                <Button
+                  size='small'
+                  color='warning'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onExport}
+                  startIcon={<i className='tabler-file-export' />}
+                >
+                  {loadingExport ? 'Proses...' : 'Export CSV'}
+                </Button>
+              </Tooltip>
+            )}
+            <Typography sx={{ flex: '1 1 auto' }} />
             <Tooltip title='Search'>
-              <TextField id='outlined-basic' fullWidth label='Search' size='small' onChange={handleFilter} />
+              <TextField id='outlined-basic' label='Search' size='small' onChange={handleFilter} />
             </Tooltip>
           </Toolbar>
           <TableView model={buildTable()} changeSort={null} />

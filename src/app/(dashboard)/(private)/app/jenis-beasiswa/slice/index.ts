@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from 'axios'
 import { getSession } from 'next-auth/react'
+
+import api from '@/libs/axios'
 
 /* --------------------------
    1. Types
@@ -21,6 +22,8 @@ export interface InitialState {
   datas: any[]
   crud: any
   delete: string | null
+  import: any
+  export: any
 }
 
 /* --------------------------
@@ -35,7 +38,9 @@ const initialState: InitialState = {
   data: {},
   datas: [],
   crud: null,
-  delete: null
+  delete: null,
+  import: null,
+  export: null
 }
 
 /* --------------------------
@@ -46,7 +51,7 @@ export const fetchJenisBeasiswaAll = createAsyncThunk<any>('jenis-beasiswa/fetch
   const session = await getSession()
 
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/app/jenis-beasiswa/all-data`, {
+    const response = await api.get(`/app/jenis-beasiswa/all-data`, {
       headers: { Authorization: `Bearer ${session?.access_token}` },
       params
     })
@@ -63,7 +68,7 @@ export const fetchJenisBeasiswaPage = createAsyncThunk<any, FetchParams>(
     const session = await getSession()
 
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/app/jenis-beasiswa`, {
+      const response = await api.get(`/app/jenis-beasiswa`, {
         headers: { Authorization: `Bearer ${session?.access_token}` },
         params
       })
@@ -81,7 +86,7 @@ export const fetchJenisBeasiswaById = createAsyncThunk<any, string>(
     const session = await getSession()
 
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/app/jenis-beasiswa/${id}`, {
+      const response = await api.get(`/app/jenis-beasiswa/${id}`, {
         headers: { Authorization: `Bearer ${session?.access_token}` }
       })
 
@@ -96,7 +101,7 @@ export const postJenisBeasiswa = createAsyncThunk<any, any>('jenis-beasiswa/crea
   const session = await getSession()
 
   try {
-    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/app/jenis-beasiswa`, params, {
+    const response = await api.post(`/app/jenis-beasiswa`, params, {
       headers: { Authorization: `Bearer ${session?.access_token}` }
     })
 
@@ -112,7 +117,7 @@ export const postJenisBeasiswaUpdate = createAsyncThunk<any, { id: string; param
     const session = await getSession()
 
     try {
-      const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/app/jenis-beasiswa/${id}`, param, {
+      const response = await api.put(`/app/jenis-beasiswa/${id}`, param, {
         headers: { Authorization: `Bearer ${session?.access_token}` }
       })
 
@@ -127,9 +132,29 @@ export const deleteJenisBeasiswa = createAsyncThunk<any, string>('jenis-beasiswa
   const session = await getSession()
 
   try {
-    const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/app/jenis-beasiswa/${id}`, {
+    const response = await api.delete(`/app/jenis-beasiswa/${id}`, {
       headers: { Authorization: `Bearer ${session?.access_token}` }
     })
+
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
+  }
+})
+
+export const postImport = createAsyncThunk<any, any>('jenis-beasiswa/import', async (params, thunkAPI) => {
+  try {
+    const response = await api.post(`/app/jenis-beasiswa/import`, params)
+
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
+  }
+})
+
+export const postExport = createAsyncThunk<any, any>('jenis-beasiswa/export', async (params, thunkAPI) => {
+  try {
+    const response = await api.post(`/app/jenis-beasiswa/export`, params)
 
     return response.data
   } catch (e: any) {
@@ -173,6 +198,14 @@ export const slice = createSlice({
 
     builder.addCase(postJenisBeasiswaUpdate.fulfilled, (state, action) => {
       state.crud = action.payload
+    })
+
+    builder.addCase(postImport.fulfilled, (state, action) => {
+      state.import = action.payload
+    })
+
+    builder.addCase(postExport.fulfilled, (state, action) => {
+      state.export = action.payload
     })
   }
 })

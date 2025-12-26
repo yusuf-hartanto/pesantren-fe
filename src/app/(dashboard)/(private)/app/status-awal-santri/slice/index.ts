@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import axios from 'axios'
 import { getSession } from 'next-auth/react'
+
+import api from '@/libs/axios'
 
 /* --------------------------
    1. Types
@@ -21,6 +22,8 @@ export interface InitialState {
   datas: any[]
   crud: any
   delete: string | null
+  import: any
+  export: any
 }
 
 /* --------------------------
@@ -35,7 +38,9 @@ const initialState: InitialState = {
   data: {},
   datas: [],
   crud: null,
-  delete: null
+  delete: null,
+  import: null,
+  export: null
 }
 
 /* --------------------------
@@ -48,7 +53,7 @@ export const fetchStatusAwalSantriAll = createAsyncThunk<any>(
     const session = await getSession()
 
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/app/status-awal-santri/all-data`, {
+      const response = await api.get(`/app/status-awal-santri/all-data`, {
         headers: { Authorization: `Bearer ${session?.access_token}` },
         params
       })
@@ -66,7 +71,7 @@ export const fetchStatusAwalSantriPage = createAsyncThunk<any, FetchParams>(
     const session = await getSession()
 
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/app/status-awal-santri`, {
+      const response = await api.get(`/app/status-awal-santri`, {
         headers: { Authorization: `Bearer ${session?.access_token}` },
         params
       })
@@ -84,7 +89,7 @@ export const fetchStatusAwalSantriById = createAsyncThunk<any, string>(
     const session = await getSession()
 
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/app/status-awal-santri/${id}`, {
+      const response = await api.get(`/app/status-awal-santri/${id}`, {
         headers: { Authorization: `Bearer ${session?.access_token}` }
       })
 
@@ -101,7 +106,7 @@ export const postStatusAwalSantri = createAsyncThunk<any, any>(
     const session = await getSession()
 
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/app/status-awal-santri`, params, {
+      const response = await api.post(`/app/status-awal-santri`, params, {
         headers: { Authorization: `Bearer ${session?.access_token}` }
       })
 
@@ -118,7 +123,7 @@ export const postStatusAwalSantriUpdate = createAsyncThunk<any, { id: string; pa
     const session = await getSession()
 
     try {
-      const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/app/status-awal-santri/${id}`, param, {
+      const response = await api.put(`/app/status-awal-santri/${id}`, param, {
         headers: { Authorization: `Bearer ${session?.access_token}` }
       })
 
@@ -135,7 +140,7 @@ export const deleteStatusAwalSantri = createAsyncThunk<any, string>(
     const session = await getSession()
 
     try {
-      const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/app/status-awal-santri/${id}`, {
+      const response = await api.delete(`/app/status-awal-santri/${id}`, {
         headers: { Authorization: `Bearer ${session?.access_token}` }
       })
 
@@ -145,6 +150,26 @@ export const deleteStatusAwalSantri = createAsyncThunk<any, string>(
     }
   }
 )
+
+export const postImport = createAsyncThunk<any, any>('status-awal-santri/import', async (params, thunkAPI) => {
+  try {
+    const response = await api.post(`/app/status-awal-santri/import`, params)
+
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
+  }
+})
+
+export const postExport = createAsyncThunk<any, any>('status-awal-santri/export', async (params, thunkAPI) => {
+  try {
+    const response = await api.post(`/app/status-awal-santri/export`, params)
+
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
+  }
+})
 
 /* --------------------------
    4. Slice + Reducers
@@ -182,6 +207,14 @@ export const slice = createSlice({
 
     builder.addCase(postStatusAwalSantriUpdate.fulfilled, (state, action) => {
       state.crud = action.payload
+    })
+
+    builder.addCase(postImport.fulfilled, (state, action) => {
+      state.import = action.payload
+    })
+
+    builder.addCase(postExport.fulfilled, (state, action) => {
+      state.export = action.payload
     })
   }
 })

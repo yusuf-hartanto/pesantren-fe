@@ -21,6 +21,8 @@ export interface InitialState {
   datas: any[]
   crud: any
   delete: string | null
+  import: any
+  export: any
 }
 
 /* --------------------------
@@ -35,7 +37,9 @@ const initialState: InitialState = {
   data: {},
   datas: [],
   crud: null,
-  delete: null
+  delete: null,
+  import: null,
+  export: null
 }
 
 /* --------------------------
@@ -115,6 +119,26 @@ export const deleteTahunAjaran = createAsyncThunk<any, string>('tahun-ajaran/del
   }
 })
 
+export const postImport = createAsyncThunk<any, any>('tahun-ajaran/import', async (params, thunkAPI) => {
+  try {
+    const response = await api.post(`/app/tahun-ajaran/import`, params)
+
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
+  }
+})
+
+export const postExport = createAsyncThunk<any, any>('tahun-ajaran/export', async (params, thunkAPI) => {
+  try {
+    const response = await api.post(`/app/tahun-ajaran/export`, params)
+
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
+  }
+})
+
 /* --------------------------
    4. Slice + Reducers
 --------------------------- */
@@ -151,6 +175,14 @@ export const slice = createSlice({
 
     builder.addCase(postTahunAjaranUpdate.fulfilled, (state, action) => {
       state.crud = action.payload
+    })
+
+    builder.addCase(postImport.fulfilled, (state, action) => {
+      state.import = action.payload
+    })
+
+    builder.addCase(postExport.fulfilled, (state, action) => {
+      state.export = action.payload
     })
   }
 })
