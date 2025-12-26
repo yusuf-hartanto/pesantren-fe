@@ -17,6 +17,7 @@ import { field, fieldBuildSubmit, formColumn } from '@/views/onevour/form/AppFor
 import { fetchMenuAll } from '../../menu/slice'
 import { buildMenuTree } from '@/@core/utils/menuHelpers'
 import { normalizeResource } from '@/libs/permission'
+import { useIsMobile } from "@core/hooks/useIsMobile"
 
 const actions = ['view', 'create', 'edit', 'delete', 'import', 'export'] as const
 
@@ -83,6 +84,7 @@ const FormValidationBasic = () => {
   const dispatch = useAppDispatch()
   const store = useAppSelector(state => state.role)
   const navigation = useAppSelector(state => state.role.navigation)
+  const isMobile = useIsMobile(1000);
 
   const [state, setState] = useState<FormData>(defaultValues)
   const [loading, setLoading] = useState(false)
@@ -372,6 +374,59 @@ const FormValidationBasic = () => {
     </Fragment>
   ))
 
+  const renderMenuMobile = (items: MenuItem[], level = 0) =>
+  items.map(item => (
+    <div
+      key={item.menu_id}
+      className="border rounded-lg p-3 bg-white shadow-sm"
+      style={{ marginLeft: level * 12 }}
+    >
+      <div className="flex items-center gap-2 mb-2">
+        {item.menu_icon && <i className={item.menu_icon} />}
+        <span className={level === 0 ? 'font-semibold' : 'font-medium'}>
+          {item.menu_name}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        {actions.map(action => {
+          const checked =
+            permissionMap[item.menu_id]?.[action] === 1 ||
+            hasAnyChecked(item, action, permissionMap)
+
+          const disabled =
+            action !== 'view' &&
+            permissionMap[item.menu_id]?.view === 0
+
+          return (
+            <label
+              key={action}
+              className={`flex items-center justify-between text-xs border rounded px-2 py-1
+                ${disabled ? 'opacity-50' : ''}`}
+            >
+              <span className="capitalize">{action}</span>
+              <input
+                type="checkbox"
+                className="w-4 h-4"
+                checked={checked}
+                disabled={disabled}
+                onChange={e =>
+                  togglePermission(item.menu_id, action, e.target.checked)
+                }
+              />
+            </label>
+          )
+        })}
+      </div>
+
+      {Array.isArray(item.children) && item.children.length > 0 && (
+        <div className="mt-3 space-y-2 border-l pl-3">
+          {renderMenuMobile(item.children, level + 1)}
+        </div>
+      )}
+    </div>
+  ))
+
   const onSubmit = () => {
     if (loading) return
     setLoading(true)
@@ -404,30 +459,36 @@ const FormValidationBasic = () => {
       type: 'custom',
       key: 'menu',
       render: () => (
-        <table className="table w-full border border-gray-200 text-sm">
-          <thead className="bg-gray-50 sticky top-0 z-10">
-            <tr>
-              <th className="px-3 py-2 text-left">Menu</th>
-              {actions.map(action => (
-                <th key={action} className="px-3 py-2 text-center">
-                  <div className="capitalize">{action}</div>
-                  <input
-                    type="checkbox"
-                    className="w-4 h-4"
-                    checked={isAllChecked(action)}
-                    ref={el => {
-                      if (el) el.indeterminate = isSomeChecked(action)
-                    }}
-                    onChange={e => onCheckAll(action, e.target.checked)}
-                  />
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {renderMenu(navigation)}
-          </tbody>
-        </table>
+        isMobile ? (
+          <div className="space-y-3">
+            {renderMenuMobile(navigation)}
+          </div>
+          ) : (
+          <table className="table w-full border border-gray-200 text-sm">
+            <thead className="bg-gray-50 sticky top-0 z-10">
+              <tr>
+                <th className="px-3 py-2 text-left">Menu</th>
+                {actions.map(action => (
+                  <th key={action} className="px-3 py-2 text-center">
+                    <div className="capitalize">{action}</div>
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4"
+                      checked={isAllChecked(action)}
+                      ref={el => {
+                        if (el) el.indeterminate = isSomeChecked(action)
+                      }}
+                      onChange={e => onCheckAll(action, e.target.checked)}
+                    />
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {renderMenu(navigation)}
+            </tbody>
+          </table>
+        )
       )
     }),
     fieldBuildSubmit({ onCancel, loading })

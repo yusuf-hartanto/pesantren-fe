@@ -23,8 +23,6 @@ import AuthGuard from '@/hocs/AuthGuard'
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
 
 const Layout = async (props: ChildrenType ) => {
-
-
   const { children } = props
 
   // Vars

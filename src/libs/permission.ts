@@ -50,6 +50,6 @@ export function normalizeResource(path: string): string {
   return path
     .toLowerCase()
     .split('?')[0]
-    .replace(/\/(list|form|edit|detail|access)(\/.*)?$/, '')
+    .replace(/\/(list|form|edit|detail|access|import)(\/.*)?$/, '')
     .replace(/\/$/, '');
 }

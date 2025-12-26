@@ -139,15 +139,11 @@ function RowAction(data: any) {
 const Table = () => {
   // ** Hooks
   const router = useRouter()
-
   const dispatch = useAppDispatch()
-
   const store = useAppSelector(state => state.role)
 
   const [filter, setFilter] = useState('')
-
   const [page, setPage] = useState(1)
-
   const [perPage, setPerPage] = useState(10)
 
   useEffect(() => {
