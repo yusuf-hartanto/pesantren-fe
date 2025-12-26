@@ -1,0 +1,1 @@
+"use strict";exports.id=5466,exports.ids=[5466],exports.modules={5466:(e,s,d)=>{d.r(s),d.d(s,{default:()=>x});var t=d(62740),l=d(97883),i=d(80137),r=d(15302);let x=()=>(0,t.jsxs)(l.default,{container:!0,spacing:6,children:[(0,t.jsx)(l.default,{size:{xs:12},children:(0,t.jsx)(i.default,{})}),(0,t.jsx)(l.default,{size:{xs:12},children:(0,t.jsx)(r.default,{})})]})}};
