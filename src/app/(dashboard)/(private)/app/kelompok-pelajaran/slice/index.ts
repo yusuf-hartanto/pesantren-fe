@@ -103,6 +103,20 @@ export const postKelompokPelajaran = createAsyncThunk<any, any>(
   }
 )
 
+export const postBatchKelompokPelajaran = createAsyncThunk<any, any>(
+  'kelompok_pelajaran/insert',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/kelompok-pelajaran/insert`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
 export const postKelompokPelajaranUpdate = createAsyncThunk<any, { id: string; params: any }>(
   'kelompok_pelajaran/update',
   async ({ id, params }, thunkAPI) => {
@@ -190,6 +204,10 @@ export const slice = createSlice({
     })
 
     builder.addCase(postKelompokPelajaran.fulfilled, (state, action) => {
+      state.crud = action.payload
+    })
+
+    builder.addCase(postBatchKelompokPelajaran.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
