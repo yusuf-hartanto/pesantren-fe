@@ -16,6 +16,7 @@ import program_pesantren from '@/app/(dashboard)/(private)/app/program-pesantren
 import param_global from '@/app/(dashboard)/(private)/app/param-global/slice/index'
 import kelompok_pelajaran from '@/app/(dashboard)/(private)/app/kelompok-pelajaran/slice/index'
 import orang_tua_wali from '@/app/(dashboard)/(private)/app/orang-tua-wali/slice/index'
+import jenis_jam_pelajaran from '@/app/(dashboard)/(private)/app/jenis-jam-pelajaran/slice/index'
 
 export const store = configureStore({
   reducer: {
@@ -32,7 +33,8 @@ export const store = configureStore({
     program_pesantren,
     param_global,
     kelompok_pelajaran,
-    orang_tua_wali
+    orang_tua_wali,
+    jenis_jam_pelajaran,
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false })
 })

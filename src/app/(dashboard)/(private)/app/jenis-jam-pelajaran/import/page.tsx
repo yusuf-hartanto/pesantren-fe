@@ -10,17 +10,16 @@ import { toast } from 'react-toastify'
 import Button from '@mui/material/Button'
 
 import { useAppDispatch } from '@/redux-store/hook'
-import { postBatchKelompokPelajaran, postExport, postImport, resetRedux } from '../slice'
+import { postBatchJenisJamPelajaran, postExport, postImport, resetRedux } from '../slice'
 import { useIsMobile } from '@/@core/hooks/useIsMobile'
 import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 
 export interface ImportPayload {
-  nama_kelpelajaran: string
+  nama_jenis_jam: string
   nomor_urut: number | null
   keterangan: string | null
   status: 'A' | 'N'
-  parent_id: string | null
-  parent_nama: string | null
+  lembaga_type: 'FORMAL' | 'PESANTREN'
 }
 
 export interface ImportRow {
@@ -59,7 +58,7 @@ export default function ImportExcelPage() {
 
   const onCancel = useCallback(() => {
     dispatch(resetRedux())
-    router.replace('/app/kelompok-pelajaran/list')
+    router.replace('/app/jenis-jam-pelajaran/list')
   }, [dispatch, router])
   
   const downloadTemplate = async () => {
@@ -152,14 +151,14 @@ export default function ImportExcelPage() {
 
     const payloads = preview?.data.filter(d => d.valid)
     .map(d => {
-      const { parent_nama, ...payload } = d.payload;
+      const { ...payload } = d.payload;
 
       return payload
     })
     
     try {
       setLoadingImport(true)
-      const res = await dispatch(postBatchKelompokPelajaran({ data: payloads })).unwrap()
+      const res = await dispatch(postBatchJenisJamPelajaran({ data: payloads })).unwrap()
       const { status, message } = res
 
       if (!status) {
@@ -241,15 +240,15 @@ export default function ImportExcelPage() {
 
                   <div className="space-y-1">
                     <div>
-                      <span className="text-gray-500">Nama Kelompok</span>
+                      <span className="text-gray-500">Nama</span>
                       <div className="font-medium">
-                        {row.payload.nama_kelpelajaran}
+                        {row.payload.nama_jenis_jam}
                       </div>
                     </div>
 
                     <div>
-                      <span className="text-gray-500">Nama Induk</span>
-                      <div>{row.payload.parent_nama ?? '-'}</div>
+                      <span className="text-gray-500">Tipe</span>
+                      <div>{row.payload.lembaga_type ?? '-'}</div>
                     </div>
 
                     <div className="flex gap-4">
@@ -285,8 +284,8 @@ export default function ImportExcelPage() {
                 <thead className="bg-gray-100 text-left">
                   <tr>
                     <th className="px-3 py-2">#</th>
-                    <th className="px-3 py-2">Nama Kelompok</th>
-                    <th className="px-3 py-2">Nama Induk</th>
+                    <th className="px-3 py-2">Nama</th>
+                    <th className="px-3 py-2">Tipe</th>
                     <th className="px-3 py-2">Nomor Urut</th>
                     <th className="px-3 py-2">Keterangan</th>
                     <th className="px-3 py-2">Status</th>
@@ -303,10 +302,10 @@ export default function ImportExcelPage() {
                     >
                       <td className="px-3 py-2">{row.row}</td>
                       <td className="px-3 py-2 font-medium">
-                        {row.payload.nama_kelpelajaran}
+                        {row.payload.nama_jenis_jam}
                       </td>
                       <td className="px-3 py-2">
-                        {row.payload.parent_nama ?? '-'}
+                        {row.payload.lembaga_type ?? '-'}
                       </td>
                       <td className="px-3 py-2">
                         {row.payload.nomor_urut ?? '-'}
@@ -381,7 +380,7 @@ export default function ImportExcelPage() {
       <div className="mx-auto">
         <div className="mb-6">
           <Link
-            href="/app/kelompok-pelajaran/list"
+            href="/app/jenis-jam-pelajaran/list"
             className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
           >
             <i className='tabler-arrow-back-up'></i> Kembali
@@ -396,8 +395,8 @@ export default function ImportExcelPage() {
             <h3 className="font-medium mb-2">Petunjuk Import</h3>
             <ul className="list-disc list-inside space-y-1">
               <li>Format file: Excel (encoding UTF-8)</li>
-              <li>Jika <b>nama_kelpelajaran</b> kosong → INSERT (data baru)</li>
-              <li>Jika <b>nama_kelpelajaran</b> ada → UPDATE (perbarui data)</li>
+              <li>Jika <b>nama_jenis_jam</b> kosong → INSERT (data baru)</li>
+              <li>Jika <b>nama_jenis_jam</b> ada → UPDATE (perbarui data)</li>
               <li>Mode Preview: hanya validasi tanpa menyimpan</li>
               <li>Mode Commit: validasi dan simpan ke database</li>
             </ul>

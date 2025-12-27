@@ -108,7 +108,7 @@ const TableView = ({ model, changeSort, ...res }) => {
           const statusField = model.fields.find(f => f.key === "status");
           const updatedField = model.fields.find(f => f.key === "updated_at");
           const actionField = model.fields.find(f => f.key === "act-x");
-          const descriptionFields = model.fields.filter(f => ["keterangan", "description"].includes(f.key));
+          const descriptionFields = model.fields.filter(f => ["keterangan", "description"].includes(f.key.toLowerCase()));
 
           const otherFields = model.fields.filter(
             f => !["status", "updated_at", "act-x", "keterangan", "description"].includes(f.key)
