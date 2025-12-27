@@ -11,6 +11,8 @@ import Button from '@mui/material/Button'
 
 import { useAppDispatch } from '@/redux-store/hook'
 import { postBatchKelompokPelajaran, postExport, postImport, resetRedux } from '../slice'
+import { useIsMobile } from '@/@core/hooks/useIsMobile'
+import { ConfirmDialog } from '@/components/dialogs/ConfirmDialog'
 
 export interface ImportPayload {
   nama_kelpelajaran: string
@@ -39,6 +41,7 @@ export interface ImportPreviewResponse {
 interface Props {
   result: ImportPreviewResponse
   onCommit: () => void
+  onReset: () => void
 }
 
 export default function ImportExcelPage() {
@@ -52,7 +55,7 @@ export default function ImportExcelPage() {
   const [loading, setLoading] = useState(false)
   const [loadingImport, setLoadingImport] = useState(false)
   const [preview, setPreview] = useState<ImportPreviewResponse>()
-
+  const [openConfirm, setOpenConfirm] = useState(false)
 
   const onCancel = useCallback(() => {
     dispatch(resetRedux())
@@ -102,7 +105,7 @@ export default function ImportExcelPage() {
   }
 
   const onSubmit = async () => {
-    if (!file) return alert('File belum dipilih')
+    if (!file) return toast.warning('File belum dipilih')
 
     const formData = new FormData()
 
@@ -134,8 +137,21 @@ export default function ImportExcelPage() {
     }
   }
 
-  const handleCommit = async () => {
-    const payloads = preview?.data.map(d => {
+  const handleCommit = () => {
+  if (preview && preview.invalid > 0) {
+    setOpenConfirm(true)
+
+    return
+  }
+
+  handleConfirmCommit()
+}
+
+  const handleConfirmCommit = async () => {
+    if (!preview) return;
+
+    const payloads = preview?.data.filter(d => d.valid)
+    .map(d => {
       const { parent_nama, ...payload } = d.payload;
 
       return payload
@@ -160,6 +176,12 @@ export default function ImportExcelPage() {
     } finally {
       setLoadingImport(false)
     }
+  }
+
+  const handleReset = () => {
+    setFileName(null);
+    setFile(null);
+    setPreview(undefined);
   }
 
   const SummaryCard = ({
@@ -187,84 +209,176 @@ export default function ImportExcelPage() {
     )
   }
 
-  const ImportPreview =({ result, onCommit }: Props) => {
+  const ImportPreview =({ result, onCommit, onReset }: Props) => {
+    const isMobile = useIsMobile(1000)
+    
     return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-3 gap-4">
-          <SummaryCard title="Total Data" value={result.total} />
-          <SummaryCard title="Valid" value={result.valid} color="green" />
-          <SummaryCard title="Invalid" value={result.invalid} color="red" />
-        </div>
+      <>
+        <div className="space-y-6">
+          <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
+            <SummaryCard title="Total Data" value={result.total} />
+            <SummaryCard title="Valid" value={result.valid} color="green" />
+            <SummaryCard title="Invalid" value={result.invalid} color="red" />
+          </div>
 
-        <div className="overflow-x-auto rounded-lg border">
-          <table className="min-w-full text-sm">
-            <thead className="bg-gray-100 text-left">
-              <tr>
-                <th className="px-3 py-2">#</th>
-                <th className="px-3 py-2">Nama Kelompok</th>
-                <th className="px-3 py-2">Nama Induk</th>
-                <th className="px-3 py-2">Nomor Urut</th>
-                <th className="px-3 py-2">Keterangan</th>
-                <th className="px-3 py-2">Status</th>
-                <th className="px-3 py-2">Valid</th>
-              </tr>
-            </thead>
-            <tbody>
+          {isMobile ? (
+            <div className="space-y-3">
               {result.data.map((row) => (
-                <tr
+                <div
                   key={row.row}
-                  className={(
-                    row.valid ? 'border-t bg-white' : 'border-t bg-red-50'
-                  )}
+                  className={`rounded-lg border p-3 text-sm ${
+                    row.valid ? 'bg-white' : 'bg-red-50'
+                  }`}
                 >
-                  <td className="px-3 py-2">{row.row}</td>
-                  <td className="px-3 py-2 font-medium">
-                    {row.payload.nama_kelpelajaran}
-                  </td>
-                  <td className="px-3 py-2">
-                    {row.payload.parent_nama ?? '-'}
-                  </td>
-                  <td className="px-3 py-2">
-                    {row.payload.nomor_urut ?? '-'}
-                  </td>
-                  <td className="px-3 py-2">
-                    {row.payload.keterangan ?? '-'}
-                  </td>
-                  <td className="px-3 py-2">
-                    {row.payload.status === 'A' ? 'Aktif' : 'Nonaktif'}
-                  </td>
-                  <td className="px-3 py-2">
+                  <div className="flex justify-between mb-2">
+                    <span className="font-semibold">Row #{row.row}</span>
                     {row.valid ? (
-                      <span className="text-green-600 font-semibold">✓</span>
+                      <span className="text-green-600 font-semibold">✓ Valid</span>
                     ) : (
-                      <span className="text-red-600">{row.error}</span>
+                      <span className="text-red-600">✕ Invalid</span>
                     )}
-                  </td>
-                </tr>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div>
+                      <span className="text-gray-500">Nama Kelompok</span>
+                      <div className="font-medium">
+                        {row.payload.nama_kelpelajaran}
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="text-gray-500">Nama Induk</span>
+                      <div>{row.payload.parent_nama ?? '-'}</div>
+                    </div>
+
+                    <div className="flex gap-4">
+                      <div>
+                        <span className="text-gray-500">Nomor Urut</span>
+                        <div>{row.payload.nomor_urut ?? '-'}</div>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Status</span>
+                        <div>
+                          {row.payload.status === 'A' ? 'Aktif' : 'Nonaktif'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="text-gray-500">Keterangan</span>
+                      <div>{row.payload.keterangan ?? '-'}</div>
+                    </div>
+
+                    {!row.valid && (
+                      <div className="text-red-600 text-xs mt-1">
+                        {row.error}
+                      </div>
+                    )}
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-lg border">
+              <table className="min-w-full text-sm">
+                <thead className="bg-gray-100 text-left">
+                  <tr>
+                    <th className="px-3 py-2">#</th>
+                    <th className="px-3 py-2">Nama Kelompok</th>
+                    <th className="px-3 py-2">Nama Induk</th>
+                    <th className="px-3 py-2">Nomor Urut</th>
+                    <th className="px-3 py-2">Keterangan</th>
+                    <th className="px-3 py-2">Status</th>
+                    <th className="px-3 py-2">Valid</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {result.data.map((row) => (
+                    <tr
+                      key={row.row}
+                      className={(
+                        row.valid ? 'border-t bg-white' : 'border-t bg-red-50'
+                      )}
+                    >
+                      <td className="px-3 py-2">{row.row}</td>
+                      <td className="px-3 py-2 font-medium">
+                        {row.payload.nama_kelpelajaran}
+                      </td>
+                      <td className="px-3 py-2">
+                        {row.payload.parent_nama ?? '-'}
+                      </td>
+                      <td className="px-3 py-2">
+                        {row.payload.nomor_urut ?? '-'}
+                      </td>
+                      <td className="px-3 py-2">
+                        {row.payload.keterangan ?? '-'}
+                      </td>
+                      <td className="px-3 py-2">
+                        {row.payload.status === 'A' ? 'Aktif' : 'Nonaktif'}
+                      </td>
+                      <td className="px-3 py-2">
+                        {row.valid ? (
+                          <span className="text-green-600 font-semibold">✓</span>
+                        ) : (
+                          <span className="text-red-600">{row.error}</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-3">
+            <Button
+              size="small"
+              color="warning"
+              variant="contained"
+              sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+              onClick={onReset}
+              startIcon={<i className="tabler-refresh" />}
+            >
+              Reset Data
+            </Button>
+            <Button
+              size="small"
+              variant="contained"
+              sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+              onClick={onCommit}
+              disabled={loadingImport}
+              startIcon={<i className="tabler-file-import" />}
+            >
+              {loadingImport ? 'Menyimpan...' :  'Import Data'}
+            </Button>
+          </div>
         </div>
 
-        <div className="flex justify-end gap-3">
-          <Button
-            size="small"
-            variant="contained"
-            sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
-            onClick={onCommit}
-            disabled={result.invalid > 0 || loadingImport}
-            startIcon={<i className="tabler-file-import" />}
-          >
-            {loadingImport ? 'Menyimpan...' :  'Import Data'}
-          </Button>
-        </div>
-      </div>
+        <ConfirmDialog
+          open={openConfirm}
+          title="Konfirmasi Import"
+          confirmText="Ya, Simpan"
+          onClose={() => setOpenConfirm(false)}
+          onConfirm={() => {
+            setOpenConfirm(false)
+            handleConfirmCommit()
+          }}
+          description={
+            <>
+              Terdapat <b>{result.invalid}</b> data invalid.
+              <br />
+              Apakah akan menyimpan data <b>tanpa data invalid</b>?
+            </>
+          }
+        />
+      </>
     )
   }
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
-      <div className="max-w-3xl mx-auto">
+      <div className="mx-auto">
         <div className="mb-6">
           <Link
             href="/app/kelompok-pelajaran/list"
@@ -328,7 +442,7 @@ export default function ImportExcelPage() {
           </div>
 
           {preview ? (
-            <ImportPreview result={preview} onCommit={handleCommit} />
+            <ImportPreview result={preview} onCommit={handleCommit} onReset={handleReset} />
           ) : (
             <div>
               <label className="block font-medium mb-2">
@@ -349,7 +463,7 @@ export default function ImportExcelPage() {
 
                   <button
                     type="button"
-                    className="px-2 py-1 bg-blue-600 text-white rounded-md text-sm"
+                    className="px-2 py-1 bg-blue-600 text-white rounded-md text-sm cursor-pointer"
                   >
                     Pilih File
                   </button>
