@@ -18,6 +18,7 @@ import kelompok_pelajaran from '@/app/(dashboard)/(private)/app/kelompok-pelajar
 import orang_tua_wali from '@/app/(dashboard)/(private)/app/orang-tua-wali/slice/index'
 import kelas_mda from '@/app/(dashboard)/(private)/app/kelas-mda/slice/index'
 import kelas_formal from '@/app/(dashboard)/(private)/app/kelas-formal/slice/index'
+import jenis_jam_pelajaran from '@/app/(dashboard)/(private)/app/jenis-jam-pelajaran/slice/index'
 
 export const store = configureStore({
   reducer: {
@@ -36,7 +37,8 @@ export const store = configureStore({
     kelompok_pelajaran,
     orang_tua_wali,
     kelas_mda,
-    kelas_formal
+    kelas_formal,
+    jenis_jam_pelajaran
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false })
 })
