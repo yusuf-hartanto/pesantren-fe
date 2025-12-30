@@ -43,11 +43,15 @@ const initialState: InitialState = {
   export: null
 }
 
+export interface FetchParamAlls {
+  type: string
+}
+
 /* --------------------------
    3. Async Thunks (typed)
 --------------------------- */
 
-export const fetchTingkatAll = createAsyncThunk<any>('tingkat/fetchAll', async (params, thunkAPI) => {
+export const fetchTingkatAll = createAsyncThunk<any, FetchParamAlls>('tingkat/fetchAll', async (params, thunkAPI) => {
   const session = await getSession()
 
   try {

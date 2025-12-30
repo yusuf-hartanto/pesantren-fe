@@ -16,6 +16,8 @@ import program_pesantren from '@/app/(dashboard)/(private)/app/program-pesantren
 import param_global from '@/app/(dashboard)/(private)/app/param-global/slice/index'
 import kelompok_pelajaran from '@/app/(dashboard)/(private)/app/kelompok-pelajaran/slice/index'
 import orang_tua_wali from '@/app/(dashboard)/(private)/app/orang-tua-wali/slice/index'
+import kelas_mda from '@/app/(dashboard)/(private)/app/kelas-mda/slice/index'
+import kelas_formal from '@/app/(dashboard)/(private)/app/kelas-formal/slice/index'
 
 export const store = configureStore({
   reducer: {
@@ -32,7 +34,9 @@ export const store = configureStore({
     program_pesantren,
     param_global,
     kelompok_pelajaran,
-    orang_tua_wali
+    orang_tua_wali,
+    kelas_mda,
+    kelas_formal
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false })
 })
