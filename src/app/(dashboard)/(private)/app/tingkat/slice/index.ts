@@ -109,6 +109,16 @@ export const postTingkat = createAsyncThunk<any, any>('tingkat/create', async (p
   }
 })
 
+export const postBatchTingkat = createAsyncThunk<any, any>('tingkat/insert', async (params, thunkAPI) => {
+  try {
+    const response = await api.post(`/app/tingkat/insert`, params)
+
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
+  }
+})
+
 export const postTingkatUpdate = createAsyncThunk<any, { id: string; param: any }>(
   'tingkat/update',
   async ({ id, param }, thunkAPI) => {
@@ -191,6 +201,10 @@ export const slice = createSlice({
     })
 
     builder.addCase(postTingkat.fulfilled, (state, action) => {
+      state.crud = action.payload
+    })
+
+    builder.addCase(postBatchTingkat.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
