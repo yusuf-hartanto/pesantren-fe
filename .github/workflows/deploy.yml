@@ -37,6 +37,9 @@ jobs:
         with:
           name: docker-image
           path: app-image.tar.gz
+      - name: Validate SSH secrets
+        run: |
+          test -n "${SSH_HOST}" && test -n "${SSH_PORT}" && test -n "${SSH_USER}" && test -n "${SSH_KEY}" || { echo "Missing SSH secrets"; exit 1; }
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
@@ -46,16 +49,16 @@ jobs:
       - name: Prepare remote directory
         run: |
           REPO="${{ github.event.repository.name }}"
-          ssh -p "${SSH_PORT}" "${SSH_USER}@${SSH_HOST}" "mkdir -p /home/apps/${REPO}"
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes -p "${SSH_PORT}" "${SSH_USER}@${SSH_HOST}" "mkdir -p /home/apps/${REPO}"
       - name: Copy files via scp
         run: |
           REPO="${{ github.event.repository.name }}"
-          scp -P "${SSH_PORT}" docker-compose.yml "${SSH_USER}@${SSH_HOST}:/home/apps/${REPO}/"
-          scp -P "${SSH_PORT}" app-image.tar.gz "${SSH_USER}@${SSH_HOST}:/home/apps/${REPO}/"
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes -P "${SSH_PORT}" docker-compose.yml "${SSH_USER}@${SSH_HOST}:/home/apps/${REPO}/"
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes -P "${SSH_PORT}" app-image.tar.gz "${SSH_USER}@${SSH_HOST}:/home/apps/${REPO}/"
       - name: Deploy via ssh
         run: |
           REPO="${{ github.event.repository.name }}"
-          ssh -p "${SSH_PORT}" "${SSH_USER}@${SSH_HOST}" bash -lc "
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes -p "${SSH_PORT}" "${SSH_USER}@${SSH_HOST}" bash -lc "
             set -e
             cd /home/apps/${REPO}
             echo \"${CONFIG_ENV}\" > .env
