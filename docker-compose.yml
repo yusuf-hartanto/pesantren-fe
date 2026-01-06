@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  app:
+    image: pesantren-fe:${IMAGE_TAG}
+    container_name: pesantren-fe
+    env_file:
+      - .env
+    environment:
+      - PORT=${PORT}
+    ports:
+      - "${PORT}:${PORT}"
+    restart: always

@@ -1,0 +1,97 @@
+name: Deploy PRD Frontend
+
+on:
+  push:
+    branches:
+      - docker-dev
+  workflow_dispatch:
+
+env:
+  SSH_HOST: ${{ secrets.SSH_HOST }}
+  SSH_PORT: ${{ secrets.SSH_PORT }}
+  SSH_USER: ${{ secrets.SSH_USER }}
+  SSH_KEY: ${{ secrets.SSH_KEY }}
+  CONFIG_ENV: ${{ secrets.CONFIG_ENV }}
+  PORT: ${{ secrets.PORT }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Get Config
+        run: |
+          echo "${{ env.CONFIG_ENV }}" > .env
+      - name: Build Docker image (frontend)
+        run: |
+          docker build -t pesantren-fe:${{ github.sha }} -f Dockerfile .
+      - name: Save Docker image artifact
+        run: |
+          docker save pesantren-fe:${{ github.sha }} | gzip > app-image.tar.gz
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: app-image.tar.gz
+      - name: Copy compose to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          source: docker-compose.yml
+          target: /home/apps/${{ github.event.repository.name }}
+      - name: Copy bundle to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          source: app-image.tar.gz
+          target: /home/apps/${{ github.event.repository.name }}
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          script: |
+            set -e
+            APP_NAME="${{ github.event.repository.name }}"
+            DEPLOY_DIR="/home/apps/$APP_NAME"
+            mkdir -p "$DEPLOY_DIR"
+            cd "$DEPLOY_DIR"
+            echo "${{ env.CONFIG_ENV }}" > .env
+            echo "PORT=${{ env.PORT }}" >> .env
+            IMAGE_TAG="${{ github.sha }}"
+            echo "IMAGE_TAG=$IMAGE_TAG" >> .env
+            if [ -f "app-image.tar.gz" ]; then
+              gunzip -c app-image.tar.gz | docker load
+              rm app-image.tar.gz
+            else
+              echo "Error: app-image.tar.gz not found!"
+              exit 1
+            fi
+            export PORT=${{ env.PORT }}
+            export IMAGE_TAG=$IMAGE_TAG
+            DCMD="docker compose"
+            $DCMD up -d --no-build
+            ok=0
+            for i in $(seq 1 30); do
+              if curl -sSf "http://127.0.0.1:${{ env.PORT }}/" > /dev/null; then
+                ok=1
+                break
+              fi
+              sleep 5
+            done
+            if [ "$ok" -ne 1 ]; then
+              $DCMD logs --tail 50 || true
+              exit 1
+            fi
