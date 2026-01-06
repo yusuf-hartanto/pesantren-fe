@@ -55,6 +55,15 @@ jobs:
           key: ${{ env.SSH_KEY }}
           source: app-image.tar.gz
           target: /home/apps/${{ github.event.repository.name }}
+      - name: Copy env to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          source: .env
+          target: /home/apps/${{ github.event.repository.name }}
       - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
