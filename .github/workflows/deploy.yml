@@ -10,7 +10,7 @@ env:
   SSH_HOST: ${{ secrets.SSH_HOST }}
   SSH_PORT: ${{ secrets.SSH_PORT }}
   SSH_USER: ${{ secrets.SSH_USER }}
-  SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  SSH_KEY: ${{ secrets.SSH_KEY }}
   CONFIG_ENV: ${{ secrets.CONFIG_ENV }}
   PORT: ${{ secrets.PORT }}
 
@@ -37,23 +37,32 @@ jobs:
         with:
           name: docker-image
           path: app-image.tar.gz
-      - name: Validate SSH secrets
-        run: |
-          test -n "${SSH_HOST}" && test -n "${SSH_PORT}" && test -n "${SSH_USER}" && test -n "${SSH_KEY}" || { echo "Missing SSH secrets"; exit 1; }
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${SSH_KEY}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p "${SSH_PORT}" "${SSH_HOST}" >> ~/.ssh/known_hosts || echo "Keyscan failed, proceeding anyway"
-      - name: Copy files to server
-        run: |
-          ssh -v -i ~/.ssh/id_rsa -p "${SSH_PORT}" -o StrictHostKeyChecking=no "${SSH_USER}@${SSH_HOST}" "mkdir -p /home/apps/${{ github.event.repository.name }}"
-          scp -v -i ~/.ssh/id_rsa -P "${SSH_PORT}" -o StrictHostKeyChecking=no docker-compose.yml "${SSH_USER}@${SSH_HOST}:/home/apps/${{ github.event.repository.name }}"
-          scp -v -i ~/.ssh/id_rsa -P "${SSH_PORT}" -o StrictHostKeyChecking=no app-image.tar.gz "${SSH_USER}@${SSH_HOST}:/home/apps/${{ github.event.repository.name }}"
+      - name: Copy compose to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          source: docker-compose.yml
+          target: /home/apps/${{ github.event.repository.name }}
+      - name: Copy bundle to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          source: app-image.tar.gz
+          target: /home/apps/${{ github.event.repository.name }}
       - name: Deploy over SSH
-        run: |
-          ssh -v -i ~/.ssh/id_rsa -p "${SSH_PORT}" -o StrictHostKeyChecking=no "${SSH_USER}@${SSH_HOST}" << 'EOF'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          script: |
             set -e
             whoami
             APP_NAME="${{ github.event.repository.name }}"
@@ -87,4 +96,3 @@ jobs:
               $DCMD logs --tail 50 || true
               exit 1
             fi
-          EOF
