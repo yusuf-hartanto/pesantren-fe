@@ -71,3 +71,6 @@ Jika health check gagal:
 1.  Menampilkan 50 baris log terakhir container.
 2.  Mengembalikan `IMAGE_TAG` di `.env` ke versi sebelumnya (`PREV_TAG`).
 3.  Menjalankan redeploy versi lama: `docker compose up -d`.
+
+
+#### Test
