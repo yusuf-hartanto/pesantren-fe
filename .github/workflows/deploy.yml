@@ -10,7 +10,7 @@ env:
   SSH_HOST: ${{ secrets.SSH_HOST }}
   SSH_PORT: ${{ secrets.SSH_PORT }}
   SSH_USER: ${{ secrets.SSH_USER }}
-  SSH_KEY: ${{ secrets.SSH_KEY }}
+  SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
   CONFIG_ENV: ${{ secrets.CONFIG_ENV }}
   PORT: ${{ secrets.PORT }}
 
@@ -37,53 +37,62 @@ jobs:
         with:
           name: docker-image
           path: app-image.tar.gz
-      - name: Validate SSH secrets
-        run: |
-          test -n "${SSH_HOST}" && test -n "${SSH_PORT}" && test -n "${SSH_USER}" && test -n "${SSH_KEY}" || { echo "Missing SSH secrets"; exit 1; }
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${SSH_KEY}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p "${SSH_PORT}" "${SSH_HOST}" >> ~/.ssh/known_hosts
-      - name: Prepare remote directory
-        run: |
-          REPO="${{ github.event.repository.name }}"
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes -p "${SSH_PORT}" "${SSH_USER}@${SSH_HOST}" "mkdir -p /home/apps/${REPO}"
-      - name: Copy files via scp
-        run: |
-          REPO="${{ github.event.repository.name }}"
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes -P "${SSH_PORT}" docker-compose.yml "${SSH_USER}@${SSH_HOST}:/home/apps/${REPO}/"
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes -P "${SSH_PORT}" app-image.tar.gz "${SSH_USER}@${SSH_HOST}:/home/apps/${REPO}/"
-      - name: Deploy via ssh
-        run: |
-          REPO="${{ github.event.repository.name }}"
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=yes -p "${SSH_PORT}" "${SSH_USER}@${SSH_HOST}" bash -lc "
+      - name: Copy compose to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          source: docker-compose.yml
+          target: /home/apps/${{ github.event.repository.name }}
+      - name: Copy bundle to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          source: app-image.tar.gz
+          target: /home/apps/${{ github.event.repository.name }}
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.SSH_HOST }}
+          port: ${{ env.SSH_PORT }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          script: |
             set -e
-            cd /home/apps/${REPO}
-            echo \"${CONFIG_ENV}\" > .env
-            echo \"PORT=${PORT}\" >> .env
-            IMAGE_TAG='${{ github.sha }}'
-            echo \"IMAGE_TAG=\$IMAGE_TAG\" >> .env
-            if [ -f app-image.tar.gz ]; then
+            whoami
+            APP_NAME="${{ github.event.repository.name }}"
+            DEPLOY_DIR="/home/apps/$APP_NAME"
+            mkdir -p "$DEPLOY_DIR"
+            cd "$DEPLOY_DIR"
+            echo "${{ env.CONFIG_ENV }}" > .env
+            echo "PORT=${{ env.PORT }}" >> .env
+            IMAGE_TAG="${{ github.sha }}"
+            echo "IMAGE_TAG=$IMAGE_TAG" >> .env
+            if [ -f "app-image.tar.gz" ]; then
               gunzip -c app-image.tar.gz | docker load
               rm app-image.tar.gz
             else
+              echo "Error: app-image.tar.gz not found!"
               exit 1
             fi
-            export PORT='${PORT}'
-            export IMAGE_TAG=\"\$IMAGE_TAG\"
-            docker compose up -d --no-build
+            export PORT=${{ env.PORT }}
+            export IMAGE_TAG=$IMAGE_TAG
+            DCMD="docker compose"
+            $DCMD up -d --no-build
             ok=0
-            for i in \$(seq 1 30); do
-              if curl -sSf \"http://127.0.0.1:\${PORT}/\" > /dev/null; then
+            for i in $(seq 1 30); do
+              if curl -sSf "http://127.0.0.1:${{ env.PORT }}/" > /dev/null; then
                 ok=1
                 break
               fi
               sleep 5
             done
-            if [ \"\$ok\" -ne 1 ]; then
-              docker compose logs --tail 50 || true
+            if [ "$ok" -ne 1 ]; then
+              $DCMD logs --tail 50 || true
               exit 1
             fi
-          "
