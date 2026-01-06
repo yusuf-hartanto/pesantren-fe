@@ -64,6 +64,7 @@ jobs:
           key: ${{ env.SSH_KEY }}
           script: |
             set -e
+            whoami
             APP_NAME="${{ github.event.repository.name }}"
             DEPLOY_DIR="/home/apps/$APP_NAME"
             mkdir -p "$DEPLOY_DIR"
