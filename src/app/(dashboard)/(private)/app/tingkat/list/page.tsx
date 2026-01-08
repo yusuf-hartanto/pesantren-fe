@@ -75,6 +75,7 @@ function RowAction(data: any) {
         <i className='tabler-dots-vertical' />
       </IconButton>
       <Menu
+        key={data.row.id_tingkat}
         keepMounted
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
