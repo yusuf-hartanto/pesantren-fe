@@ -109,6 +109,16 @@ export const postTahunAjaranUpdate = createAsyncThunk<any, { id: string; params:
   }
 )
 
+export const postBatchTahunAjaran = createAsyncThunk<any, any>('tahun-ajaran/insert', async (params, thunkAPI) => {
+  try {
+    const response = await api.post(`/app/tahun-ajaran/insert`, params)
+
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
+  }
+})
+
 export const deleteTahunAjaran = createAsyncThunk<any, string>('tahun-ajaran/delete', async (id, thunkAPI) => {
   try {
     const response = await api.delete(`/app/tahun-ajaran/${id}`)
@@ -174,6 +184,10 @@ export const slice = createSlice({
     })
 
     builder.addCase(postTahunAjaranUpdate.fulfilled, (state, action) => {
+      state.crud = action.payload
+    })
+
+    builder.addCase(postBatchTahunAjaran.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
