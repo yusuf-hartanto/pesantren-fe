@@ -5,8 +5,6 @@ import type { PermissionMap } from "./permission"
 declare module "next-auth" {
   interface Session {
     access_token?: string
-    refresh_token?: string
-    permissions?: PermissionMap
     userdata?: {
       resource_id?: string | number
       full_name?: string

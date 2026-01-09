@@ -2,17 +2,13 @@
 
 import { usePathname } from 'next/navigation'
 
-import { useSession } from 'next-auth/react'
-
-import type { Ability } from '@/types/permission'
 import { can, normalizeResource } from '@/libs/permission'
+import { usePermissionContext } from '@/contexts/PermissionContext'
+import type { Ability } from '@/types/permission'
 
-
-export function useCan(abilities: Ability | Ability[]): boolean {
-  const { data: session } = useSession()
-
+export function useCan(abilities: Ability | Ability[]) {
+  const { permissions } = usePermissionContext()
   const pathname = usePathname()
-  const resource = normalizeResource(pathname)
 
-  return can(session?.permissions, resource, abilities)
+  return can(permissions, normalizeResource(pathname), abilities)
 }

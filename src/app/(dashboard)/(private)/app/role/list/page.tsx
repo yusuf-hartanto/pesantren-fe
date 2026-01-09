@@ -28,6 +28,7 @@ import DialogDelete from '@views/onevour/components/dialog-delete'
 
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
+import { useCan } from '@/hooks/useCan'
 
 const statusObj: Record<number, { color: any; value: string }> = {
   1: {
@@ -44,6 +45,9 @@ function RowAction(data: any) {
   const [anchorEl, setAnchorEl] = useState(null)
   const [openConfirm, setOpenConfirm] = useState(false)
   const dispatch = useAppDispatch()
+
+  const canEdit = useCan('edit')
+  const canDelete = useCan('delete')
 
   const rowOptionsOpen = Boolean(anchorEl)
 
@@ -90,30 +94,37 @@ function RowAction(data: any) {
           View
         </MenuItem>
 
-        <MenuItem
-          component={Link}
-          sx={{ '& svg': { mr: 2 } }}
-          href={`/app/role/form?id=${data.row.role_id}`}
-          onClick={handleView}
-        >
-          <i className='tabler-edit' />
-          Edit
-        </MenuItem>
+        {canEdit && [
+          <MenuItem
+            key='edit'
+            component={Link}
+            sx={{ '& svg': { mr: 2 } }}
+            href={`/app/role/form?id=${data.row.role_id}`}
+            onClick={handleView}
+          >
+            <i className='tabler-edit' />
+            Edit
+          </MenuItem>,
 
-        <MenuItem
-          component={Link}
-          sx={{ '& svg': { mr: 2 } }}
-          href={`/app/role/access?id=${data.row.role_id}`}
-          onClick={handleView}
-        >
-          <i className='tabler-lock-access' />
-          Role Access
-        </MenuItem>
+          <MenuItem
+            key='role-access'
+            component={Link}
+            sx={{ '& svg': { mr: 2 } }}
+            href={`/app/role/access?id=${data.row.role_id}`}
+            onClick={handleView}
+          >
+            <i className='tabler-lock-access' />
+            Role Access
+          </MenuItem>
+        ]}
 
-        <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}>
-          <i className='tabler-trash' />
-          Delete
-        </MenuItem>
+        {canDelete && (
+          <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}>
+            <i className='tabler-trash' />
+            Delete
+          </MenuItem>
+        )}
+
         <DialogDelete
           id={data.row.role_name}
           open={openConfirm}
@@ -142,6 +153,8 @@ const Table = () => {
   const dispatch = useAppDispatch()
   const store = useAppSelector(state => state.role)
 
+  const canCreate = useCan('create')
+
   const [filter, setFilter] = useState('')
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
@@ -164,7 +177,7 @@ const Table = () => {
     return () => clearTimeout(timer)
   }, [dispatch, filter, perPage])
 
-  const onSubmit = () => {
+  const onAddForm = () => {
     router.replace('/app/role/form')
   }
 
@@ -234,15 +247,31 @@ const Table = () => {
       <Grid size={12}>
         <Card>
           <CardHeader title='Role' sx={{ paddingBottom: 0 }} />
-          <Toolbar sx={{ paddingLeft: '1.5rem !important', paddingRight: '1.5rem !important' }}>
-            <Tooltip title='Add'>
-              <Button size='medium' variant='outlined' onClick={onSubmit}>
-                Add
-              </Button>
-            </Tooltip>
-            <Typography sx={{ flex: '1 1 100%' }} variant='h6' id='tableTitle' component='div'></Typography>
+          <Toolbar
+            sx={{
+              px: '1.5rem !important',
+              minHeight: 'auto',
+              gap: 2,
+              flexWrap: 'wrap',
+              mb: '10px'
+            }}
+          >
+            {canCreate && (
+              <Tooltip title='Tambah'>
+                <Button
+                  size='small'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onAddForm}
+                  startIcon={<i className='tabler-plus' />}
+                >
+                  Tambah
+                </Button>
+              </Tooltip>
+            )}
+            <Typography sx={{ flex: '1 1 auto' }} />
             <Tooltip title='Search'>
-              <TextField id='outlined-basic' fullWidth label='Search' size='small' onChange={handleFilter} />
+              <TextField id='outlined-basic' label='Search' size='small' onChange={handleFilter} />
             </Tooltip>
           </Toolbar>
           <TableView model={buildTable()} changeSort={null} />

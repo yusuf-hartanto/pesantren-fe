@@ -3,7 +3,6 @@ import { useRef } from 'react'
 
 // Next Imports
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
 
 // MUI Imports
 import { styled } from '@mui/material/styles'

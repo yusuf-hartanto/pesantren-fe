@@ -1,6 +1,7 @@
-// Next Imports
-
 // MUI Imports
+import { cookies } from 'next/headers'
+
+import { getToken } from 'next-auth/jwt'
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
 
 // Third-party Imports
@@ -18,6 +19,7 @@ import '@/app/globals.css'
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
 import TopProgressBar from '@/components/Loading'
+import AppClientLayout from './(dashboard)/(private)/AppClientLayout'
 
 export const metadata = {
   title: 'Pesantren',
@@ -31,12 +33,21 @@ const RootLayout = async (props: ChildrenType ) => {
   const systemMode = await getSystemMode()
   const direction = 'ltr'
 
+  const token = await getToken({
+    req: {
+      cookies: await cookies()
+    } as any,
+    secret: process.env.NEXTAUTH_SECRET,
+  })
+  
   return (
     <html id='__next' lang='en' dir={direction} suppressHydrationWarning>
       <body className='flex is-full min-bs-full flex-auto flex-col'>
         <InitColorSchemeScript attribute='data' defaultMode={systemMode} />
         <TopProgressBar />
-        {children}
+        <AppClientLayout initialPermissions={token?.permissions ?? {}}>
+          {children}
+        </AppClientLayout>
       </body>
     </html>
   )

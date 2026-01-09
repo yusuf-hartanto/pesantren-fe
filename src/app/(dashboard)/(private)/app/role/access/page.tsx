@@ -18,6 +18,8 @@ import { fetchMenuAll } from '../../menu/slice'
 import { buildMenuTree } from '@/@core/utils/menuHelpers'
 import { normalizeResource } from '@/libs/permission'
 import { useIsMobile } from "@core/hooks/useIsMobile"
+import { usePermissionContext } from '@/contexts/PermissionContext'
+import type { PermissionMap } from '@/types/permission'
 
 const actions = ['view', 'create', 'edit', 'delete', 'import', 'export'] as const
 
@@ -54,7 +56,7 @@ interface RoleMenuUpdate {
   menu: MenuPermission[]
 }
 
-type PermissionMap = Record<string, MenuPermission>
+type PermissionMapAccess = Record<string, MenuPermission>
 
 interface FormData {
   role_id: string
@@ -89,6 +91,7 @@ const FormValidationBasic = () => {
   const [state, setState] = useState<FormData>(defaultValues)
   const [loading, setLoading] = useState(false)
   const [roleMenus, setRoleMenus] = useState<MenuPermission[]>([])
+  const { setPermissions } = usePermissionContext()
 
   const {
     control,
@@ -98,7 +101,7 @@ const FormValidationBasic = () => {
   } = useForm({defaultValues})
 
   const permissionMap = useMemo(() => {
-    const map: PermissionMap = {}
+    const map: PermissionMapAccess = {}
 
     state.menu.forEach(p => {
       map[p.menu_id] = p
@@ -187,29 +190,23 @@ const FormValidationBasic = () => {
       toast.success('Success saved')
 
       const permissions = submittedMenuRef.current?.menu.reduce((acc, m) => {
-        const key = normalizeResource(m.module_name)
+      const key = normalizeResource(m.module_name)
 
-        acc[key] = {
-          view: m.view === 1,
-          create: m.create === 1,
-          edit: m.edit === 1,
-          delete: m.delete === 1,
-          import: m.import === 1,
-          export: m.export === 1,
-        }
+      acc[key] = {
+        view: m.view === 1,
+        create: m.create === 1,
+        edit: m.edit === 1,
+        delete: m.delete === 1,
+        import: m.import === 1,
+        export: m.export === 1,
+      }
 
-        return acc
-      }, {} as Record<string, any>)
+      return acc
+    }, {} as PermissionMap)
 
-      const hasViewDisabled = Object.values(permissions).some(
-        p => p.view === false
-      )
+      setPermissions(permissions)
 
       update({ permissions })
-
-      if (hasViewDisabled) {
-        window.location.reload()
-      }
 
       onCancel()
     } else {
@@ -217,7 +214,7 @@ const FormValidationBasic = () => {
 
       setLoading(false)
     }
-  }, [onCancel, store, update])
+  }, [onCancel, setPermissions, store.crud, update])
 
   const mergePermissions = (
     defaults: MenuPermission[],
@@ -251,7 +248,7 @@ const FormValidationBasic = () => {
   const hasAnyChecked = (
     menu: MenuItem,
     action: ActionType,
-    map: PermissionMap
+    map: PermissionMapAccess
   ): boolean => {
     if (!menu.children?.length) {
       return map[menu.menu_id]?.[action] === 1
