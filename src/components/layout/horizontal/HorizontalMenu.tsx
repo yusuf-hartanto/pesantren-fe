@@ -1,6 +1,3 @@
-// Next Imports
-import { useParams } from 'next/navigation'
-
 // MUI Imports
 import { useTheme } from '@mui/material/styles'
 

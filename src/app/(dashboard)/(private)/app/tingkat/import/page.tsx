@@ -259,10 +259,10 @@ export default function ImportExcelPage() {
             <ul className='list-disc list-inside space-y-1'>
               <li>Format file: Excel (encoding UTF-8)</li>
               <li>
-                Jika <b>tingkat</b> dan <b>tingkat_type</b> kosong → INSERT (data baru)
+                Jika <b>Tingkat</b> dan <b>Tipe</b> kosong → INSERT (data baru)
               </li>
               <li>
-                Jika <b>tingkat</b> dan <b>tingkat_type</b> ada → UPDATE (perbarui data)
+                Jika <b>Tingkat</b> dan <b>Tipe</b> ada → UPDATE (perbarui data)
               </li>
               <li>Mode Preview: hanya validasi tanpa menyimpan</li>
               <li>Mode Commit: validasi dan simpan ke database</li>

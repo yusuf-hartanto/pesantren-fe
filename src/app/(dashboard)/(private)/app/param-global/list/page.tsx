@@ -185,8 +185,6 @@ const Table = () => {
     if (dataPage) {
       const { values, total } = dataPage
 
-      console.warn(values, total)
-
       return {
         page: page,
         fields: [

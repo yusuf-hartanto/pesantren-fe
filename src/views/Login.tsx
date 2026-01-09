@@ -128,7 +128,7 @@ const Login = ({ mode }: { mode: SystemMode }) => {
       username: data.username,
       password: data.password,
       redirect: true,
-      callbackUrl: '/dashboards/analytics'
+      callbackUrl: '/dashboards/crm'
     })
 
     if (res && res.ok && res.error === null) {
