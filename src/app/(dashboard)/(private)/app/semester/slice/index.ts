@@ -105,6 +105,16 @@ export const postSemester = createAsyncThunk<any, any>('semester/create', async 
   }
 })
 
+export const postBatchSemester = createAsyncThunk<any, any>('semester/insert', async (params, thunkAPI) => {
+  try {
+    const response = await api.post(`/app/semester/insert`, params)
+
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
+  }
+})
+
 export const postSemesterUpdate = createAsyncThunk<any, { id: string; params: any }>(
   'semester/update',
   async ({ id, params }, thunkAPI) => {
@@ -191,6 +201,10 @@ export const slice = createSlice({
     })
 
     builder.addCase(postSemesterUpdate.fulfilled, (state, action) => {
+      state.crud = action.payload
+    })
+
+    builder.addCase(postBatchSemester.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 

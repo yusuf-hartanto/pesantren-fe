@@ -196,7 +196,7 @@ export default function ImportExcelPage() {
               <tr>
                 <th className='px-3 py-2'>#</th>
                 <th className='px-3 py-2'>Tahun Ajaran</th>
-                <th className='px-3 py-2'>Statust</th>
+                <th className='px-3 py-2'>Status</th>
                 <th className='px-3 py-2'>Keterangan</th>
                 <th className='px-3 py-2'>Valid</th>
               </tr>
