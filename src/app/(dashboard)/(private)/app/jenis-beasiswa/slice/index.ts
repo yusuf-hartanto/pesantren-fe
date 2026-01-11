@@ -111,6 +111,16 @@ export const postJenisBeasiswa = createAsyncThunk<any, any>('jenis-beasiswa/crea
   }
 })
 
+export const postBatchJenisBeasiswa = createAsyncThunk<any, any>('jenis-beasiswa/insert', async (params, thunkAPI) => {
+  try {
+    const response = await api.post(`/app/jenis-beasiswa/insert`, params)
+
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
+  }
+})
+
 export const postJenisBeasiswaUpdate = createAsyncThunk<any, { id: string; param: any }>(
   'jenis-beasiswa/update',
   async ({ id, param }, thunkAPI) => {
@@ -197,6 +207,10 @@ export const slice = createSlice({
     })
 
     builder.addCase(postJenisBeasiswaUpdate.fulfilled, (state, action) => {
+      state.crud = action.payload
+    })
+
+    builder.addCase(postBatchJenisBeasiswa.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
