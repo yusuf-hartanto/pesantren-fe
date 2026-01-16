@@ -117,6 +117,19 @@ export const postStatusAwalSantri = createAsyncThunk<any, any>(
   }
 )
 
+export const postBatchStatusAwalSantri = createAsyncThunk<any, any>(
+  'status-awal-santri/insert',
+  async (params, thunkAPI) => {
+    try {
+      const response = await api.post(`/app/status-awal-santri/insert`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
 export const postStatusAwalSantriUpdate = createAsyncThunk<any, { id: string; param: any }>(
   'status-awal-santri/update',
   async ({ id, param }, thunkAPI) => {
@@ -206,6 +219,10 @@ export const slice = createSlice({
     })
 
     builder.addCase(postStatusAwalSantriUpdate.fulfilled, (state, action) => {
+      state.crud = action.payload
+    })
+
+    builder.addCase(postBatchStatusAwalSantri.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
