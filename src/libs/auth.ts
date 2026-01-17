@@ -23,9 +23,17 @@ export const authOptions: NextAuthOptions = {
             body: JSON.stringify(credentials)
           })
 
-          const {data: data} = await res.json()
+          const json = await res.json()
 
-          if (!res.ok) return null
+          if (!res.ok) {
+            throw new Error(
+              JSON.stringify({
+                message: 'Username atau password salah'
+              })
+            )
+          }
+
+          const data = json.data
 
           return {
             id: String(data.userdata.resource_id),

@@ -6,6 +6,8 @@ import { useState } from 'react'
 // Next Imports
 import { useRouter, useSearchParams } from 'next/navigation'
 
+import { toast } from 'react-toastify'
+
 // MUI Imports
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
@@ -108,8 +110,8 @@ const Login = ({ mode }: { mode: SystemMode }) => {
   } = useForm<FormData>({
     resolver: valibotResolver(schema),
     defaultValues: {
-      username: 'adminuser',
-      password: 'adminuser'
+      username: 'username',
+      password: '********'
     }
   })
 
@@ -127,10 +129,9 @@ const Login = ({ mode }: { mode: SystemMode }) => {
     const res = await signIn('credentials', {
       username: data.username,
       password: data.password,
-      redirect: true,
-      callbackUrl: '/dashboards/crm'
+      redirect: false,
     })
-
+    
     if (res && res.ok && res.error === null) {
       // Vars
       const redirectURL = searchParams.get('redirectTo') ?? '/'
@@ -138,9 +139,13 @@ const Login = ({ mode }: { mode: SystemMode }) => {
       router.replace(redirectURL)
     } else {
       if (res?.error) {
-        const error = JSON.parse(res.error)
+        try {
+          const error = JSON.parse(res.error)
 
-        setErrorState(error)
+          setErrorState(error)
+        } catch {
+          toast.error('Username atau password salah')
+        }
       }
     }
   }
