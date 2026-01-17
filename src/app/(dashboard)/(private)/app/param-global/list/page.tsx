@@ -5,6 +5,8 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+import { toast } from 'react-toastify'
+
 // ** MUI Imports
 import Grid from '@mui/material/Grid2'
 import Card from '@mui/material/Card'
@@ -18,7 +20,7 @@ import TableCell from '@mui/material/TableCell'
 import IconButton from '@mui/material/IconButton'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import { deleteParamGlobal, fetchParamGlobalPage, resetRedux } from '../slice/index'
+import { deleteParamGlobal, fetchParamGlobalPage, postExport, resetRedux } from '../slice/index'
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
 import CustomChip from '@core/components/mui/Chip'
@@ -26,16 +28,17 @@ import DialogDelete from '@views/onevour/components/dialog-delete'
 
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
+import { useCan } from '@/hooks/useCan'
 
 const statusObj: Record<number, { color: any; value: string }> = {
+  0: {
+    color: 'secondary',
+    value: 'Nonaktif'
+  },
   1: {
     color: 'success',
     value: 'Aktif'
   },
-  2: {
-    color: 'secondary',
-    value: 'Nonaktif'
-  }
 }
 
 function RowAction(data: any) {
@@ -43,6 +46,9 @@ function RowAction(data: any) {
   const [openConfirm, setOpenConfirm] = useState(false)
   const dispatch = useAppDispatch()
 
+  const canEdit = useCan('edit')
+  const canDelete = useCan('delete')
+  
   const setOpen = (event: any) => {
     setAnchorEl(event.currentTarget)
   }
@@ -86,37 +92,45 @@ function RowAction(data: any) {
           View
         </MenuItem>
 
-        <MenuItem
-          component={Link}
-          sx={{ '& svg': { mr: 2 } }}
-          href={`/app/param-global/form?id=${data.row.id}`}
-          onClick={handleView}
-        >
-          <i className='tabler-edit' />
-          Edit
-        </MenuItem>
+        {canEdit && 
+          <MenuItem
+            component={Link}
+            sx={{ '& svg': { mr: 2 } }}
+            href={`/app/param-global/form?id=${data.row.id}`}
+            onClick={handleView}
+          >
+            <i className='tabler-edit' />
+            Edit
+          </MenuItem>
+        }
 
-        <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}>
-          <i className='tabler-trash' />
-          Delete
-        </MenuItem>
-        <DialogDelete
-          id={data.row.menu_name}
-          open={openConfirm}
-          onClose={(event: any, reason: any) => {
-            if (reason !== 'backdropClick') {
+        {canDelete && [
+          <MenuItem
+            key={data.row.id}
+            onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}
+          >
+            <i className='tabler-trash' />
+            Delete
+          </MenuItem>,
+          <DialogDelete
+            key={'dialog_' + data.row.id}
+            id={data.row.menu_name}
+            open={openConfirm}
+            onClose={(event: any, reason: any) => {
+              if (reason !== 'backdropClick') {
+                setOpenConfirm(false)
+              }
+            }}
+            handleOk={() => {
+              handleDelete(data.row.id)
               setOpenConfirm(false)
-            }
-          }}
-          handleOk={() => {
-            handleDelete(data.row.id)
-            setOpenConfirm(false)
-          }}
-          handleClose={() => {
-            setOpenConfirm(false)
-          }}
-          disableEscapeKeyDown={true}
-        />
+            }}
+            handleClose={() => {
+              setOpenConfirm(false)
+            }}
+            disableEscapeKeyDown={true}
+          />
+        ]}
       </Menu>
     </TableCell>
   )
@@ -125,16 +139,17 @@ function RowAction(data: any) {
 const Table = () => {
   // ** Hooks
   const router = useRouter()
-
   const dispatch = useAppDispatch()
-
   const store = useAppSelector(state => state.param_global)
 
+  const canCreate = useCan('create')
+  const canImport = useCan('import')
+  const canExport = useCan('export')
+
   const [filter, setFilter] = useState('')
-
   const [page, setPage] = useState(1)
-
   const [perPage, setPerPage] = useState(10)
+  const [loadingExport, setLoadingExport] = useState(false)
 
   useEffect(() => {
     if (store.delete) {
@@ -154,15 +169,41 @@ const Table = () => {
     return () => clearTimeout(timer)
   }, [dispatch, filter, perPage])
 
-  const onSubmit = () => {
+  const onAddForm = () => {
     router.replace('/app/param-global/form')
+  }
+  
+  const onImport = () => {
+    router.replace('/app/param-global/import')
+  }
+
+  const onExport = async () => {
+    try {
+      setLoadingExport(true)
+      const res = await dispatch(postExport({ q: filter })).unwrap()
+
+      if (res?.status && res?.data) {
+        const url = `${process.env.NEXT_PUBLIC_API_URL}${res.data}`
+        const link = document.createElement('a')
+
+        link.href = url
+        link.download = ''
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+    } catch {
+      toast.error('Gagal export data')
+    } finally {
+      setLoadingExport(false)
+    }
   }
 
   const handleFilter = (event: any) => {
     setFilter(event.target.value)
   }
 
-  const handleChangePage = (event: any, newPage: number) => {
+  const handleChangePage = (newPage: number) => {
     setPage(newPage)
     dispatch(fetchParamGlobalPage({ page: newPage, perPage: perPage, q: filter }))
   }
@@ -211,8 +252,8 @@ const Table = () => {
         }),
         count: total,
         perPage: perPage,
-        changePage: (event: any, newPage: number) => {
-          handleChangePage(event, newPage)
+        changePage: (_: any, newPage: number) => {
+          handleChangePage(newPage + 1);
         },
         changePerPage: (event: any, o: any) => {
           handleChangePerPage(event)
@@ -226,15 +267,60 @@ const Table = () => {
       <Grid size={12}>
         <Card>
           <CardHeader title='ParamGlobal' sx={{ paddingBottom: 0 }} />
-          <Toolbar sx={{ paddingLeft: '1.5rem !important', paddingRight: '1.5rem !important' }}>
-            <Tooltip title='Add'>
-              <Button size='medium' variant='outlined' onClick={onSubmit}>
-                Add
-              </Button>
-            </Tooltip>
-            <Typography sx={{ flex: '1 1 100%' }} variant='h6' id='tableTitle' component='div'></Typography>
+          <Toolbar
+            sx={{
+              px: '1.5rem !important',
+              minHeight: 'auto',
+              gap: 2,
+              flexWrap: 'wrap',
+              mb: '10px'
+            }}
+          >
+            {canCreate && (
+              <Tooltip title='Tambah'>
+                <Button
+                  size='small'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onAddForm}
+                  startIcon={<i className='tabler-plus' />}
+                >
+                  Tambah
+                </Button>
+              </Tooltip>
+            )}
+            {canImport && (
+              <Tooltip title="Import CSV">
+                <Button
+                  size="small"
+                  color="success"
+                  variant="outlined"
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onImport}
+                  startIcon={<i className="tabler-file-import" />}
+                >
+                  Import CSV
+                </Button>
+              </Tooltip>
+            )}
+
+            {canExport && (
+              <Tooltip title="Export CSV">
+                <Button
+                  size="small"
+                  color="warning"
+                  variant="outlined"
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onExport}
+                  startIcon={<i className="tabler-file-export" />}
+                >
+                  {loadingExport ? 'Proses...' : 'Export CSV'}
+                </Button>
+              </Tooltip>
+            )}
+            <Typography sx={{ flex: '1 1 auto' }} />
             <Tooltip title='Search'>
-              <TextField id='outlined-basic' fullWidth label='Search' size='small' onChange={handleFilter} />
+              <TextField id='outlined-basic' label='Search' size='small' onChange={handleFilter} />
             </Tooltip>
           </Toolbar>
           <TableView model={buildTable()} changeSort={null} />

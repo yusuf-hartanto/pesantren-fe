@@ -187,7 +187,7 @@ const Table = () => {
   }, [dispatch, filter, perPage])
 
   const handleChangePage = useCallback(
-    (event: any, newPage: number) => {
+    (newPage: number) => {
       setPage(newPage)
       dispatch(fetchKelasMdaPage({ page: newPage, perPage: perPage, q: filter }))
     },
@@ -199,7 +199,7 @@ const Table = () => {
 
     if (store.crud.status) {
       toast.success('Success saved')
-      handleChangePage(null, page)
+      handleChangePage(page)
       dispatch(resetRedux())
     } else {
       toast.error('Error saved: ' + store.crud.message)
@@ -316,8 +316,8 @@ const Table = () => {
         }),
         count: total,
         perPage: perPage,
-        changePage: (event: any, newPage: number) => {
-          handleChangePage(event, newPage)
+        changePage: (_: any, newPage: number) => {
+          handleChangePage(newPage + 1);
         },
         changePerPage: (event: any, o: any) => {
           handleChangePerPage(event)

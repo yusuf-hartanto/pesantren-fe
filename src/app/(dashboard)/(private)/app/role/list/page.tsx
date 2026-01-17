@@ -120,30 +120,34 @@ function RowAction(data: any) {
           </MenuItem>
         ]}
 
-        {canDelete && (
-          <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}>
+        {canDelete && [
+          <MenuItem
+            key={data.row.role_id}
+            onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}
+          >
             <i className='tabler-trash' />
             Delete
-          </MenuItem>
-        )}
+          </MenuItem>,
 
-        <DialogDelete
-          id={data.row.role_name}
-          open={openConfirm}
-          onClose={(event: any, reason: any) => {
-            if (reason !== 'backdropClick') {
+          <DialogDelete
+            key={'dialog_' + data.row.role_id}
+            id={data.row.role_name}
+            open={openConfirm}
+            onClose={(event: any, reason: any) => {
+              if (reason !== 'backdropClick') {
+                setOpenConfirm(false)
+              }
+            }}
+            handleOk={() => {
+              handleDelete(data.row.role_id)
               setOpenConfirm(false)
-            }
-          }}
-          handleOk={() => {
-            handleDelete(data.row.role_id)
-            setOpenConfirm(false)
-          }}
-          handleClose={() => {
-            setOpenConfirm(false)
-          }}
-          disableEscapeKeyDown={true}
-        />
+            }}
+            handleClose={() => {
+              setOpenConfirm(false)
+            }}
+            disableEscapeKeyDown={true}
+          />
+        ]}
       </Menu>
     </TableCell>
   )
@@ -216,7 +220,7 @@ const Table = () => {
     setFilter(event.target.value)
   }
 
-  const handleChangePage = (event: any, newPage: number) => {
+  const handleChangePage = (newPage: number) => {
     setPage(newPage)
     dispatch(fetchRolePage({ page: newPage, perPage: perPage, q: filter }))
   }
@@ -263,8 +267,8 @@ const Table = () => {
         }),
         count: total,
         perPage: perPage,
-        changePage: (event: any, newPage: number) => {
-          handleChangePage(event, newPage)
+        changePage: (_: any, newPage: number) => {
+          handleChangePage(newPage + 1);
         },
         changePerPage: (event: any, o: any) => {
           handleChangePerPage(event)

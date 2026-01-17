@@ -207,7 +207,7 @@ const Table = () => {
     setFilter(event.target.value)
   }
 
-  const handleChangePage = (event: any, newPage: number) => {
+  const handleChangePage = (newPage: number) => {
     setPage(newPage)
     dispatch(fetchOrangTuaWaliPage({ page: newPage, perPage: perPage, q: filter }))
   }
@@ -251,8 +251,8 @@ const Table = () => {
         }),
         count: total,
         perPage: perPage,
-        changePage: (event: any, newPage: number) => {
-          handleChangePage(event, newPage)
+        changePage: (_: any, newPage: number) => {
+          handleChangePage(newPage + 1);
         },
         changePerPage: (event: any, o: any) => {
           handleChangePerPage(event)

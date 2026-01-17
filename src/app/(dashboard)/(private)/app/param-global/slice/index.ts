@@ -22,6 +22,8 @@ export interface InitialState {
   datas: any[]
   crud: any
   delete: string | null
+  import: any,
+  export: any,
 }
 
 /* --------------------------
@@ -37,6 +39,8 @@ const initialState: InitialState = {
   datas: [],
   crud: null,
   delete: null,
+  import: null,
+  export: null,
 }
 
 /* --------------------------
@@ -127,6 +131,48 @@ export const deleteParamGlobal = createAsyncThunk<any, string>(
   }
 )
 
+export const postBatch = createAsyncThunk<any, any>(
+  'param-global/insert',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/param-global/insert`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postImport = createAsyncThunk<any, any>(
+  'param-global/import',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/param-global/import`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postExport = createAsyncThunk<any, any>(
+  'param-global/export',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/param-global/export`, params)
+
+      return response.data;
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
 /* --------------------------
    4. Slice + Reducers
 --------------------------- */
@@ -163,6 +209,18 @@ export const slice = createSlice({
 
     builder.addCase(postParamGlobalUpdate.fulfilled, (state, action) => {
       state.crud = action.payload
+    })
+        
+    builder.addCase(postBatch.fulfilled, (state, action) => {
+      state.crud = action.payload
+    })
+    
+    builder.addCase(postImport.fulfilled, (state, action) => {
+      state.import = action.payload
+    })
+
+    builder.addCase(postExport.fulfilled, (state, action) => {
+      state.export = action.payload
     })
   },
 })
