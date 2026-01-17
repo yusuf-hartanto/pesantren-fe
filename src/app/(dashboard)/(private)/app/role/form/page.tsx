@@ -21,13 +21,13 @@ import { field, fieldBuildSubmit, formColumn } from '@views/onevour/form/AppForm
 const statusOption = {
   values: [
     {
+      label: 'Nonaktif',
+      value: 0
+    },
+    {
       label: 'Aktif',
       value: 1
     },
-    {
-      label: 'Nonaktif',
-      value: 2
-    }
   ]
 }
 
