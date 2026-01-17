@@ -21,6 +21,8 @@ export interface InitialState {
   datas: any[]
   crud: any
   delete: string | null
+  import: any
+  export: any
 
   navigation: any[]
 }
@@ -38,6 +40,8 @@ const initialState: InitialState = {
   datas: [],
   crud: null,
   delete: null,
+  import: null,
+  export: null,
 
   navigation: []
 }
@@ -175,6 +179,48 @@ export const fetchNavigation = createAsyncThunk<any>(
   }
 )
 
+export const postBatchRole = createAsyncThunk<any, any>(
+  'role/insert',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/role/insert`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postImport = createAsyncThunk<any, any>(
+  'role/import',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/role/import`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postExport = createAsyncThunk<any, any>(
+  'role/export',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/role/export`, params)
+
+      return response.data;
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
 /* --------------------------
    4. Slice + Reducers
 --------------------------- */
@@ -222,6 +268,18 @@ export const slice = createSlice({
 
     builder.addCase(fetchNavigation.fulfilled, (state, action) => {
       state.navigation = action.payload.data || []
+    })
+        
+    builder.addCase(postBatchRole.fulfilled, (state, action) => {
+      state.crud = action.payload
+    })
+    
+    builder.addCase(postImport.fulfilled, (state, action) => {
+      state.import = action.payload
+    })
+
+    builder.addCase(postExport.fulfilled, (state, action) => {
+      state.export = action.payload
     })
   },
 })

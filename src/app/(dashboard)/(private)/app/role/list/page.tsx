@@ -5,6 +5,8 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
+import { toast } from 'react-toastify'
+
 // ** MUI Imports
 import Grid from '@mui/material/Grid2'
 import Card from '@mui/material/Card'
@@ -20,7 +22,7 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import { deleteRole, fetchRolePage, resetRedux } from '../slice/index'
+import { deleteRole, fetchRolePage, postExport, resetRedux } from '../slice/index'
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
 import CustomChip from '@core/components/mui/Chip'
@@ -31,14 +33,14 @@ import '@assets/iconify-icons/generated-icons.css'
 import { useCan } from '@/hooks/useCan'
 
 const statusObj: Record<number, { color: any; value: string }> = {
+  0: {
+    color: 'secondary',
+    value: 'Nonaktif'
+  },
   1: {
     color: 'success',
     value: 'Aktif'
   },
-  2: {
-    color: 'secondary',
-    value: 'Nonaktif'
-  }
 }
 
 function RowAction(data: any) {
@@ -154,10 +156,13 @@ const Table = () => {
   const store = useAppSelector(state => state.role)
 
   const canCreate = useCan('create')
+  const canImport = useCan('import')
+  const canExport = useCan('export')
 
   const [filter, setFilter] = useState('')
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
+  const [loadingExport, setLoadingExport] = useState(false)
 
   useEffect(() => {
     if (store.delete) {
@@ -179,6 +184,32 @@ const Table = () => {
 
   const onAddForm = () => {
     router.replace('/app/role/form')
+  }
+  
+  const onImport = () => {
+    router.replace('/app/role/import')
+  }
+
+  const onExport = async () => {
+    try {
+      setLoadingExport(true)
+      const res = await dispatch(postExport({ q: filter })).unwrap()
+
+      if (res?.status && res?.data) {
+        const url = `${process.env.NEXT_PUBLIC_API_URL}${res.data}`
+        const link = document.createElement('a')
+
+        link.href = url
+        link.download = ''
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+    } catch {
+      toast.error('Gagal export data')
+    } finally {
+      setLoadingExport(false)
+    }
   }
 
   const handleFilter = (event: any) => {
@@ -266,6 +297,35 @@ const Table = () => {
                   startIcon={<i className='tabler-plus' />}
                 >
                   Tambah
+                </Button>
+              </Tooltip>
+            )}
+            {canImport && (
+              <Tooltip title="Import CSV">
+                <Button
+                  size="small"
+                  color="success"
+                  variant="outlined"
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onImport}
+                  startIcon={<i className="tabler-file-import" />}
+                >
+                  Import CSV
+                </Button>
+              </Tooltip>
+            )}
+
+            {canExport && (
+              <Tooltip title="Export CSV">
+                <Button
+                  size="small"
+                  color="warning"
+                  variant="outlined"
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onExport}
+                  startIcon={<i className="tabler-file-export" />}
+                >
+                  {loadingExport ? 'Proses...' : 'Export CSV'}
                 </Button>
               </Tooltip>
             )}

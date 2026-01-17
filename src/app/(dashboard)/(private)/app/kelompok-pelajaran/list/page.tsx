@@ -112,13 +112,13 @@ function RowAction(data: any) {
 
         {canDelete && [
           <MenuItem
-            key="delete"
+            key={data.row.id_kelpelajaran}
             onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}>
             <i className='tabler-trash' />
             Delete
           </MenuItem>,
           <DialogDelete
-            key="dialog-delete"
+            key={'dialog_' + data.row.id_kelpelajaran}
             id={data.row.nama_kelpelajaran}
             open={openConfirm}
             onClose={(event: any, reason: any) => {
