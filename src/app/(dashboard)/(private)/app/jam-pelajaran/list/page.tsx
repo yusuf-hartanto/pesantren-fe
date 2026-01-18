@@ -247,11 +247,11 @@ const Table = () => {
           tableColumn('NAMA', 'nama_jampel'),
           tableColumn('JENIS', 'jenis_jam_pelajaran'),
           tableColumn('LEMBAGA', 'lembaga_formal'),
-          tableColumn('LEMBAGA TYPE', 'lembaga_type'),
           tableColumn('MULAI', 'mulai'),
           tableColumn('SELESAI', 'selesai'),
           tableColumn('JUMLAH', 'jumlah_jampel'),
           tableColumn('KETERANGAN', 'keterangan'),
+          tableColumn('TIPE', 'lembaga_type'),
           tableColumn('STATUS', 'status'),
           tableColumn('TERAKHIR DIUBAH', 'updated_at'),
         ],
@@ -297,7 +297,7 @@ const Table = () => {
     <Grid container spacing={6} sx={{ width: '100%' }}>
       <Grid size={12}>
         <Card>
-          <CardHeader title='Mata Pelajaran' sx={{ paddingBottom: 0 }} />
+          <CardHeader title='Jam Pelajaran' sx={{ paddingBottom: 0 }} />
           <Toolbar
             sx={{
               px: '1.5rem !important',
