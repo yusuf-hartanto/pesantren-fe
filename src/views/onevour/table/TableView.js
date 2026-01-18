@@ -50,6 +50,10 @@ const TableView = ({ model, changeSort, ...res }) => {
   }
 
   const renderTableRows = model => {
+    if (!model?.values || model.values.length === 0) {
+      return renderEmptyRow(model)
+    }
+
     return (
       <>
         {model &&
@@ -102,6 +106,14 @@ const TableView = ({ model, changeSort, ...res }) => {
   }
 
   const renderMobileRows = (model) => {
+    if (!model?.values || model.values.length === 0) {
+      return (
+        <div className="text-center py-8 text-gray-500">
+          Tidak Ada Data
+        </div>
+      )
+    }
+
     return (
       <div>
         {model.values?.map((row, i) => {
@@ -174,6 +186,22 @@ const TableView = ({ model, changeSort, ...res }) => {
         })}
       </div>
     );
+  }
+
+  const renderEmptyRow = (model) => {
+    const colSpan = model?.fields?.length || 1
+
+    return (
+      <TableRow>
+        <TableCell
+          colSpan={colSpan}
+          align="center"
+          sx={{ py: 4, color: 'text.secondary' }}
+        >
+          Tidak Ada Data
+        </TableCell>
+      </TableRow>
+    )
   }
 
   const handleSort = fieldName => {
