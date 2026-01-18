@@ -15,9 +15,9 @@ import { toast } from 'react-toastify'
 import { useForm } from 'react-hook-form'
 
 import { field, fieldBuildSubmit, formColumn } from '@views/onevour/form/AppFormBuilder'
-import { fetchLembagaAll, fetchMataPelajaranById, postMataPelajaran, postMataPelajaranUpdate, resetRedux } from '../slice/index'
+import { fetchLembagaAll, fetchJamPelajaranById, postJamPelajaran, postJamPelajaranUpdate, resetRedux } from '../slice/index'
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import { fetchKelompokPelajaranAll } from '../../kelompok-pelajaran/slice'
+import { fetchJenisJamPelajaranAll } from '../../jenis-jam-pelajaran/slice'
 
 const statusOption = {
   values: [
@@ -54,14 +54,14 @@ const FormValidationBasic = () => {
 
   const dispatch = useAppDispatch()
 
-  const store = useAppSelector(state => state.mata_pelajaran)
-  const storeKelpel = useAppSelector(state => state.kelompok_pelajaran)
+  const store = useAppSelector(state => state.jam_pelajaran)
+  const storeJenisJam = useAppSelector(state => state.jenis_jam_pelajaran)
 
   interface FormData {
-    kode_mapel: string
-    nama_mapel: string
+    nama_jampel: string
     keterangan: string
-    kkm: string
+    mulai: string
+    selesai: string
     status: {
       value: string
       label: string
@@ -74,7 +74,7 @@ const FormValidationBasic = () => {
       value: string
       label: string
     },
-    id_kelpelajaran: {
+    id_jenisjam: {
       value: string
       label: string
     },
@@ -82,9 +82,10 @@ const FormValidationBasic = () => {
 
   const defaultValues = {
     kode_mapel: '',
-    nama_mapel: '',
+    nama_jampel: '',
     keterangan: '',
-    kkm: '',
+    mulai: '',
+    selesai: '',
     status: {
       value: 'A',
       label: 'Aktif'
@@ -97,7 +98,7 @@ const FormValidationBasic = () => {
       value: '',
       label: ''
     },
-    id_kelpelajaran: {
+    id_jenisjam: {
       value: '',
       label: ''
     },
@@ -115,15 +116,27 @@ const FormValidationBasic = () => {
 
   const onCancel = useCallback(() => {
     dispatch(resetRedux())
-    router.replace('/app/mata-pelajaran/list')
+    router.replace('/app/jam-pelajaran/list')
   }, [dispatch, router])
+
+  const timeToDate = (time: any) => {
+    if (!time) return null
+
+    const [hour, minute] = time.split(':').map(Number)
+
+    const date = new Date()
+    
+    date.setHours(hour, minute, 0, 0)
+
+    return date
+  }
 
   useEffect(() => {
     dispatch(fetchLembagaAll({}))
-    dispatch(fetchKelompokPelajaranAll({}))
+    dispatch(fetchJenisJamPelajaranAll({}))
 
     if (id) {
-      dispatch(fetchMataPelajaranById(id)).then(res => {
+      dispatch(fetchJamPelajaranById(id)).then(res => {
         const datas = { ...res?.payload?.data }
 
         if (datas) {
@@ -134,11 +147,13 @@ const FormValidationBasic = () => {
             label: datas?.lembaga_formal?.nama_lembaga,
             value: datas?.lembaga_formal?.id_lembaga,
           }
-          datas.id_kelpelajaran = {
-            ...datas.kelompok_pelajaran,
-            label: datas?.kelompok_pelajaran?.nama_kelpelajaran,
-            value: datas?.kelompok_pelajaran?.id_kelpelajaran,
+          datas.id_jenisjam = {
+            ...datas.jenis_jam_pelajaran,
+            label: datas?.jenis_jam_pelajaran?.nama_kelpelajaran,
+            value: datas?.jenis_jam_pelajaran?.id_jenisjam,
           }
+          datas.mulai = datas.mulai ? timeToDate(datas.mulai) : null
+          datas.selesai = datas.selesai ? timeToDate(datas.selesai) : null
 
           setState(datas)
           reset(datas)
@@ -160,6 +175,19 @@ const FormValidationBasic = () => {
     }
   }, [onCancel, store])
 
+  const dateToTime = (date: any) => {
+    const newDate = new Date(date)
+
+    return newDate.toLocaleString('id-ID', {
+        timeZone: 'Asia/Jakarta',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      })
+      .replace(/\./g, ':')
+  }
+
   const onSubmit = () => {
     if (loading) return
     setLoading(true)
@@ -167,21 +195,25 @@ const FormValidationBasic = () => {
     if (id) {
       // update
       dispatch(
-        postMataPelajaranUpdate({
+        postJamPelajaranUpdate({
           id: id,
           params: {
             ...state,
             status: state.status.value,
             lembaga_type: state.lembaga_type.value,
+            mulai: state.mulai ? dateToTime(state.mulai) : null,
+            selesai: state.selesai ? dateToTime(state.selesai) : null,
           }
         })
       )
     } else {
       dispatch(
-        postMataPelajaran({
+        postJamPelajaran({
           ...state,
           status: state.status.value,
           lembaga_type: state.lembaga_type.value,
+          mulai: state.mulai ? dateToTime(state.mulai) : null,
+          selesai: state.selesai ? dateToTime(state.selesai) : null,
         })
       )
     }
@@ -191,18 +223,26 @@ const FormValidationBasic = () => {
     return [
       field({
         type: 'text',
-        key: 'kode_mapel',
-        label: 'Kode',
-        placeholder: 'Input kode',
+        key: 'nama_jampel',
+        label: 'Name',
+        placeholder: 'Input nama',
         required: true,
         readOnly: Boolean(view)
       }),
       field({
-        type: 'text',
-        key: 'nama_mapel',
-        label: 'Name',
-        placeholder: 'Input nama',
+        type: 'select',
+        key: 'id_jenisjam',
+        label: 'Jenis Jam',
+        placeholder: 'Pilih Jenis Jam',
         required: true,
+        options: {
+          values: storeJenisJam.datas.map(m => {
+            return {
+              label: m.nama_jenis_jam,
+              value: m.id_jenisjam
+            }
+          }),
+        },
         readOnly: Boolean(view)
       }),
       field({
@@ -231,27 +271,21 @@ const FormValidationBasic = () => {
         readOnly: Boolean(view)
       }),
       field({
-        type: 'select',
-        key: 'id_kelpelajaran',
-        label: 'Kelompok',
-        placeholder: 'Pilih Kelompok',
+        type: 'time',
+        key: 'mulai',
+        label: 'Waktu Mulai',
+        placeholder: 'Input Waktu Mulai',
         required: true,
-        options: {
-          values: storeKelpel.datas.map(m => {
-            return {
-              label: m.nama_kelpelajaran,
-              value: m.id_kelpelajaran
-            }
-          }),
-        },
-        readOnly: Boolean(view)
+        interval: 15,
+        readOnly: Boolean(view),
       }),
       field({
-        type: 'numeral',
-        key: 'kkm',
-        label: 'KKM',
-        placeholder: 'Input KKM',
+        type: 'time',
+        key: 'selesai',
+        label: 'Waktu Selesai',
+        placeholder: 'Input Waktu Selesai',
         required: true,
+        interval: 15,
         readOnly: Boolean(view)
       }),
       field({
@@ -278,7 +312,7 @@ const FormValidationBasic = () => {
   return (
     <>
       <Card>
-        <CardHeader title='Form Mata Pelajaran' />
+        <CardHeader title='Form Jam Pelajaran' />
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} autoComplete='off'>
             {formColumn({

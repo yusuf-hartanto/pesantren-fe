@@ -52,6 +52,12 @@ import InputImage from '../components/input-image'
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
 
+// Components Imports
+import CustomTextField from '@core/components/mui/TextField'
+
+// Styled Component Imports
+import AppReactDatepicker from '@/libs/styles/AppReactDatepicker'
+
 function MaskedTextField(props) {
   const { options, inputRef, ...other } = props
 
@@ -82,7 +88,8 @@ export function field(props) {
     color = null,
     autoFocus = false,
     urlImage = null,
-    render
+    render,
+    interval = 30
   } = props
 
   return {
@@ -104,7 +111,8 @@ export function field(props) {
     color: color,
     autoFocus: autoFocus,
     urlImage: urlImage,
-    render
+    render,
+    interval
   }
 }
 
@@ -1470,50 +1478,38 @@ const selectDate = form => {
 const selectTime = form => {
   const { control, errors, session, props } = form
 
-  const popperPlacement = 'bottom-start'
-
-  if (undefined === props.options || null === props.options) {
-    props.options = {}
-  }
-
-  if (undefined === props.options.values || null === props.options.values) {
-    props.options.values = []
-  }
-
-  let valueTmp = session.state[props.key]
-
-  let selected = valueTmp ? props.options.values.find(e => e.value === valueTmp) : { label: '', value: null }
-
   return (
     <Controller
-      control={control}
       name={props.key}
-      value={selected}
-      defaultValue={null}
-      rules={{ required: props.required }}
-      render={({ field: { value, onChange } }) => {
-        if (value && value?.value) {
-          selected = value
-        }
-
-        return (
-          <DatePicker
-            id='time-only-picker'
-            showTimeSelect
-            showTimeSelectOnly
-            timeIntervals={60}
-            dateFormat='HH:mm'
-            timeFormat='HH:mm'
-            selected={value}
-            popperPlacement={popperPlacement}
-            onChange={date => {
-              onChange(date)
-              updateValueDate(session, props, date)
-            }}
-            placeholderText='Click to select a time'
-          />
-        )
-      }}
+      control={control}
+      render={({ field: { value, onChange } }) => (
+        <AppReactDatepicker
+          selected={value ? new Date(value) : null}
+          onChange={e => {
+            onChange(e)
+            updateValueDate(session, props, e)
+          }}
+          showTimeSelect
+          showTimeSelectOnly
+          timeIntervals={props.interval || 30}
+          timeFormat="HH:mm"
+          dateFormat="HH:mm"
+          placeholderText={props.placeholder}
+          disabled={props.readOnly}
+          className="w-100"
+          wrapperClassName="w-100"
+          boxProps={{ sx: { width: '100%' } }}
+          customInput={
+            <CustomTextField
+              fullWidth
+              label={props.placeholder}
+              InputProps={{
+                readOnly: true
+              }}
+            />
+          }
+        />
+      )}
     />
   )
 }
