@@ -93,6 +93,16 @@ export const postKelasMda = createAsyncThunk<any, any>('kelas-mda/create', async
   }
 })
 
+export const postBatchKelasMda = createAsyncThunk<any, any>('kelas-mda/insert', async (params, thunkAPI) => {
+  try {
+    const response = await api.post(`/app/kelas-mda/insert`, params)
+
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
+  }
+})
+
 export const postKelasMdaUpdate = createAsyncThunk<any, { id: string; params: any }>(
   'kelas-mda/update',
   async ({ id, params }, thunkAPI) => {
@@ -167,6 +177,10 @@ export const slice = createSlice({
     })
 
     builder.addCase(postKelasMda.fulfilled, (state, action) => {
+      state.crud = action.payload
+    })
+
+    builder.addCase(postBatchKelasMda.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
