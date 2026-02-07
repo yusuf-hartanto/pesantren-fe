@@ -96,6 +96,16 @@ export const postKelasFormal = createAsyncThunk<any, any>('kelas-formal/create',
   }
 })
 
+export const postBatchKelasFormal = createAsyncThunk<any, any>('kelas-formal/insert', async (params, thunkAPI) => {
+  try {
+    const response = await api.post(`/app/kelas-formal/insert`, params)
+
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
+  }
+})
+
 export const postKelasFormalUpdate = createAsyncThunk<any, { id: string; params: any }>(
   'kelas-formal/update',
   async ({ id, params }, thunkAPI) => {
@@ -174,6 +184,10 @@ export const slice = createSlice({
     })
 
     builder.addCase(postKelasFormalUpdate.fulfilled, (state, action) => {
+      state.crud = action.payload
+    })
+
+    builder.addCase(postBatchKelasFormal.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
