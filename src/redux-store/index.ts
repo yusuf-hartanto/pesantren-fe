@@ -22,6 +22,12 @@ import jenis_jam_pelajaran from '@/app/(dashboard)/(private)/app/jenis-jam-pelaj
 import mata_pelajaran from '@/app/(dashboard)/(private)/app/mata-pelajaran/slice/index'
 import jam_pelajaran from '@/app/(dashboard)/(private)/app/jam-pelajaran/slice/index'
 import guru_mata_pelajaran from '@/app/(dashboard)/(private)/app/guru-mata-pelajaran/slice/index'
+import cabang from '@/app/(dashboard)/(private)/app/cabang/slice/index'
+import areas from '@/app/(dashboard)/(private)/app/areas/slice/index'
+import location from '@/app/(dashboard)/(private)/app/location/slice/index'
+import lembaga_kepesantrenan from '@/app/(dashboard)/(private)/app/lembaga-kepesantrenan/slice/index'
+import lembaga_formal from '@/app/(dashboard)/(private)/app/lembaga-formal/slice/index'
+import organisasi_unit from '@/app/(dashboard)/(private)/app/organisasi/slice/index'
 
 export const store = configureStore({
   reducer: {
@@ -29,6 +35,12 @@ export const store = configureStore({
     kanbanReducer,
     role,
     menu,
+    areas,
+    cabang,
+    location,
+    lembaga_kepesantrenan,
+    lembaga_formal,
+    organisasi_unit,
     tahun_ajaran,
     semester,
     tingkat,
