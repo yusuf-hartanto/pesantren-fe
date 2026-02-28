@@ -1492,12 +1492,12 @@ const selectTime = form => {
           showTimeSelect
           showTimeSelectOnly
           timeIntervals={props.interval || 30}
-          timeFormat="HH:mm"
-          dateFormat="HH:mm"
+          timeFormat='HH:mm'
+          dateFormat='HH:mm'
           placeholderText={props.placeholder}
           disabled={props.readOnly}
-          className="w-100"
-          wrapperClassName="w-100"
+          className='w-100'
+          wrapperClassName='w-100'
           boxProps={{ sx: { width: '100%' } }}
           customInput={
             <CustomTextField

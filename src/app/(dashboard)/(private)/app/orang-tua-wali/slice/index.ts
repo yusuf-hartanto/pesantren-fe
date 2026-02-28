@@ -125,6 +125,16 @@ export const postOrangTuaWaliUpdate = createAsyncThunk<any, { id: string; param:
   }
 )
 
+export const postBatchOrangTuaWali = createAsyncThunk<any, any>('orang-tua-wali/insert', async (params, thunkAPI) => {
+  try {
+    const response = await api.post(`/app/orang-tua-wali/insert`, params)
+
+    return response.data
+  } catch (e: any) {
+    return thunkAPI.fulfillWithValue(e.response?.data)
+  }
+})
+
 export const deleteOrangTuaWali = createAsyncThunk<any, string>('orang-tua-wali/delete', async (id, thunkAPI) => {
   const session = await getSession()
 
@@ -194,6 +204,10 @@ export const slice = createSlice({
     })
 
     builder.addCase(postOrangTuaWaliUpdate.fulfilled, (state, action) => {
+      state.crud = action.payload
+    })
+
+    builder.addCase(postBatchOrangTuaWali.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 

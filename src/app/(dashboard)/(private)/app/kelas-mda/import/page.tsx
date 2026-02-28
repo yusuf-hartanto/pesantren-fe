@@ -274,7 +274,7 @@ export default function ImportExcelPage() {
                 Jika <b>Nama Kelas MDA</b> , <b>Lembaga</b> dan <b>Tahun Ajaran</b> kosong → INSERT (data baru)
               </li>
               <li>
-                Jika <b>Nama Kelas MDA</b> , <b>Lembaga</b> ada <b>Tahun Ajaran</b> → UPDATE (perbarui data)
+                Jika <b>Nama Kelas MDA</b> , <b>Lembaga</b> dan <b>Tahun Ajaran</b> ada → UPDATE (perbarui data)
               </li>
               <li>Mode Preview: hanya validasi tanpa menyimpan</li>
               <li>Mode Commit: validasi dan simpan ke database</li>
