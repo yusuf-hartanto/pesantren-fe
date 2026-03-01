@@ -79,12 +79,14 @@ const OrganizationUnitForm = () => {
         ...(resFormal?.data || []).map((item: any) => ({
           label: `[Formal] ${item.nama_lembaga}`,
           value: item.id_lembaga,
-          type: 'FORMAL'
+          type: 'FORMAL',
+          id_cabang: item.id_cabang
         })),
         ...(resPesantren?.data || []).map((item: any) => ({
           label: `[Pesantren] ${item.nama_lembaga}`,
           value: item.id_lembaga,
-          type: 'PESANTREN'
+          type: 'PESANTREN',
+          id_cabang: item.id_cabang
         }))
       ]
 
@@ -106,7 +108,8 @@ const OrganizationUnitForm = () => {
             id_lembaga: d.lembaga?.id_lembaga ? {
               label: `[${d.lembaga_type}] ${d.lembaga.nama_lembaga}`,
               value: d.lembaga.id_lembaga,
-              type: d.lembaga_type
+              type: d.lembaga_type,
+              id_cabang: d.id_cabang
             } : null,
           }
           setState(formatted)
@@ -117,6 +120,25 @@ const OrganizationUnitForm = () => {
       toast.error("Gagal memuat referensi data")
     }
   }, [id, dispatch, reset])
+
+
+  // State untuk menyimpan daftar lembaga yang sudah terfilter
+  const [filteredLembaga, setFilteredLembaga] = useState<any[]>([])
+
+  useEffect(() => {
+    const selectedCabangId = state.id_cabang?.value
+
+    if (selectedCabangId) {
+      const filtered = opt.lembaga.filter((l: any) => l.id_cabang === selectedCabangId)
+      setFilteredLembaga(filtered)
+
+      if (state.id_lembaga && state.id_lembaga.id_cabang !== selectedCabangId) {
+        setState((prev: any) => ({ ...prev, id_lembaga: null }))
+      }
+    } else {
+      setFilteredLembaga(opt.lembaga)
+    }
+  }, [state.id_cabang, opt.lembaga])
 
   useEffect(() => {
     initForm()
