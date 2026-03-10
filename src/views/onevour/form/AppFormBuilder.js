@@ -636,6 +636,16 @@ export function formColumnDetailField(form) {
     )
   }
 
+  if ('date_custom' === props.type) {
+    return (
+      <Grid item size={{ xs: 12, sm: props?.options?.grid | 6 }} key={index}>
+        <FormControl fullWidth size='small'>
+          {selectDateCustom(form)}
+        </FormControl>
+      </Grid>
+    )
+  }
+
   if ('time' === props.type) {
     return (
       <Grid item size={{ xs: 12, sm: props?.options?.grid | 6 }} key={index}>
@@ -1475,6 +1485,64 @@ const selectDate = form => {
   )
 }
 
+const selectDateCustom = form => {
+  const { control, errors, session, props } = form
+
+  return (
+    <Controller
+      name={props.key}
+      control={control}
+      rules={{ required: props.required }}
+      render={({ field: { value, onChange } }) => {
+        // Pastikan value adalah objek Date. Jika string (dari API), konversi ke Date.
+        const currentValue = value || session.state[props.key] || null
+        const dateValue = currentValue ? new Date(currentValue) : null
+
+        return (
+          <AppReactDatepicker
+            selected={dateValue}
+            id={`date-picker-${props.key}`}
+            popperPlacement={props.popperPlacement || 'bottom-start'}
+            onChange={date => {
+              // 1. Update React Hook Form
+              onChange(date)
+
+              // 2. Update Vuexy Session State
+              updateValueDate(session, props, date)
+
+              // 3. Custom Callback
+              if (typeof props?.options?.onChange === 'function') {
+                props.options.onChange(date)
+              }
+            }}
+            placeholderText={props.placeholder || 'Select Date'}
+            disabled={props.readOnly}
+            portalId={props.portalId}
+            minDate={props.minDate}
+            maxDate={props.maxDate}
+            dateFormat={props.dateFormat || 'dd/MM/yyyy'} // Format tampilan
+            className='w-100'
+            wrapperClassName='w-100'
+            // Menggunakan CustomTextField agar styling MUI konsisten
+            customInput={
+              <CustomTextField
+                fullWidth
+                size='small'
+                label={props.label}
+                error={Boolean(errors[props.key])}
+                {...(errors[props.key] && { helperText: errors[props.key].message })}
+                InputProps={{
+                  readOnly: true // User harus pilih lewat kalender, tidak bisa ketik manual
+                }}
+              />
+            }
+          />
+        )
+      }}
+    />
+  )
+}
+
 const selectTime = form => {
   const { control, errors, session, props } = form
 
@@ -1492,12 +1560,12 @@ const selectTime = form => {
           showTimeSelect
           showTimeSelectOnly
           timeIntervals={props.interval || 30}
-          timeFormat="HH:mm"
-          dateFormat="HH:mm"
+          timeFormat='HH:mm'
+          dateFormat='HH:mm'
           placeholderText={props.placeholder}
           disabled={props.readOnly}
-          className="w-100"
-          wrapperClassName="w-100"
+          className='w-100'
+          wrapperClassName='w-100'
           boxProps={{ sx: { width: '100%' } }}
           customInput={
             <CustomTextField

@@ -28,6 +28,8 @@ import location from '@/app/(dashboard)/(private)/app/location/slice/index'
 import lembaga_kepesantrenan from '@/app/(dashboard)/(private)/app/lembaga-kepesantrenan/slice/index'
 import lembaga_formal from '@/app/(dashboard)/(private)/app/lembaga-formal/slice/index'
 import organisasi_unit from '@/app/(dashboard)/(private)/app/organisasi/slice/index'
+import jabatan from '@/app/(dashboard)/(private)/app/jabatan/slice/index'
+import pegawai from '@/app/(dashboard)/(private)/app/pegawai/slice/index'
 
 export const store = configureStore({
   reducer: {
@@ -41,6 +43,8 @@ export const store = configureStore({
     lembaga_kepesantrenan,
     lembaga_formal,
     organisasi_unit,
+    jabatan,
+    pegawai,
     tahun_ajaran,
     semester,
     tingkat,

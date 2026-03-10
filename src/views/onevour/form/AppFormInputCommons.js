@@ -24,6 +24,7 @@ export function updateValueDate(session, props, date) {
   let store = { ...session.state }
 
   store[props.key] = date
+  console.log('DATEEE', date, props.key)
 
   // session.state[props.key] = e.target.value
   session.setState(store)
