@@ -1,6 +1,7 @@
 'use client'
 
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import api from '@/libs/axios'
 
 /* --------------------------
@@ -41,7 +42,9 @@ const initialState: InitialState = {
 export const fetchJabatanAll = createAsyncThunk('jabatan/fetchAll', async (params: any, thunkAPI) => {
   try {
     const response = await api.get(`/app/jabatan/all-data`, { params })
-    return response.data
+
+    
+return response.data
   } catch (e: any) {
     return thunkAPI.rejectWithValue(e.response?.data)
   }
@@ -51,7 +54,9 @@ export const fetchJabatanAll = createAsyncThunk('jabatan/fetchAll', async (param
 export const fetchJabatanPage = createAsyncThunk('jabatan/fetchPage', async (params: any, thunkAPI) => {
   try {
     const response = await api.get('/app/jabatan', { params })
-    return response.data
+
+    
+return response.data
   } catch (e: any) {
     return thunkAPI.rejectWithValue(e.response?.data)
   }
@@ -61,7 +66,9 @@ export const fetchJabatanPage = createAsyncThunk('jabatan/fetchPage', async (par
 export const fetchJabatanById = createAsyncThunk('jabatan/fetchById', async (id: string, thunkAPI) => {
   try {
     const response = await api.get(`/app/jabatan/${id}`)
-    return response.data
+
+    
+return response.data
   } catch (e: any) {
     return thunkAPI.rejectWithValue(e.response?.data)
   }
@@ -71,7 +78,9 @@ export const fetchJabatanById = createAsyncThunk('jabatan/fetchById', async (id:
 export const postJabatan = createAsyncThunk('jabatan/post', async (params: any, thunkAPI) => {
   try {
     const response = await api.post('/app/jabatan', params)
-    return response.data
+
+    
+return response.data
   } catch (e: any) {
     // Di sini error duplikasi (400/409) ditangkap dan dilempar ke rejected
     return thunkAPI.rejectWithValue(e.response?.data)
@@ -82,7 +91,9 @@ export const postJabatan = createAsyncThunk('jabatan/post', async (params: any, 
 export const postJabatanUpdate = createAsyncThunk('jabatan/update', async ({ id, params }: { id: string, params: any }, thunkAPI) => {
   try {
     const response = await api.put(`/app/jabatan/${id}`, params)
-    return response.data
+
+    
+return response.data
   } catch (e: any) {
     return thunkAPI.rejectWithValue(e.response?.data)
   }
@@ -92,12 +103,56 @@ export const postJabatanUpdate = createAsyncThunk('jabatan/update', async ({ id,
 export const deleteJabatan = createAsyncThunk('jabatan/delete', async (id: string, thunkAPI) => {
   try {
     const response = await api.delete(`/app/jabatan/${id}`)
-    return response.data
+
+    
+return response.data
   } catch (e: any) {
     // Menangkap error proteksi relasi (misal: masih ada pegawai)
     return thunkAPI.rejectWithValue(e.response?.data)
   }
 })
+
+export const postBatch = createAsyncThunk<any, any>(
+  'jabatan/insert',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/jabatan/insert`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postImport = createAsyncThunk<any, any>(
+  'jabatan/import',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/jabatan/import`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postExport = createAsyncThunk<any, any>(
+  'jabatan/export',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/jabatan/export`, params)
+
+      return response.data;
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
 
 /* --------------------------
    4. Slice
@@ -110,6 +165,7 @@ export const jabatanSlice = createSlice({
       state.crud = null
       state.delete = null
       state.loading = false
+
       // Kita tidak mereset dataPage agar UI tidak flicker saat pindah form
     }
   },
@@ -145,6 +201,7 @@ export const jabatanSlice = createSlice({
     const handleCrudRejected = (state: any, action: any) => {
       state.crud = {
         status: false,
+
         // Mengambil pesan error dari Zod atau Error buatan di Controller
         message: action.payload?.message || 'Terjadi kesalahan sistem'
       }

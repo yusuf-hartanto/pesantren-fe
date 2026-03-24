@@ -174,6 +174,7 @@ export const postExport = createAsyncThunk<any, any>(
     }
   }
 )
+
 export const fetchLembagaAll = createAsyncThunk<any, FetchParams>(
   'lembaga/fetchAll',
   async (params, thunkAPI) => {

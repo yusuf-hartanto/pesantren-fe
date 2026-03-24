@@ -10,7 +10,7 @@ import { toast } from 'react-toastify'
 import Button from '@mui/material/Button'
 
 import { useAppDispatch } from '@/redux-store/hook'
-import { postBatchTahunAjaran, postExport, postImport, resetRedux } from '../slice'
+import { postBatch, postExport, postImport, resetRedux } from '../slice'
 
 export interface ImportPayload {
   tahun_ajaran: string
@@ -139,7 +139,7 @@ export default function ImportExcelPage() {
 
     try {
       setLoadingImport(true)
-      const res = await dispatch(postBatchTahunAjaran({ data: payloads })).unwrap()
+      const res = await dispatch(postBatch({ data: payloads })).unwrap()
       const { status, message } = res
 
       if (!status) {

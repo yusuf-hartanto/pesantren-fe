@@ -1,6 +1,7 @@
 'use client'
 
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import api from '@/libs/axios'
 
 /* --------------------------
@@ -19,6 +20,8 @@ export interface InitialState {
   export: any,
   loading: boolean
 }
+
+
 /* --------------------------
    2. Initial State
 --------------------------- */
@@ -44,7 +47,9 @@ export const fetchLocationAll = createAsyncThunk<any, any>(
   async (params, thunkAPI) => {
     try {
       const response = await api.get(`/app/location/all-data`, { params })
-      return response.data
+
+      
+return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
@@ -55,7 +60,9 @@ export const fetchLocationAll = createAsyncThunk<any, any>(
 export const fetchLocationPage = createAsyncThunk('location/fetchPage', async (params: any, thunkAPI) => {
   try {
     const response = await api.get('/app/location', { params })
-    return response.data
+
+    
+return response.data
   } catch (e: any) {
     return thunkAPI.rejectWithValue(e.response?.data)
   }
@@ -65,7 +72,9 @@ export const fetchLocationPage = createAsyncThunk('location/fetchPage', async (p
 export const fetchLocationById = createAsyncThunk('location/fetchById', async (id: string, thunkAPI) => {
   try {
     const response = await api.get(`/app/location/${id}`)
-    return response.data
+
+    
+return response.data
   } catch (e: any) {
     return thunkAPI.rejectWithValue(e.response?.data)
   }
@@ -75,7 +84,9 @@ export const fetchLocationById = createAsyncThunk('location/fetchById', async (i
 export const postLocation = createAsyncThunk('location/post', async (params: any, thunkAPI) => {
   try {
     const response = await api.post('/app/location', params)
-    return response.data
+
+    
+return response.data
   } catch (e: any) {
     return thunkAPI.rejectWithValue(e.response?.data)
   }
@@ -85,10 +96,13 @@ export const postLocation = createAsyncThunk('location/post', async (params: any
 export const postLocationUpdate = createAsyncThunk('location/update', async ({ id, params }: { id: string, params: any }, thunkAPI) => {
   try {
     const response = await api.put(`/app/location/${id}`, params)
-    return response.data
+
+    
+return response.data
   } catch (e: any) {
     console.log(e)
-    return thunkAPI.rejectWithValue(e.response?.data)
+    
+return thunkAPI.rejectWithValue(e.response?.data)
   }
 })
 
@@ -96,17 +110,35 @@ export const postLocationUpdate = createAsyncThunk('location/update', async ({ i
 export const deleteLocation = createAsyncThunk('location/delete', async (id: string, thunkAPI) => {
   try {
     const response = await api.delete(`/app/location/${id}`)
-    return response.data
+
+    
+return response.data
   } catch (e: any) {
     return thunkAPI.rejectWithValue(e.response?.data)
   }
 })
 
+export const postBatchLocation = createAsyncThunk<any, any>(
+  'location/insert',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/location/insert`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
 // Export CSV
 export const postExportLocation = createAsyncThunk('location/export', async (params: any, thunkAPI) => {
   try {
     const response = await api.post('/app/location/export', params)
-    return response.data
+
+    
+return response.data
   } catch (e: any) {
     return thunkAPI.rejectWithValue(e.response?.data)
   }
@@ -118,7 +150,9 @@ export const postImportLocation = createAsyncThunk('location/import', async (for
     const response = await api.post('/app/location/import', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
-    return response.data
+
+    
+return response.data
   } catch (e: any) {
     return thunkAPI.rejectWithValue(e.response?.data)
   }

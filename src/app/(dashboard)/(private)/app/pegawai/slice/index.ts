@@ -1,6 +1,7 @@
 'use client'
 
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import api from '@/libs/axios'
 
 /* --------------------------
@@ -40,37 +41,89 @@ const initialState: InitialState = {
 export const fetchPegawaiPage = createAsyncThunk('pegawai/fetchPage', async (params: any, thunkAPI) => {
   try {
     const response = await api.get('/app/pegawai', { params })
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
 export const fetchPegawaiById = createAsyncThunk('pegawai/fetchById', async (id: string, thunkAPI) => {
   try {
     const response = await api.get(`/app/pegawai/${id}`)
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
 export const postPegawai = createAsyncThunk('pegawai/post', async (params: any, thunkAPI) => {
   try {
     const response = await api.post('/app/pegawai', params)
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
 export const postPegawaiUpdate = createAsyncThunk('pegawai/update', async ({ id, params }: any, thunkAPI) => {
   try {
     const response = await api.put(`/app/pegawai/${id}`, params)
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
 export const deletePegawai = createAsyncThunk('pegawai/delete', async (id: string, thunkAPI) => {
   try {
     const response = await api.delete(`/app/pegawai/${id}`)
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
+
+export const postBatch = createAsyncThunk<any, any>(
+  'pegawai/insert',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/pegawai/insert`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postImport = createAsyncThunk<any, any>(
+  'pegawai/import',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/pegawai/import`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postExport = createAsyncThunk<any, any>(
+  'pegawai/export',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/pegawai/export`, params)
+
+      return response.data;
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
 
 export const pegawaiSlice = createSlice({
   name: 'pegawai',

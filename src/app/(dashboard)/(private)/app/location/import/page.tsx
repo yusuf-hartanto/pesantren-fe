@@ -10,7 +10,7 @@ import { toast } from 'react-toastify'
 import Button from '@mui/material/Button'
 
 import { useAppDispatch } from '@/redux-store/hook'
-import { postBatchTahunAjaran, postExport, postImport, resetRedux } from '../slice'
+import { postBatchLocation, postExportLocation, postImportLocation, resetRedux } from '../slice'
 
 export interface ImportPayload {
   tahun_ajaran: string
@@ -57,7 +57,7 @@ export default function ImportExcelPage() {
 
   const downloadTemplate = async () => {
     try {
-      const res = await dispatch(postExport({ template: 1 })).unwrap()
+      const res = await dispatch(postExportLocation({ template: 1 })).unwrap()
 
       if (res?.status && res?.data) {
         const url = `${process.env.NEXT_PUBLIC_API_URL}${res.data}`
@@ -107,7 +107,7 @@ export default function ImportExcelPage() {
 
     try {
       setLoading(true)
-      const res = await dispatch(postImport(formData)).unwrap()
+      const res = await dispatch(postImportLocation(formData)).unwrap()
       const { status, message, data } = res
 
       if (!status) {
@@ -139,7 +139,7 @@ export default function ImportExcelPage() {
 
     try {
       setLoadingImport(true)
-      const res = await dispatch(postBatchTahunAjaran({ data: payloads })).unwrap()
+      const res = await dispatch(postBatchLocation({ data: payloads })).unwrap()
       const { status, message } = res
 
       if (!status) {

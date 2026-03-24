@@ -1,6 +1,7 @@
 'use client'
 
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import api from '@/libs/axios'
 
 /* --------------------------
@@ -43,7 +44,9 @@ export const fetchOrgUnitPage = createAsyncThunk(
   async (params: any, thunkAPI) => {
     try {
       const response = await api.get('/app/organization-unit', { params })
-      return response.data
+
+      
+return response.data
     } catch (e: any) {
       return thunkAPI.rejectWithValue(e.response?.data)
     }
@@ -56,7 +59,9 @@ export const fetchOrgUnitAll = createAsyncThunk(
   async (params: any, thunkAPI) => {
     try {
       const response = await api.get('/app/organization-unit/all-data', { params })
-      return response.data
+
+      
+return response.data
     } catch (e: any) {
       return thunkAPI.rejectWithValue(e.response?.data)
     }
@@ -69,7 +74,9 @@ export const fetchOrgUnitById = createAsyncThunk(
   async (id: string, thunkAPI) => {
     try {
       const response = await api.get(`/app/organization-unit/${id}`)
-      return response.data
+
+      
+return response.data
     } catch (e: any) {
       return thunkAPI.rejectWithValue(e.response?.data)
     }
@@ -82,7 +89,9 @@ export const postOrgUnit = createAsyncThunk(
   async (params: any, thunkAPI) => {
     try {
       const response = await api.post('/app/organization-unit', params)
-      return response.data
+
+      
+return response.data
     } catch (e: any) {
       return thunkAPI.rejectWithValue(e.response?.data)
     }
@@ -95,7 +104,9 @@ export const postOrgUnitUpdate = createAsyncThunk(
   async ({ id, params }: { id: string; params: any }, thunkAPI) => {
     try {
       const response = await api.put(`/app/organization-unit/${id}`, params)
-      return response.data
+
+      
+return response.data
     } catch (e: any) {
       return thunkAPI.rejectWithValue(e.response?.data)
     }
@@ -108,9 +119,53 @@ export const deleteOrgUnit = createAsyncThunk(
   async (id: string, thunkAPI) => {
     try {
       const response = await api.delete(`/app/organization-unit/${id}`)
-      return response.data
+
+      
+return response.data
     } catch (e: any) {
       return thunkAPI.rejectWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postBatch = createAsyncThunk<any, any>(
+  'orgUnit/insert',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/organization-unit/insert`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postImport = createAsyncThunk<any, any>(
+  'orgUnit/import',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/organization-unit/import`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postExport = createAsyncThunk<any, any>(
+  'orgUnit/export',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/organization-unit/export`, params)
+
+      return response.data;
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
     }
   }
 )

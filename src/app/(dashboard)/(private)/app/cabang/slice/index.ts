@@ -1,6 +1,7 @@
 'use client'
 
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import api from '@/libs/axios'
 
 /* --------------------------
@@ -52,8 +53,10 @@ const initialState: InitialState = {
 export const fetchProvinces = createAsyncThunk('area/fetchProvinces', async (_, thunkAPI) => {
   try {
     const response = await api.get('/app/area/province')
+
+
     // Backend mengembalikan array langsung dalam response.data.data
-    return response.data
+      return response.data
   } catch (e: any) {
     return thunkAPI.rejectWithValue(e.response?.data)
   }
@@ -62,7 +65,9 @@ export const fetchProvinces = createAsyncThunk('area/fetchProvinces', async (_, 
 export const fetchRegenciesByProvince = createAsyncThunk('area/fetchRegencies', async (id: string, thunkAPI) => {
   try {
     const response = await api.get(`/app/area/regency/${id}`)
-    return response.data
+
+    
+  return response.data
   } catch (e: any) {
     return thunkAPI.rejectWithValue(e.response?.data)
   }
@@ -74,7 +79,9 @@ export const fetchCabangAll = createAsyncThunk<any, any>(
   async (params, thunkAPI) => {
     try {
       const response = await api.get(`/app/cabang/all-data`, { params })
-      return response.data
+
+      
+  return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
@@ -94,7 +101,9 @@ export const fetchCabangPage = createAsyncThunk<any, FetchParams>(
           keyword: params.q
         }
       })
-      return response.data
+
+      
+  return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
@@ -106,7 +115,9 @@ export const fetchCabangById = createAsyncThunk<any, string>(
   async (id, thunkAPI) => {
     try {
       const response = await api.get(`/app/cabang/${id}`)
-      return response.data
+
+      
+  return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
@@ -117,7 +128,9 @@ export const postCabang = createAsyncThunk<any, any>(
   async (params, thunkAPI) => {
     try {
       const response = await api.post(`/app/cabang`, params)
-      return response.data
+
+      
+  return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
@@ -128,7 +141,9 @@ export const postCabangUpdate = createAsyncThunk<any, { id: string; params: any 
   async ({ id, params }, thunkAPI) => {
     try {
       const response = await api.put(`/app/cabang/${id}`, params)
-      return response.data
+
+      
+  return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
@@ -140,17 +155,36 @@ export const deleteCabang = createAsyncThunk<any, string>(
   async (id, thunkAPI) => {
     try {
       const response = await api.delete(`/app/cabang/${id}`)
-      return response.data
+
+      
+  return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
   })
 
+  
+export const postBatchCabang = createAsyncThunk<any, any>(
+  'app/cabang/insert',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/cabang/insert`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
 export const postImportCabang = createAsyncThunk<any, any>('cabang/import', async (params, thunkAPI) => {
   try {
     // Gunakan header multipart/form-data jika mengirim file
     const response = await api.post(`/app/cabang/import`, params)
-    return response.data
+
+    
+  return response.data
   } catch (e: any) {
     return thunkAPI.fulfillWithValue(e.response?.data)
   }
@@ -162,7 +196,9 @@ export const postExportCabang = createAsyncThunk<any, any>(
     try {
       // Sesuaikan endpoint export jika ada
       const response = await api.post(`/app/cabang/export`, params)
-      return response.data
+
+      
+  return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }

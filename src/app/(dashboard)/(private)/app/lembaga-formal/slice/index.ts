@@ -1,6 +1,7 @@
 'use client'
 
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import api from '@/libs/axios'
 
 /* --------------------------
@@ -47,7 +48,9 @@ export const fetchLembagaFormalAll = createAsyncThunk<any, any>(
   async (params, thunkAPI) => {
     try {
       const response = await api.get(`/app/lembaga-formal/all-data`, { params })
-      return response.data
+
+      
+return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
@@ -60,7 +63,9 @@ export const fetchLembagaFormalPage = createAsyncThunk(
   async (params: any, thunkAPI) => {
     try {
       const response = await api.get('/app/lembaga-formal', { params })
-      return response.data
+
+      
+return response.data
     } catch (e: any) {
       return thunkAPI.rejectWithValue(e.response?.data)
     }
@@ -73,7 +78,9 @@ export const fetchLembagaFormalById = createAsyncThunk(
   async (id: string, thunkAPI) => {
     try {
       const response = await api.get(`/app/lembaga-formal/${id}`)
-      return response.data
+
+      
+return response.data
     } catch (e: any) {
       return thunkAPI.rejectWithValue(e.response?.data)
     }
@@ -86,7 +93,9 @@ export const postLembagaFormal = createAsyncThunk(
   async (params: any, thunkAPI) => {
     try {
       const response = await api.post('/app/lembaga-formal', params)
-      return response.data
+
+      
+return response.data
     } catch (e: any) {
       return thunkAPI.rejectWithValue(e.response?.data)
     }
@@ -99,7 +108,9 @@ export const postLembagaFormalUpdate = createAsyncThunk(
   async ({ id, params }: { id: string; params: any }, thunkAPI) => {
     try {
       const response = await api.put(`/app/lembaga-formal/${id}`, params)
-      return response.data
+
+      
+return response.data
     } catch (e: any) {
       return thunkAPI.rejectWithValue(e.response?.data)
     }
@@ -112,9 +123,53 @@ export const deleteLembagaFormal = createAsyncThunk(
   async (id: string, thunkAPI) => {
     try {
       const response = await api.delete(`/app/lembaga-formal/${id}`)
-      return response.data
+
+      
+return response.data
     } catch (e: any) {
       return thunkAPI.rejectWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postBatch = createAsyncThunk<any, any>(
+  'lembagaFormal/insert',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/lembaga-formal/insert`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postImport = createAsyncThunk<any, any>(
+  'lembagaFormal/import',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/lembaga-formal/import`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postExport = createAsyncThunk<any, any>(
+  'lembagaFormal/export',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`/app/lembaga-formal/export`, params)
+
+      return response.data;
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
     }
   }
 )
