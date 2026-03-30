@@ -97,17 +97,17 @@ function RowAction(data: any) {
           View
         </MenuItem>
 
-        {canEdit &&
-          <MenuItem
-            component={Link}
-            sx={{ '& svg': { mr: 2 } }}
-            href={`/app/menu/form?id=${data.row.menu_id}`}
-            onClick={handleView}
-          >
-            <i className='tabler-edit' />
-            Edit
-          </MenuItem>
-        }
+        {/* {canEdit && */}
+        <MenuItem
+          component={Link}
+          sx={{ '& svg': { mr: 2 } }}
+          href={`/app/menu/form?id=${data.row.menu_id}`}
+          onClick={handleView}
+        >
+          <i className='tabler-edit' />
+          Edit
+        </MenuItem>
+        {/* } */}
 
         {canDelete && [
           <MenuItem
@@ -135,7 +135,7 @@ function RowAction(data: any) {
             }}
             disableEscapeKeyDown={true}
           />
-          ]}
+        ]}
       </Menu>
     </TableCell>
   )
@@ -177,7 +177,7 @@ const Table = () => {
   const onAddForm = () => {
     router.replace('/app/menu/form')
   }
-  
+
   const onImport = () => {
     router.replace('/app/menu/import')
   }
@@ -300,19 +300,19 @@ const Table = () => {
               mb: '10px',
             }}
           >
-            {canCreate && (
-              <Tooltip title="Tambah">
-                <Button
-                  size="small"
-                  variant="outlined"
-                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
-                  onClick={onAddForm}
-                  startIcon={<i className="tabler-plus" />}
-                >
-                  Tambah
-                </Button>
-              </Tooltip>
-            )}
+            {/* {canCreate && ( */}
+            <Tooltip title="Tambah">
+              <Button
+                size="small"
+                variant="outlined"
+                sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                onClick={onAddForm}
+                startIcon={<i className="tabler-plus" />}
+              >
+                Tambah
+              </Button>
+            </Tooltip>
+            {/* )} */}
 
             {canImport && (
               <Tooltip title="Import CSV">

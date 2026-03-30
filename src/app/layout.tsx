@@ -22,9 +22,13 @@ import TopProgressBar from '@/components/Loading'
 import AppClientLayout from './(dashboard)/(private)/AppClientLayout'
 
 export const metadata = {
-  title: 'Pesantren',
-  description:
-    'Pesantren'
+  title: 'SADA',
+  description: "Sistem Administrasi Digital Asshiddiqiyah",
+  manifest: '/manifest.json',
+}
+
+export const viewport = {
+  themeColor: '#01793c'
 }
 
 const RootLayout = async (props: ChildrenType ) => {
