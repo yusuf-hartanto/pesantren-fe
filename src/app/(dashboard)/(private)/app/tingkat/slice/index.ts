@@ -8,9 +8,9 @@ import api from '@/libs/axios'
 --------------------------- */
 
 export interface FetchParams {
-  page: number
-  perPage: number
-  q: string
+  page?: number
+  perPage?: number
+  q?: string
 }
 
 export interface InitialState {
@@ -66,7 +66,7 @@ export const fetchTingkatAll = createAsyncThunk<any, FetchParamAlls>('tingkat/fe
   }
 })
 
-export const fetchTingkatPage = createAsyncThunk<any, FetchParams>('tingkat/fetchPage', async (params, thunkAPI) => {
+export const fetchTingkatPage = createAsyncThunk<any, FetchParams>('tingkat/fetchPage', async (params: any, thunkAPI) => {
   const session = await getSession()
 
   try {
