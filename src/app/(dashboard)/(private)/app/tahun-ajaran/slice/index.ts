@@ -7,9 +7,9 @@ import api from '@/libs/axios'
 --------------------------- */
 
 export interface FetchParams {
-  page: number
-  perPage: number
-  q: string
+  page?: number
+  perPage?: number
+  q?: string
 }
 
 export interface InitialState {

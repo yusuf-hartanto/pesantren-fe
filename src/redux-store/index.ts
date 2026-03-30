@@ -30,6 +30,8 @@ import lembaga_formal from '@/app/(dashboard)/(private)/app/lembaga-formal/slice
 import organisasi_unit from '@/app/(dashboard)/(private)/app/organisasi/slice/index'
 import jabatan from '@/app/(dashboard)/(private)/app/jabatan/slice/index'
 import pegawai from '@/app/(dashboard)/(private)/app/pegawai/slice/index'
+import jenis_penilaian from '@/app/(dashboard)/(private)/app/jenis-penilaian/slice/index'
+import jenis_penilaian_bobot from '@/app/(dashboard)/(private)/app/jenis-penilaian-bobot/slice/index'
 
 export const store = configureStore({
   reducer: {
@@ -60,7 +62,9 @@ export const store = configureStore({
     jenis_jam_pelajaran,
     mata_pelajaran,
     jam_pelajaran,
-    guru_mata_pelajaran
+    guru_mata_pelajaran,
+    jenis_penilaian,
+    jenis_penilaian_bobot
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false })
 })
