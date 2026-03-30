@@ -96,29 +96,29 @@ function RowAction(data: any) {
           View
         </MenuItem>
 
-        {canEdit && [
-          <MenuItem
-            key='edit'
-            component={Link}
-            sx={{ '& svg': { mr: 2 } }}
-            href={`/app/role/form?id=${data.row.role_id}`}
-            onClick={handleView}
-          >
-            <i className='tabler-edit' />
-            Edit
-          </MenuItem>,
+        {/* {canEdit && [ */}
+        <MenuItem
+          key='edit'
+          component={Link}
+          sx={{ '& svg': { mr: 2 } }}
+          href={`/app/role/form?id=${data.row.role_id}`}
+          onClick={handleView}
+        >
+          <i className='tabler-edit' />
+          Edit
+        </MenuItem>,
 
-          <MenuItem
-            key='role-access'
-            component={Link}
-            sx={{ '& svg': { mr: 2 } }}
-            href={`/app/role/access?id=${data.row.role_id}`}
-            onClick={handleView}
-          >
-            <i className='tabler-lock-access' />
-            Role Access
-          </MenuItem>
-        ]}
+        <MenuItem
+          key='role-access'
+          component={Link}
+          sx={{ '& svg': { mr: 2 } }}
+          href={`/app/role/access?id=${data.row.role_id}`}
+          onClick={handleView}
+        >
+          <i className='tabler-lock-access' />
+          Role Access
+        </MenuItem>
+        {/* ]} */}
 
         {canDelete && [
           <MenuItem
@@ -189,7 +189,7 @@ const Table = () => {
   const onAddForm = () => {
     router.replace('/app/role/form')
   }
-  
+
   const onImport = () => {
     router.replace('/app/role/import')
   }

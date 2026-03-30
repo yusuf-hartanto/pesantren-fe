@@ -51,7 +51,7 @@
       ],
       "@libs/*": [
         "./src/libs/*"
-        ]
+      ]
     }
   },
   "include": [
@@ -61,8 +61,13 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.js",
-    ".next/types/**/*.ts" ],
+    ".next/types/**/*.ts"
+  ],
   "exclude": [
     "node_modules"
+  ],
+  "typeRoots": [
+    "./types",
+    "./node_modules/@types"
   ]
 }
