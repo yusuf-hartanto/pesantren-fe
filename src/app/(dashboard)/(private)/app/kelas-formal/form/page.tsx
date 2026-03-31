@@ -19,6 +19,8 @@ import { fetchKelasFormalById, postKelasFormal, postKelasFormalUpdate, resetRedu
 import { field, fieldBuildSubmit, formColumn } from '@views/onevour/form/AppFormBuilder'
 import { fetchTahunAjaranAll } from '../../tahun-ajaran/slice'
 import { fetchTingkatAll } from '../../tingkat/slice'
+import { fetchLembagaFormalAll } from '../../lembaga-formal/slice'
+import { fetchPegawaiAll } from '../../guru-mata-pelajaran/slice'
 
 const statusOption = {
   values: [
@@ -44,6 +46,8 @@ const FormValidationBasic = () => {
   const store = useAppSelector(state => state.kelas_formal)
   const storeTahunAjaran = useAppSelector(state => state.tahun_ajaran)
   const storeTingkat = useAppSelector(state => state.tingkat)
+  const storeLembaga = useAppSelector(state => state.lembaga_formal)
+  const storeGuru = useAppSelector(state => state.guru_mata_pelajaran)
 
   interface FormData {
     nama_kelas: string
@@ -113,6 +117,10 @@ const FormValidationBasic = () => {
   }, [dispatch, router])
 
   useEffect(() => {
+    dispatch(fetchLembagaFormalAll({}))
+
+    dispatch(fetchPegawaiAll({}))
+
     dispatch(
       fetchTahunAjaranAll({
         status: 'Aktif'
@@ -208,7 +216,12 @@ const FormValidationBasic = () => {
         placeholder: 'Pilih Lembaga Formal',
         required: true,
         options: {
-          values: [{ label: 'Dummy', value: '1' }]
+          values: storeLembaga.datas.map(r => {
+            return {
+              label: r.nama_lembaga,
+              value: r.id_lembaga
+            }
+          })
         },
         readOnly: Boolean(view)
       }),
@@ -251,7 +264,12 @@ const FormValidationBasic = () => {
         placeholder: 'Pilih Wali Kelas',
         required: true,
         options: {
-          values: [{ label: 'Dummy', value: '1' }]
+          values: storeGuru.pegawai.map(r => {
+            return {
+              label: r.nama_lengkap,
+              value: r.id_pegawai
+            }
+          })
         },
         readOnly: Boolean(view)
       }),
