@@ -48,14 +48,13 @@ const initialState: InitialState = {
 
 export interface FetchParamAlls {
   status: string
-  id_tingkat: string
 }
 
-export const fetchKelasFormalAll = createAsyncThunk<any, FetchParamAlls>(
-  'kelas-formal/fetchAll',
+export const fetchJadwalPelajaranAll = createAsyncThunk<any, FetchParamAlls>(
+  'jadwal-pelajaran/fetchAll',
   async (params, thunkAPI) => {
     try {
-      const response = await api.get(`/app/kelas-formal/all-data`, { params })
+      const response = await api.get(`/app/jadwal-pelajaran/all-data`, { params })
 
       return response.data
     } catch (e: any) {
@@ -64,11 +63,11 @@ export const fetchKelasFormalAll = createAsyncThunk<any, FetchParamAlls>(
   }
 )
 
-export const fetchKelasFormalPage = createAsyncThunk<any, FetchParams>(
-  'kelas-formal/fetchPage',
+export const fetchJadwalPelajaranPage = createAsyncThunk<any, FetchParams>(
+  'jadwal-pelajaran/fetchPage',
   async (params, thunkAPI) => {
     try {
-      const response = await api.get(`/app/kelas-formal`, { params })
+      const response = await api.get(`/app/jadwal-pelajaran`, { params })
 
       return response.data
     } catch (e: any) {
@@ -77,9 +76,22 @@ export const fetchKelasFormalPage = createAsyncThunk<any, FetchParams>(
   }
 )
 
-export const fetchKelasFormalById = createAsyncThunk<any, string>('kelas-formal/fetchById', async (id, thunkAPI) => {
+export const fetchJadwalPelajaranById = createAsyncThunk<any, string>(
+  'jadwal-pelajaran/fetchById',
+  async (id, thunkAPI) => {
+    try {
+      const response = await api.get(`/app/jadwal-pelajaran/${id}`)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postJadwalPelajaran = createAsyncThunk<any, any>('jadwal-pelajaran/create', async (params, thunkAPI) => {
   try {
-    const response = await api.get(`/app/kelas-formal/${id}`)
+    const response = await api.post(`/app/jadwal-pelajaran`, params)
 
     return response.data
   } catch (e: any) {
@@ -87,31 +99,24 @@ export const fetchKelasFormalById = createAsyncThunk<any, string>('kelas-formal/
   }
 })
 
-export const postKelasFormal = createAsyncThunk<any, any>('kelas-formal/create', async (params, thunkAPI) => {
-  try {
-    const response = await api.post(`/app/kelas-formal`, params)
+export const postBatchJadwalPelajaran = createAsyncThunk<any, any>(
+  'jadwal-pelajaran/insert',
+  async (params, thunkAPI) => {
+    try {
+      const response = await api.post(`/app/jadwal-pelajaran/insert`, params)
 
-    return response.data
-  } catch (e: any) {
-    return thunkAPI.fulfillWithValue(e.response?.data)
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
   }
-})
+)
 
-export const postBatchKelasFormal = createAsyncThunk<any, any>('kelas-formal/insert', async (params, thunkAPI) => {
-  try {
-    const response = await api.post(`/app/kelas-formal/insert`, params)
-
-    return response.data
-  } catch (e: any) {
-    return thunkAPI.fulfillWithValue(e.response?.data)
-  }
-})
-
-export const postKelasFormalUpdate = createAsyncThunk<any, { id: string; params: any }>(
-  'kelas-formal/update',
+export const postJadwalPelajaranUpdate = createAsyncThunk<any, { id: string; params: any }>(
+  'jadwal-pelajaran/update',
   async ({ id, params }, thunkAPI) => {
     try {
-      const response = await api.put(`/app/kelas-formal/${id}`, params)
+      const response = await api.put(`/app/jadwal-pelajaran/${id}`, params)
 
       return response.data
     } catch (e: any) {
@@ -120,9 +125,9 @@ export const postKelasFormalUpdate = createAsyncThunk<any, { id: string; params:
   }
 )
 
-export const deleteKelasFormal = createAsyncThunk<any, string>('kelas-formal/delete', async (id, thunkAPI) => {
+export const deleteJadwalPelajaran = createAsyncThunk<any, string>('jadwal-pelajaran/delete', async (id, thunkAPI) => {
   try {
-    const response = await api.delete(`/app/kelas-formal/${id}`)
+    const response = await api.delete(`/app/jadwal-pelajaran/${id}`)
 
     return response.data
   } catch (e: any) {
@@ -130,9 +135,9 @@ export const deleteKelasFormal = createAsyncThunk<any, string>('kelas-formal/del
   }
 })
 
-export const postImport = createAsyncThunk<any, any>('kelas-formal/import', async (params, thunkAPI) => {
+export const postImport = createAsyncThunk<any, any>('jadwal-pelajaran/import', async (params, thunkAPI) => {
   try {
-    const response = await api.post(`/app/kelas-formal/import`, params)
+    const response = await api.post(`/app/jadwal-pelajaran/import`, params)
 
     return response.data
   } catch (e: any) {
@@ -140,9 +145,9 @@ export const postImport = createAsyncThunk<any, any>('kelas-formal/import', asyn
   }
 })
 
-export const postExport = createAsyncThunk<any, any>('kelas-formal/export', async (params, thunkAPI) => {
+export const postExport = createAsyncThunk<any, any>('jadwal-pelajaran/export', async (params, thunkAPI) => {
   try {
-    const response = await api.post(`/app/kelas-formal/export`, params)
+    const response = await api.post(`/app/jadwal-pelajaran/export`, params)
 
     return response.data
   } catch (e: any) {
@@ -155,40 +160,40 @@ export const postExport = createAsyncThunk<any, any>('kelas-formal/export', asyn
 --------------------------- */
 
 export const slice = createSlice({
-  name: 'kelas_formal',
+  name: 'jadwal_pelajaran',
   initialState,
   reducers: {
     resetRedux: () => initialState
   },
   extraReducers: builder => {
-    builder.addCase(fetchKelasFormalAll.fulfilled, (state, action) => {
+    builder.addCase(fetchJadwalPelajaranAll.fulfilled, (state, action) => {
       state.datas = action.payload.data || []
     })
 
-    builder.addCase(fetchKelasFormalPage.fulfilled, (state, action) => {
+    builder.addCase(fetchJadwalPelajaranPage.fulfilled, (state, action) => {
       state.dataPage = {
         values: action.payload.data?.values || [],
         total: action.payload.data?.total || 0
       }
     })
 
-    builder.addCase(fetchKelasFormalById.fulfilled, (state, action) => {
+    builder.addCase(fetchJadwalPelajaranById.fulfilled, (state, action) => {
       state.data = action.payload.data
     })
 
-    builder.addCase(deleteKelasFormal.fulfilled, (state, action) => {
+    builder.addCase(deleteJadwalPelajaran.fulfilled, (state, action) => {
       state.delete = action.payload.message
     })
 
-    builder.addCase(postKelasFormal.fulfilled, (state, action) => {
+    builder.addCase(postJadwalPelajaran.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
-    builder.addCase(postKelasFormalUpdate.fulfilled, (state, action) => {
+    builder.addCase(postJadwalPelajaranUpdate.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
-    builder.addCase(postBatchKelasFormal.fulfilled, (state, action) => {
+    builder.addCase(postBatchJadwalPelajaran.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 

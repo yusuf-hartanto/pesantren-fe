@@ -47,7 +47,7 @@ const initialState: InitialState = {
    3. Async Thunks (typed)
 --------------------------- */
 
-export const fetchSemesterAll = createAsyncThunk<any>('semester/fetchAll', async (params, thunkAPI) => {
+export const fetchSemesterAll = createAsyncThunk<any, any>('semester/fetchAll', async (params, thunkAPI) => {
   const session = await getSession()
 
   try {
