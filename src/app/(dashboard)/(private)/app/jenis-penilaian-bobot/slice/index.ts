@@ -1,6 +1,7 @@
 'use client'
 
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import api from '@/libs/axios'
 
 /* --------------------------
@@ -43,7 +44,9 @@ const BASE_URL = '/app/bobot-penilaian'
 export const fetchBobotPenilaianPage = createAsyncThunk('bobotPenilaian/fetchPage', async (params: any, thunkAPI) => {
   try {
     const response = await api.get(BASE_URL, { params })
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
@@ -51,7 +54,9 @@ export const fetchBobotPenilaianPage = createAsyncThunk('bobotPenilaian/fetchPag
 export const fetchBobotPenilaianList = createAsyncThunk('bobotPenilaian/fetchList', async (params: any, thunkAPI) => {
   try {
     const response = await api.get(`${BASE_URL}/list`, { params })
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
@@ -59,7 +64,9 @@ export const fetchBobotPenilaianList = createAsyncThunk('bobotPenilaian/fetchLis
 export const fetchBobotPenilaianById = createAsyncThunk('bobotPenilaian/fetchById', async (id: string, thunkAPI) => {
   try {
     const response = await api.get(`${BASE_URL}/${id}`)
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
@@ -67,7 +74,9 @@ export const fetchBobotPenilaianById = createAsyncThunk('bobotPenilaian/fetchByI
 export const postBobotPenilaian = createAsyncThunk('bobotPenilaian/post', async (params: any, thunkAPI) => {
   try {
     const response = await api.post(BASE_URL, params)
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
@@ -75,7 +84,9 @@ export const postBobotPenilaian = createAsyncThunk('bobotPenilaian/post', async 
 export const postBobotPenilaianUpdate = createAsyncThunk('bobotPenilaian/update', async ({ id, params }: any, thunkAPI) => {
   try {
     const response = await api.put(`${BASE_URL}/${id}`, params)
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
@@ -83,9 +94,53 @@ export const postBobotPenilaianUpdate = createAsyncThunk('bobotPenilaian/update'
 export const deleteBobotPenilaian = createAsyncThunk('bobotPenilaian/delete', async (id: string, thunkAPI) => {
   try {
     const response = await api.delete(`${BASE_URL}/${id}`)
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
+
+export const postBatch = createAsyncThunk<any, any>(
+  'bobotPenilaian/batch',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`${BASE_URL}/batch`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postImport = createAsyncThunk<any, any>(
+  'bobotPenilaian/import',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`${BASE_URL}/import`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postExport = createAsyncThunk<any, any>(
+  'bobotPenilaian/export',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`${BASE_URL}/export`, params)
+
+      return response.data;
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
 
 /* --------------------------
    4. Slice
@@ -120,6 +175,7 @@ export const bobotPenilaianSlice = createSlice({
 
     // Create & Update Actions
     const crudActions = [postBobotPenilaian, postBobotPenilaianUpdate]
+
     crudActions.forEach(action => {
       builder.addCase(action.fulfilled, (state, action: any) => {
         state.crud = { status: true, message: action.payload.message }

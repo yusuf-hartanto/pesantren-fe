@@ -117,5 +117,8 @@
   },
   "overrides": {
     "rimraf": "^5.0.7"
+  },
+  "engines": {
+    "node": ">=20 <=24"
   }
 }
