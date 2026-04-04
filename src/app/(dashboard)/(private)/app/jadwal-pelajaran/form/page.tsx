@@ -181,8 +181,6 @@ const FormValidationBasic = () => {
   }, [dispatch, router])
 
   useEffect(() => {
-    dispatch(fetchSemesterAll({}))
-
     dispatch(fetchJamPelajaranAll({}))
 
     dispatch(
@@ -302,7 +300,13 @@ const FormValidationBasic = () => {
               label: r.tahun_ajaran,
               value: r.id_tahunajaran
             }
-          })
+          }),
+          onChange: async (value: any) => {
+            if (!value.value) return
+
+            dispatch(fetchSemesterAll({ status: 'Aktif', id_tahunajaran: value.value }))
+            setValue('id_semester', { value: '', label: '' })
+          }
         },
         readOnly: Boolean(view)
       }),
@@ -363,6 +367,8 @@ const FormValidationBasic = () => {
             }
           }),
           onChange: async (value: any) => {
+            if (!value.value) return
+
             setValue('id_kelas', { value: '', label: '' })
             setState(state => ({ ...state, id_kelas: { value: '', label: '' } }))
 

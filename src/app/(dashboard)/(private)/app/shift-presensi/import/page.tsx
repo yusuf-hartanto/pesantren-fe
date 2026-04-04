@@ -10,17 +10,17 @@ import { toast } from 'react-toastify'
 import Button from '@mui/material/Button'
 
 import { useAppDispatch } from '@/redux-store/hook'
-import { postBatchJadwalPelajaran, postExport, postImport, resetRedux } from '../slice'
+import { postBatchShiftPresensi, postExport, postImport, resetRedux } from '../slice'
 
 export interface ImportPayload {
-  tahun_ajaran: string
-  semester: string
-  hari: string
-  jam: string
-  kelas: string
-  mapel: string
-  guru: string
-  lokasi: string
+  kode_shift: string
+  nama_shift: string
+  kategori_shift: string
+  waktu_mulai: string
+  waktu_selesai: string
+  toleransi_menit: number | null
+  is_wajib: boolean
+  wajib: string
   status: string
   keterangan: string | null
 }
@@ -59,7 +59,7 @@ export default function ImportExcelPage() {
 
   const onCancel = useCallback(() => {
     dispatch(resetRedux())
-    router.replace('/app/jadwal-pelajaran/list')
+    router.replace('/app/shift-presensi/list')
   }, [dispatch, router])
 
   const downloadTemplate = async () => {
@@ -146,7 +146,7 @@ export default function ImportExcelPage() {
 
     try {
       setLoadingImport(true)
-      const res = await dispatch(postBatchJadwalPelajaran({ data: payloads })).unwrap()
+      const res = await dispatch(postBatchShiftPresensi({ data: payloads })).unwrap()
       const { status, message } = res
 
       if (!status) {
@@ -202,14 +202,12 @@ export default function ImportExcelPage() {
             <thead className='bg-gray-100 text-left'>
               <tr>
                 <th className='px-3 py-2'>#</th>
-                <th className='px-3 py-2'>Tahun Ajaran</th>
-                <th className='px-3 py-2'>Semester</th>
-                <th className='px-3 py-2'>Hari</th>
-                <th className='px-3 py-2'>Jam</th>
-                <th className='px-3 py-2'>Kelas/Lembaga</th>
-                <th className='px-3 py-2'>Mata Pelajaran</th>
-                <th className='px-3 py-2'>Guru</th>
-                <th className='px-3 py-2'>Lokasi</th>
+                <th className='px-3 py-2'>Kode Shift</th>
+                <th className='px-3 py-2'>Nama Shift</th>
+                <th className='px-3 py-2'>Kategori Shift</th>
+                <th className='px-3 py-2'>Jam (Mulai - Selesai)</th>
+                <th className='px-3 py-2'>Toleransi Menit</th>
+                <th className='px-3 py-2'>Wajib</th>
                 <th className='px-3 py-2'>Status</th>
                 <th className='px-3 py-2'>Keterangan</th>
                 <th className='px-3 py-2'>Valid</th>
@@ -219,14 +217,14 @@ export default function ImportExcelPage() {
               {result.data.map(row => (
                 <tr key={row.row} className={row.valid ? 'border-t bg-white' : 'border-t bg-red-50'}>
                   <td className='px-3 py-2'>{row.row}</td>
-                  <td className='px-3 py-2 font-medium'>{row.payload.tahun_ajaran}</td>
-                  <td className='px-3 py-2 font-medium'>{row.payload.semester}</td>
-                  <td className='px-3 py-2 font-medium'>{row.payload.hari}</td>
-                  <td className='px-3 py-2 font-medium text-nowrap'>{row.payload.jam}</td>
-                  <td className='px-3 py-2 font-medium text-nowrap'>{row.payload.kelas}</td>
-                  <td className='px-3 py-2 font-medium text-nowrap'>{row.payload.mapel}</td>
-                  <td className='px-3 py-2 font-medium text-nowrap'>{row.payload.guru}</td>
-                  <td className='px-3 py-2 font-medium text-nowrap'>{row.payload.lokasi}</td>
+                  <td className='px-3 py-2 font-medium text-nowrap'>{row.payload.kode_shift}</td>
+                  <td className='px-3 py-2 font-medium text-nowrap'>{row.payload.nama_shift}</td>
+                  <td className='px-3 py-2 font-medium text-nowrap'>{row.payload.kategori_shift}</td>
+                  <td className='px-3 py-2 font-medium text-nowrap'>
+                    {row.payload.waktu_mulai} - {row.payload.waktu_selesai}
+                  </td>
+                  <td className='px-3 py-2 font-medium'>{row.payload.toleransi_menit}</td>
+                  <td className='px-3 py-2'>{row.payload.wajib}</td>
                   <td className='px-3 py-2'>{row.payload.status}</td>
                   <td className='px-3 py-2 text-nowrap'>{row.payload.keterangan ?? '-'}</td>
                   <td className='px-3 py-2 text-nowrap'>
@@ -263,7 +261,7 @@ export default function ImportExcelPage() {
       <div className='max-w-3xl mx-auto'>
         <div className='mb-6'>
           <Link
-            href='/app/jadwal-pelajaran/list'
+            href='/app/shift-presensi/list'
             className='inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900'
           >
             <i className='tabler-arrow-back-up'></i> Kembali
@@ -277,10 +275,10 @@ export default function ImportExcelPage() {
             <ul className='list-disc list-inside space-y-1'>
               <li>Format file: Excel (encoding UTF-8)</li>
               <li>
-                Jika <b>Hari</b> , <b>Jam</b> dan <b>Kelas</b> kosong → INSERT (data baru)
+                Jika <b>Kode Shift</b> kosong → INSERT (data baru)
               </li>
               <li>
-                Jika <b>Hari</b> , <b>Jam</b> dan <b>Kelas</b> ada → UPDATE (perbarui data)
+                Jika <b>Kode Shift</b> ada → UPDATE (perbarui data)
               </li>
               <li>Mode Preview: hanya validasi tanpa menyimpan</li>
               <li>Mode Commit: validasi dan simpan ke database</li>

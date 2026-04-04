@@ -84,6 +84,8 @@ export function field(props) {
     endAdornment = null,
     portalId = '',
     minDate = null,
+    minTime = null,
+    maxTime = null,
     variant = null,
     color = null,
     autoFocus = false,
@@ -107,6 +109,8 @@ export function field(props) {
     endAdornment: endAdornment,
     portalId: portalId,
     minDate: minDate,
+    minTime: minTime,
+    maxTime: maxTime,
     variant: variant,
     color: color,
     autoFocus: autoFocus,
@@ -1556,6 +1560,10 @@ const selectTime = form => {
           onChange={e => {
             onChange(e)
             updateValueDate(session, props, e)
+
+            if (typeof props?.options?.onChange === 'function') {
+              props?.options?.onChange(e)
+            }
           }}
           showTimeSelect
           showTimeSelectOnly
@@ -1564,15 +1572,28 @@ const selectTime = form => {
           dateFormat='HH:mm'
           placeholderText={props.placeholder}
           disabled={props.readOnly}
+          minTime={props.minTime}
+          maxTime={props.maxTime}
           className='w-100'
           wrapperClassName='w-100'
           boxProps={{ sx: { width: '100%' } }}
           customInput={
-            <CustomTextField
+            <TextField
               fullWidth
-              label={props.placeholder}
-              InputProps={{
-                readOnly: true
+              size='small'
+              label={props.label}
+              slotProps={{
+                input: {
+                  inputProps: {
+                    readOnly: props.readOnly,
+                    inputRef: props.ref
+                  }
+                },
+
+                inputLabel: {
+                  shrink: true,
+                  readOnly: props.readOnly
+                }
               }}
             />
           }

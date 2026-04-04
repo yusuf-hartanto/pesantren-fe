@@ -23,9 +23,9 @@ import { toast } from 'react-toastify'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
 import {
-  deleteJadwalPelajaran,
-  fetchJadwalPelajaranPage,
-  postJadwalPelajaranUpdate,
+  deleteShiftPresensi,
+  fetchShiftPresensiPage,
+  postShiftPresensiUpdate,
   postExport,
   resetRedux
 } from '../slice/index'
@@ -46,10 +46,6 @@ const statusObj: Record<string, { color: any; value: string }> = {
   Nonaktif: {
     color: 'secondary',
     value: 'Nonaktif'
-  },
-  Arsip: {
-    color: 'secondary',
-    value: 'Arsip'
   }
 }
 
@@ -76,7 +72,7 @@ function RowAction(data: any) {
   }
 
   const handleDelete = (id: string) => {
-    dispatch(deleteJadwalPelajaran(id))
+    dispatch(deleteShiftPresensi(id))
     optionsOnClose()
   }
 
@@ -99,7 +95,7 @@ function RowAction(data: any) {
         <MenuItem
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
-          href={`/app/jadwal-pelajaran/form?id=${data.row.id_jadwal}&view=true`}
+          href={`/app/shift-presensi/form?id=${data.row.id_shift}&view=true`}
           onClick={handleView}
         >
           <i className='tabler-eye' />
@@ -111,7 +107,7 @@ function RowAction(data: any) {
             key='edit'
             component={Link}
             sx={{ '& svg': { mr: 2 } }}
-            href={`/app/jadwal-pelajaran/form?id=${data.row.id_jadwal}`}
+            href={`/app/shift-presensi/form?id=${data.row.id_shift}`}
             onClick={handleView}
           >
             <i className='tabler-edit' />
@@ -123,13 +119,6 @@ function RowAction(data: any) {
               <i className='tabler-toggle-right' />
               Set Aktif
             </MenuItem>
-          ),
-
-          data.row.status == 'Nonaktif' && (
-            <MenuItem onClick={() => data.handleAktifOrArsip(data.row, 'Arsip')} sx={{ '& svg': { mr: 2 } }}>
-              <i className='tabler-archive' />
-              Arsip
-            </MenuItem>
           )
         ]}
 
@@ -140,7 +129,7 @@ function RowAction(data: any) {
           </MenuItem>
         )}
         <DialogDelete
-          id={data.row.hari}
+          id={data.row.nama_kelas}
           open={openConfirm}
           onClose={(event: any, reason: any) => {
             if (reason !== 'backdropClick') {
@@ -148,7 +137,7 @@ function RowAction(data: any) {
             }
           }}
           handleOk={() => {
-            handleDelete(data.row.id_jadwal)
+            handleDelete(data.row.id_shift)
             setOpenConfirm(false)
           }}
           handleClose={() => {
@@ -165,7 +154,7 @@ const Table = () => {
   // ** Hooks
   const router = useRouter()
   const dispatch = useAppDispatch()
-  const store = useAppSelector(state => state.jadwal_pelajaran)
+  const store = useAppSelector(state => state.shift_presensi)
 
   const canCreate = useCan('create')
   const canImport = useCan('import')
@@ -178,7 +167,7 @@ const Table = () => {
 
   useEffect(() => {
     if (store.delete) {
-      dispatch(fetchJadwalPelajaranPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(fetchShiftPresensiPage({ page: 1, perPage: perPage, q: filter }))
       dispatch(resetRedux())
     }
   }, [dispatch, filter, perPage, store.delete])
@@ -186,7 +175,7 @@ const Table = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setPage(1)
-      dispatch(fetchJadwalPelajaranPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(fetchShiftPresensiPage({ page: 1, perPage: perPage, q: filter }))
     }, 500)
 
     return () => clearTimeout(timer)
@@ -195,7 +184,7 @@ const Table = () => {
   const handleChangePage = useCallback(
     (newPage: number) => {
       setPage(newPage)
-      dispatch(fetchJadwalPelajaranPage({ page: newPage, perPage: perPage, q: filter }))
+      dispatch(fetchShiftPresensiPage({ page: newPage, perPage: perPage, q: filter }))
     },
     [dispatch, perPage, filter]
   )
@@ -213,11 +202,11 @@ const Table = () => {
   }, [dispatch, handleChangePage, page, store.crud])
 
   const onAddForm = () => {
-    router.replace('/app/jadwal-pelajaran/form')
+    router.replace('/app/shift-presensi/form')
   }
 
   const onImport = () => {
-    router.replace('/app/jadwal-pelajaran/import')
+    router.replace('/app/shift-presensi/import')
   }
 
   const onExport = async () => {
@@ -245,29 +234,11 @@ const Table = () => {
   const handleAktifOrArsip = (data: any, status: string) => {
     delete data.status_custom
     dispatch(
-      postJadwalPelajaranUpdate({
-        id: data.id_jadwal,
+      postShiftPresensiUpdate({
+        id: data.id_shift,
         params: {
           ...data,
-          status: status,
-          id_tahunajaran: {
-            value: data.id_tahunajaran
-          },
-          id_kelas: {
-            value: data.id_kelas
-          },
-          id_gmapel: {
-            value: data.id_gmapel
-          },
-          id_jam_pelajaran: {
-            value: data.id_jam_pelajaran
-          },
-          id_lokasi: {
-            value: data.id_lokasi
-          },
-          id_semester: {
-            value: data.id_semester
-          }
+          status: status
         }
       })
     )
@@ -282,7 +253,7 @@ const Table = () => {
 
     setPage(1)
     setPerPage(newPerPage)
-    dispatch(fetchJadwalPelajaranPage({ page: 1, perPage: newPerPage, q: filter }))
+    dispatch(fetchShiftPresensiPage({ page: 1, perPage: newPerPage, q: filter }))
   }
 
   const renderOption = (row: any) => {
@@ -299,12 +270,12 @@ const Table = () => {
         page: page,
         fields: [
           tableColumn('OPTION', 'act-x', 'left', renderOption as any),
-          tableColumn('HARI', 'hari'),
-          tableColumn('JAM', 'jam'),
-          tableColumn('KELAS/LEMBAGA', 'kelas'),
-          tableColumn('MATA PELAJARAN', 'mapel'),
-          tableColumn('GURU', 'guru'),
-          tableColumn('LOKASI', 'lokasi'),
+          tableColumn('KODE SHIFT', 'kode_shift'),
+          tableColumn('NAMA SHIFT', 'nama_shift'),
+          tableColumn('KATEGORI', 'kategori_shift'),
+          tableColumn('JAM (MULAI - SELESAI)', 'jam'),
+          tableColumn('TOLERANSI', 'toleransi'),
+          tableColumn('WAJIB', 'wajib'),
           tableColumn('STATUS', 'status_custom'),
           tableColumn('KETERANGAN', 'keterangan'),
           tableColumn('TERAKHIR DIUBAH', 'updated_at')
@@ -312,11 +283,9 @@ const Table = () => {
         values: values?.map((row: any) => {
           return {
             ...row,
-            jam: `${row.jam_pelajaran.mulai?.slice(0, -3)} - ${row.jam_pelajaran.selesai?.slice(0, -3)}`,
-            kelas: `${row.kelas_formal ? row.kelas_formal?.nama_kelas : row.kelas_mda?.nama_kelas_mda} (${row.kelas_formal ? row.kelas_formal?.lembaga?.nama_lembaga : row.kelas_mda?.lembaga?.nama_lembaga})`,
-            mapel: row.jenis_guru?.mata_pelajaran?.nama_mapel,
-            guru: row.jenis_guru?.pegawai?.nama_lengkap,
-            lokasi: row.lokasi?.nama_lokasi,
+            jam: `${row.waktu_mulai?.slice(0, -3)} - ${row.waktu_selesai?.slice(0, -3)}`,
+            toleransi: `${row.toleransi_menit} menit`,
+            wajib: row.is_wajib ? 'Ya' : 'Tidak',
             status_custom: (
               <CustomChip
                 round='true'
@@ -344,7 +313,7 @@ const Table = () => {
     <Grid container spacing={6} sx={{ width: '100%' }}>
       <Grid size={12}>
         <Card>
-          <CardHeader title='Jadwal Pelajaran' sx={{ paddingBottom: 0 }} />
+          <CardHeader title='Shift Presensi' sx={{ paddingBottom: 0 }} />
           <Toolbar
             sx={{
               px: '1.5rem !important',
