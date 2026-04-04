@@ -10,7 +10,7 @@ import { toast } from 'react-toastify'
 import Button from '@mui/material/Button'
 
 import { useAppDispatch } from '@/redux-store/hook'
-import { postBatch, postExport, postImport, resetRedux } from '../slice'
+import { postBatch, postImport, postExport, resetRedux } from '../slice/index'
 
 export interface ImportPayload {
   tahun_ajaran: string

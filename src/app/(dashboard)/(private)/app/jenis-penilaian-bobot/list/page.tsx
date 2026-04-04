@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useCallback, useEffect, useState } from 'react'
+
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -21,6 +22,7 @@ import {
 } from '@mui/material'
 
 import { toast } from 'react-toastify'
+
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
 import { deleteBobotPenilaian, fetchBobotPenilaianPage, resetRedux } from '../slice/index'
 
@@ -85,7 +87,9 @@ const JenisPenilaianBobotList = () => {
 
   useEffect(() => {
     const timer = setTimeout(fetchData, 500)
-    return () => clearTimeout(timer)
+
+    
+return () => clearTimeout(timer)
   }, [fetchData])
 
   useEffect(() => {
@@ -102,7 +106,9 @@ const JenisPenilaianBobotList = () => {
 
   const buildTable = () => {
     const { dataPage } = store
-    return {
+
+    
+return {
       page: page,
       fields: [
         tableColumn('OPTION', 'act-x', 'left', renderOption as any),

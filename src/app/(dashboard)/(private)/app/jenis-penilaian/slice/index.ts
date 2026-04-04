@@ -1,6 +1,7 @@
 'use client'
 
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+
 import api from '@/libs/axios'
 
 /* --------------------------
@@ -43,44 +44,98 @@ const BASE_URL = '/app/jenis-penilaian'
 export const fetchJenisPenilaianPage = createAsyncThunk('jenisPenilaian/fetchPage', async (params: any, thunkAPI) => {
   try {
     const response = await api.get(BASE_URL, { params })
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
 export const fetchJenisPenilaianList = createAsyncThunk('jenisPenilaian/fetchAllData', async (params: any, thunkAPI) => {
   try {
     const response = await api.get(`${BASE_URL}/all-data`, { params })
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
 export const fetchJenisPenilaianById = createAsyncThunk('jenisPenilaian/fetchById', async (id: string, thunkAPI) => {
   try {
     const response = await api.get(`${BASE_URL}/${id}`)
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
 export const postJenisPenilaian = createAsyncThunk('jenisPenilaian/post', async (params: any, thunkAPI) => {
   try {
     const response = await api.post(BASE_URL, params)
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
 export const postJenisPenilaianUpdate = createAsyncThunk('jenisPenilaian/update', async ({ id, params }: any, thunkAPI) => {
   try {
     const response = await api.put(`${BASE_URL}/${id}`, params)
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
 export const deleteJenisPenilaian = createAsyncThunk('jenisPenilaian/delete', async (id: string, thunkAPI) => {
   try {
     const response = await api.delete(`${BASE_URL}/${id}`)
-    return response.data
+
+    
+return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
+
+export const postBatch = createAsyncThunk<any, any>(
+  'jenisPenilaian/batch',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`${BASE_URL}/batch`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postImport = createAsyncThunk<any, any>(
+  'jenisPenilaian/import',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`${BASE_URL}/import`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const postExport = createAsyncThunk<any, any>(
+  'jenisPenilaian/export',
+  async (params, thunkAPI) => {
+
+    try {
+      const response = await api.post(`${BASE_URL}/export`, params)
+
+      return response.data;
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
 
 /* --------------------------
    4. Slice
