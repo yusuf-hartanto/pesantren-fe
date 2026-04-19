@@ -25,10 +25,11 @@ export const authOptions: NextAuthOptions = {
 
           const json = await res.json()
 
-          if (!res.ok) {
+          if (!res.ok || !json?.data) {
             throw new Error(
               JSON.stringify({
-                message: 'Username atau password salah'
+                message: 'Username atau password salah',
+                message_dev: json?.message || 'Login gagal',
               })
             )
           }
@@ -50,6 +51,8 @@ export const authOptions: NextAuthOptions = {
             permissions: normalizeAbility(data.userdata.ability)
           }
         } catch (err) {
+          console.error("LOGIN ERROR:", err);
+          
           return null
         }
       }
