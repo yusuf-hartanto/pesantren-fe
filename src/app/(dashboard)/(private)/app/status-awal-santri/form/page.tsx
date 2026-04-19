@@ -82,8 +82,6 @@ const FormValidationBasic = () => {
         if (datas) {
           datas.status = statusOption.values.find(r => r.value === datas.status)
 
-          //console.log('prament', datas)
-
           setState(datas)
           reset(datas)
         }

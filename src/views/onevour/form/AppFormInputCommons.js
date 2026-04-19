@@ -24,7 +24,6 @@ export function updateValueDate(session, props, date) {
   let store = { ...session.state }
 
   store[props.key] = date
-  console.log('DATEEE', date, props.key)
 
   // session.state[props.key] = e.target.value
   session.setState(store)
@@ -75,11 +74,9 @@ export function updateValueSelected(state, key, option_values) {
   let storeVal = store[key]
 
   if (option_values === null || undefined === option_values) return null
-  console.log('option_values', option_values)
 
   let selected = option_values?.filter(function (option) {
     if (option) {
-      // console.log("update value selected", option)
       return option.value === storeVal
     }
 

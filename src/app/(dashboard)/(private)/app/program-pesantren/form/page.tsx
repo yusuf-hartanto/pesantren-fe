@@ -113,8 +113,6 @@ const FormValidationBasic = () => {
           datas.aktif = statusOption.values.find(r => r.value === datas.aktif)
           datas.tipe_program = tipeOption.values.find(r => r.value === datas.tipe_program)
 
-          //console.log('prament', datas)
-
           setState(datas)
           reset(datas)
         }

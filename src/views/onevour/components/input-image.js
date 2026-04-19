@@ -53,13 +53,6 @@ const InputImage = props => {
 
             handleChange(r)
         })
-
-        //Promise(file => ).then(imageBase64 => {
-        //const img = await
-        //     console.log(img)
-        //})
-
-        // handleFile(fileUploaded);
     }
 
     const renderFilePreview = file => {
