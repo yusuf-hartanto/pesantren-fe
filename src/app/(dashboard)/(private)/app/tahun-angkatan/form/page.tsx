@@ -71,7 +71,6 @@ const FormValidationBasic = () => {
         const datas = { ...res?.payload?.data }
 
         if (datas) {
-          //console.log('prament', datas)
 
           setState(datas)
           reset(datas)

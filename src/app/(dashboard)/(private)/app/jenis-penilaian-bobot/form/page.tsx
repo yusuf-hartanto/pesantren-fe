@@ -1,7 +1,9 @@
 'use client'
 
 import React, { useCallback, useEffect, useState } from 'react'
+
 import { useSearchParams, useRouter } from 'next/navigation'
+
 import { Card, CardHeader, CardContent, Grid, Divider } from '@mui/material'
 import { toast } from 'react-toastify'
 import { useForm } from 'react-hook-form'
@@ -18,6 +20,7 @@ import {
 import { fetchJenisPenilaianList } from '../../jenis-penilaian/slice'
 import { fetchTingkatPage } from '../../tingkat/slice'
 import { fetchTahunAjaranPage } from '../../tahun-ajaran/slice'
+
 // Asumsi service/thunk untuk lembaga (Formal & Pesantren)
 import { fetchLembagaFormalPage } from '../../lembaga-formal/slice'
 import { fetchLembagaPage } from '../../lembaga-kepesantrenan/slice'
@@ -57,17 +60,21 @@ const JenisPenilaianBobotForm = () => {
   const fetchLembagaOptions = useCallback(async (type: string) => {
     try {
       let res: any
+
       if (type === 'FORMAL') {
         res = await dispatch(fetchLembagaFormalPage({ perPage: 1000 })).unwrap()
       } else {
         res = await dispatch(fetchLembagaPage({ perPage: 1000 })).unwrap()
       }
+
       const options = (res?.data?.values || []).map((i: any) => ({
         label: i.nama_lembaga,
         value: i.id_lembaga
       }))
+
       setOpt((prev: any) => ({ ...prev, lembagaList: options }))
-      return options
+      
+return options
     } catch (err) { return [] }
   }, [dispatch])
 
@@ -99,9 +106,10 @@ const JenisPenilaianBobotForm = () => {
         if (d) {
           // --- KUNCI PERBAIKAN DI SINI ---
           const currentLembagaOpts = await fetchLembagaOptions(d.lembaga_type)
-          console.log('LEMBAGA oPT', currentLembagaOpts, d.id_lembaga)
+
           const formatted = {
             ...d,
+
             // Cari objek label & value dari list yang sudah kita fetch
             id_penilaian: jpOpts.find((o: any) => o.value === d.id_penilaian) || null,
             lembaga_type: opt.lembagaType.find((o: any) => o.value === d.lembaga_type) || null,
@@ -124,6 +132,7 @@ const JenisPenilaianBobotForm = () => {
       toast.error("Gagal memuat data")
     }
   }, [id, dispatch, reset, fetchLembagaOptions, opt.lembagaType, opt.status])
+
   useEffect(() => { initForm() }, [initForm])
 
   // Efek ketika lembaga_type berubah (saat input manual)

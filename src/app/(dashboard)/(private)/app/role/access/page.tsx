@@ -192,14 +192,14 @@ const FormValidationBasic = () => {
       const permissions = submittedMenuRef.current?.menu.reduce((acc, m) => {
       const key = normalizeResource(m.module_name)
 
-      acc[key] = {
-        view: m.view === 1,
-        create: m.create === 1,
-        edit: m.edit === 1,
-        delete: m.delete === 1,
-        import: m.import === 1,
-        export: m.export === 1,
-      }
+      acc[key] = (
+        (m.view ? 1 : 0) +
+        (m.create ? 2 : 0) +
+        (m.edit ? 4 : 0) +
+        (m.delete ? 8 : 0) +
+        (m.import ? 16 : 0) +
+        (m.export ? 32 : 0)
+      )
 
       return acc
     }, {} as PermissionMap)

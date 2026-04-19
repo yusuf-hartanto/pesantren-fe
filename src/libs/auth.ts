@@ -41,10 +41,8 @@ export const authOptions: NextAuthOptions = {
             access_token: data.access_token,
             refresh_token: data.refresh_token,
             userdata: {
-              resource_id: data.userdata.resource_id,
               full_name: data.userdata.full_name,
               email: data.userdata.email,
-              username: data.userdata.username,
               role_name: data.userdata.role.role_name,
             },
 
@@ -65,7 +63,6 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.access_token = user.access_token
-        token.refresh_token = user.refresh_token
         token.userdata = user.userdata
         token.permissions = user.permissions
       }
