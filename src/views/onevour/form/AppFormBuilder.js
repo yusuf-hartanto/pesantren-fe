@@ -684,7 +684,7 @@ export function formColumnDetailField(form) {
 
     const { key } = props
 
-    const defaultImage = 'https://placehold.co/300x300?font=roboto&text=Upload image'
+    const defaultImage = `https://placehold.co/300x300?font=roboto&text=${props.placeholder}`
 
     const valueImage = session.state[key] ? process.env.NEXT_PUBLIC_API_URL + props.urlImage + session.state[key] : ''
 
@@ -991,7 +991,7 @@ const checkboxField = form => {
     <FormControlLabel
       control={
         <Checkbox
-          checked={valueTmp || props.checked}
+          checked={valueTmp}
           onChange={e => {
             let val = {
               target: {
@@ -1476,10 +1476,31 @@ const selectDate = form => {
                 props?.options?.onChange(date)
               }
             }}
+            dateFormat={'dd/MM/yyyy'}
             placeholderText='Click to select a date'
             disabled={props.readOnly}
             portalId={props.portalId}
             minDate={props.minDate}
+            customInput={
+              <TextField
+                fullWidth
+                size='small'
+                label={props.label}
+                slotProps={{
+                  input: {
+                    inputProps: {
+                      readOnly: props.readOnly,
+                      inputRef: props.ref
+                    }
+                  },
+
+                  inputLabel: {
+                    shrink: true,
+                    readOnly: props.readOnly
+                  }
+                }}
+              />
+            }
           />
         )
       }}
@@ -1525,7 +1546,6 @@ const selectDateCustom = form => {
             dateFormat={props.dateFormat || 'dd/MM/yyyy'} // Format tampilan
             className='w-100'
             wrapperClassName='w-100'
-
             // Menggunakan CustomTextField agar styling MUI konsisten
             customInput={
               <CustomTextField

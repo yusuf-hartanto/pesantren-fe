@@ -48,14 +48,13 @@ const initialState: InitialState = {
 
 export interface FetchParamAlls {
   is_active: string
-  id_petugas: string
 }
 
-export const fetchJadwalInspeksiKebersihanAll = createAsyncThunk<any, FetchParamAlls>(
-  'jadwal-inspeksi-kebersihan/fetchAll',
+export const fetchKebersihanInspeksiAll = createAsyncThunk<any, FetchParamAlls>(
+  'kebersihan-inspeksi/fetchAll',
   async (params, thunkAPI) => {
     try {
-      const response = await api.get(`/app/jadwal-inspeksi-kebersihan/all-data`, { params })
+      const response = await api.get(`/app/kebersihan-inspeksi/all-data`, { params })
 
       return response.data
     } catch (e: any) {
@@ -64,11 +63,11 @@ export const fetchJadwalInspeksiKebersihanAll = createAsyncThunk<any, FetchParam
   }
 )
 
-export const fetchJadwalInspeksiKebersihanPage = createAsyncThunk<any, FetchParams>(
-  'jadwal-inspeksi-kebersihan/fetchPage',
+export const fetchKebersihanInspeksiPage = createAsyncThunk<any, FetchParams>(
+  'kebersihan-inspeksi/fetchPage',
   async (params, thunkAPI) => {
     try {
-      const response = await api.get(`/app/jadwal-inspeksi-kebersihan`, { params })
+      const response = await api.get(`/app/kebersihan-inspeksi`, { params })
 
       return response.data
     } catch (e: any) {
@@ -77,11 +76,11 @@ export const fetchJadwalInspeksiKebersihanPage = createAsyncThunk<any, FetchPara
   }
 )
 
-export const fetchJadwalInspeksiKebersihanById = createAsyncThunk<any, string>(
-  'jadwal-inspeksi-kebersihan/fetchById',
+export const fetchKebersihanInspeksiById = createAsyncThunk<any, string>(
+  'kebersihan-inspeksi/fetchById',
   async (id, thunkAPI) => {
     try {
-      const response = await api.get(`/app/jadwal-inspeksi-kebersihan/${id}`)
+      const response = await api.get(`/app/kebersihan-inspeksi/${id}`)
 
       return response.data
     } catch (e: any) {
@@ -90,11 +89,11 @@ export const fetchJadwalInspeksiKebersihanById = createAsyncThunk<any, string>(
   }
 )
 
-export const postJadwalInspeksiKebersihan = createAsyncThunk<any, any>(
-  'jadwal-inspeksi-kebersihan/create',
+export const postKebersihanInspeksi = createAsyncThunk<any, any>(
+  'kebersihan-inspeksi/create',
   async (params, thunkAPI) => {
     try {
-      const response = await api.post(`/app/jadwal-inspeksi-kebersihan`, params)
+      const response = await api.post(`/app/kebersihan-inspeksi`, params)
 
       return response.data
     } catch (e: any) {
@@ -103,11 +102,11 @@ export const postJadwalInspeksiKebersihan = createAsyncThunk<any, any>(
   }
 )
 
-export const postBatchJadwalInspeksiKebersihan = createAsyncThunk<any, any>(
-  'jadwal-inspeksi-kebersihan/insert',
+export const postBatchKebersihanInspeksi = createAsyncThunk<any, any>(
+  'kebersihan-inspeksi/insert',
   async (params, thunkAPI) => {
     try {
-      const response = await api.post(`/app/jadwal-inspeksi-kebersihan/insert`, params)
+      const response = await api.post(`/app/kebersihan-inspeksi/insert`, params)
 
       return response.data
     } catch (e: any) {
@@ -116,11 +115,11 @@ export const postBatchJadwalInspeksiKebersihan = createAsyncThunk<any, any>(
   }
 )
 
-export const postJadwalInspeksiKebersihanUpdate = createAsyncThunk<any, { id: string; params: any }>(
-  'jadwal-inspeksi-kebersihan/update',
+export const postKebersihanInspeksiUpdate = createAsyncThunk<any, { id: string; params: any }>(
+  'kebersihan-inspeksi/update',
   async ({ id, params }, thunkAPI) => {
     try {
-      const response = await api.put(`/app/jadwal-inspeksi-kebersihan/${id}`, params)
+      const response = await api.put(`/app/kebersihan-inspeksi/${id}`, params)
 
       return response.data
     } catch (e: any) {
@@ -129,11 +128,11 @@ export const postJadwalInspeksiKebersihanUpdate = createAsyncThunk<any, { id: st
   }
 )
 
-export const deleteJadwalInspeksiKebersihan = createAsyncThunk<any, string>(
-  'jadwal-inspeksi-kebersihan/delete',
+export const deleteKebersihanInspeksi = createAsyncThunk<any, string>(
+  'kebersihan-inspeksi/delete',
   async (id, thunkAPI) => {
     try {
-      const response = await api.delete(`/app/jadwal-inspeksi-kebersihan/${id}`)
+      const response = await api.delete(`/app/kebersihan-inspeksi/${id}`)
 
       return response.data
     } catch (e: any) {
@@ -142,9 +141,9 @@ export const deleteJadwalInspeksiKebersihan = createAsyncThunk<any, string>(
   }
 )
 
-export const postImport = createAsyncThunk<any, any>('jadwal-inspeksi-kebersihan/import', async (params, thunkAPI) => {
+export const postImport = createAsyncThunk<any, any>('kebersihan-inspeksi/import', async (params, thunkAPI) => {
   try {
-    const response = await api.post(`/app/jadwal-inspeksi-kebersihan/import`, params)
+    const response = await api.post(`/app/kebersihan-inspeksi/import`, params)
 
     return response.data
   } catch (e: any) {
@@ -152,9 +151,9 @@ export const postImport = createAsyncThunk<any, any>('jadwal-inspeksi-kebersihan
   }
 })
 
-export const postExport = createAsyncThunk<any, any>('jadwal-inspeksi-kebersihan/export', async (params, thunkAPI) => {
+export const postExport = createAsyncThunk<any, any>('kebersihan-inspeksi/export', async (params, thunkAPI) => {
   try {
-    const response = await api.post(`/app/jadwal-inspeksi-kebersihan/export`, params)
+    const response = await api.post(`/app/kebersihan-inspeksi/export`, params)
 
     return response.data
   } catch (e: any) {
@@ -173,34 +172,34 @@ export const slice = createSlice({
     resetRedux: () => initialState
   },
   extraReducers: builder => {
-    builder.addCase(fetchJadwalInspeksiKebersihanAll.fulfilled, (state, action) => {
+    builder.addCase(fetchKebersihanInspeksiAll.fulfilled, (state, action) => {
       state.datas = action.payload.data || []
     })
 
-    builder.addCase(fetchJadwalInspeksiKebersihanPage.fulfilled, (state, action) => {
+    builder.addCase(fetchKebersihanInspeksiPage.fulfilled, (state, action) => {
       state.dataPage = {
         values: action.payload.data?.values || [],
         total: action.payload.data?.total || 0
       }
     })
 
-    builder.addCase(fetchJadwalInspeksiKebersihanById.fulfilled, (state, action) => {
+    builder.addCase(fetchKebersihanInspeksiById.fulfilled, (state, action) => {
       state.data = action.payload.data
     })
 
-    builder.addCase(deleteJadwalInspeksiKebersihan.fulfilled, (state, action) => {
+    builder.addCase(deleteKebersihanInspeksi.fulfilled, (state, action) => {
       state.delete = action.payload.message
     })
 
-    builder.addCase(postJadwalInspeksiKebersihan.fulfilled, (state, action) => {
+    builder.addCase(postKebersihanInspeksi.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
-    builder.addCase(postBatchJadwalInspeksiKebersihan.fulfilled, (state, action) => {
+    builder.addCase(postBatchKebersihanInspeksi.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
-    builder.addCase(postJadwalInspeksiKebersihanUpdate.fulfilled, (state, action) => {
+    builder.addCase(postKebersihanInspeksiUpdate.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
