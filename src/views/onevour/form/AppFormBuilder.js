@@ -72,6 +72,7 @@ export function field(props) {
   const {
     type,
     label,
+    tooltip,
     key,
     placeholder,
     required = false,
@@ -91,12 +92,14 @@ export function field(props) {
     autoFocus = false,
     urlImage = null,
     render,
-    interval = 30
+    interval = 30,
+    base64 = false
   } = props
 
   return {
     type: type,
     label: label,
+    tooltip: tooltip,
     key: key,
     placeholder: placeholder,
     required: required,
@@ -116,7 +119,8 @@ export function field(props) {
     autoFocus: autoFocus,
     urlImage: urlImage,
     render,
-    interval
+    interval,
+    base64
   }
 }
 
@@ -682,11 +686,16 @@ export function formColumnDetailField(form) {
   if ('image' === props.type) {
     let session = form.session
 
-    const { key } = props
+    const { key, base64 } = props
 
     const defaultImage = 'https://placehold.co/300x300?font=roboto&text=Upload image'
 
-    const valueImage = session.state[key] ? process.env.NEXT_PUBLIC_API_URL + props.urlImage + session.state[key] : ''
+    let valueImage = ''
+    if (base64) {
+      valueImage = session.state[key] ? session.state[key] : ''
+    } else {
+      valueImage = session.state[key] ? process.env.NEXT_PUBLIC_API_URL + props.urlImage + session.state[key] : ''
+    }
 
     const imageData = { value: 'img', img: valueImage ? valueImage : defaultImage }
 
@@ -696,6 +705,7 @@ export function formColumnDetailField(form) {
       <Grid item size={{ xs: 12, sm: 6 }} key={index}>
         <FormHelperText id='validation-basic-last-name'>{props.label}</FormHelperText>
         <InputImage
+          className='mt-2'
           key={index}
           data={imageData}
           selected={selected}
@@ -935,7 +945,21 @@ const textField = form => {
             type={props.type}
             size='small'
             value={valueText}
-            label={props.label}
+            label={
+              <Box component='span' sx={{ display: 'inline-flex', alignItems: 'center' }}>
+                {props.label}
+                {props.tooltip && (
+                  <Tooltip title={props.tooltip} placement='top' arrow>
+                    <Box component='span' sx={{ display: 'inline-flex', ml: 1, cursor: 'help' }}>
+                      <i
+                        className='tabler-info-circle'
+                        style={{ fontSize: '1.1rem', color: 'var(--mui-palette-text-secondary)' }}
+                      />
+                    </Box>
+                  </Tooltip>
+                )}
+              </Box>
+            }
             placeholder={props.placeholder}
             error={Boolean(errors[props.key])}
             aria-describedby='validation-basic-first-name'

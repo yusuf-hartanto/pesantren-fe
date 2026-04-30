@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Card, CardHeader, CardContent, Grid } from '@mui/material'
+import { Card, CardHeader, CardContent, Grid, Button, CircularProgress, Divider, Box, IconButton } from '@mui/material'
 import { toast } from 'react-toastify'
 import { useForm } from 'react-hook-form'
 
@@ -17,6 +17,18 @@ import {
 import { fetchCabangPage } from '../../cabang/slice/index'
 
 import { field, fieldBuildSubmit, formColumn } from '@views/onevour/form/AppFormBuilder'
+import QrPrintModal from './QrPrintModal'
+import dynamic from 'next/dynamic';
+import GeoLocation from './GeoLocation'
+
+// const GeoLocation = dynamic(() => import('./GeoLocation'), {
+//   ssr: false,
+//   loading: () => (
+//     <Box sx={{ display: 'flex', justifyContent: 'center', p: 10 }}>
+//       <CircularProgress />
+//     </Box>
+//   )
+// });
 
 const LocationForm = () => {
   const router = useRouter()
@@ -65,6 +77,8 @@ const LocationForm = () => {
     longitude: null,
     keterangan: ''
   })
+
+  const [isGeoModalOpen, setGeoModalOpen] = useState(false);
 
   const { control, handleSubmit, formState: { errors }, reset } = useForm({
     values: state
@@ -122,7 +136,7 @@ const LocationForm = () => {
     if (store.crud?.status) {
       toast.success(store.crud?.message || 'Data berhasil disimpan')
       dispatch(resetRedux())
-      router.replace('/app/location/list')
+      // router.replace('/app/location/list')
     } else {
       if (store.crud?.message) {
         toast.error(store.crud?.message || 'Gagal menyimpan data lokasi')
@@ -162,7 +176,7 @@ const LocationForm = () => {
   const fields = () => [
     // --- Informasi Utama ---
     field({ type: 'text', key: 'nama_lokasi', label: 'Nama Lokasi', required: true, readOnly: !!view }),
-    field({ type: 'text', key: 'kode_lokasi', label: 'Kode Lokasi', readOnly: !!view }),
+    field({ type: 'text', key: 'kode_lokasi', label: 'Kode Lokasi', tooltip: "Jika kosong, akan diisi otomatis oleh sistem", readOnly: !!view }),
 
     field({
       type: 'select',
@@ -199,34 +213,42 @@ const LocationForm = () => {
     field({ type: 'numeral', key: 'map_zoom', label: 'Zoom Level Map', readOnly: !!view }), // Ditambahkan
 
     // --- Sistem ---
-    field({ type: 'text', key: 'qr_code', label: 'QR Code / Barcode', readOnly: !!view }), // Ditambahkan
+    // field({ type: 'text', key: 'qr_code', label: 'QR Code / Barcode', placeholder: 'Otomatis dibuat sistem', readOnly: true }),
+    field({ type: 'image', key: 'qr_code_base64', base64: true, label: 'QR Code' }), // Ditambahkan
+
 
     // --- Lainnya ---
     field({ type: 'textarea', key: 'keterangan', label: 'Keterangan', readOnly: !!view }),
 
-    fieldBuildSubmit({
-      onCancel: () => router.push('/app/location/list'),
-      loading: store.loading,
-      disabled: !!view
-    })
+    // fieldBuildSubmit({
+    //   onCancel: () => router.push('/app/location/list'),
+    //   loading: store.loading,
+    //   disabled: !!view
+    // })
   ]
 
+  const [isQrModalOpen, setQrModalOpen] = useState(false);
+
+
   return (
-    <Grid container spacing={6}>
-      <Grid item xs={12}>
-        <Card>
-          <CardHeader
-            title={id ? (view ? 'Detail Lokasi' : 'Edit Lokasi') : 'Tambah Lokasi'}
-            subheader='Pastikan data lokasi sesuai dengan hierarki cabang atau gedung'
-          />
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              {formColumn({ control, errors, state, setState, fields: fields() })}
-            </form>
-          </CardContent>
-        </Card>
-      </Grid>
-    </Grid>
+    <>
+      <Card sx={{ mt: 4 }}>
+        <CardHeader
+          title={`Kelola Area Geo - ${state.nama_lokasi}`}
+          subheader={`Kode Lokasi: ${state.kode_lokasi}`}
+          action={
+            <IconButton onClick={() => setGeoModalOpen(false)}>
+              <i className="tabler-x" />
+            </IconButton>
+          }
+        />
+        <CardContent>
+          <GeoLocation data={state} onClose={() => setGeoModalOpen(false)} />
+        </CardContent>
+      </Card>
+
+
+    </>
   )
 }
 
