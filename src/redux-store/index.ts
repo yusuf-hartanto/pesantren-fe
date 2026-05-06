@@ -35,6 +35,8 @@ import jenis_penilaian_bobot from '@/app/(dashboard)/(private)/app/jenis-penilai
 import jadwal_pelajaran from '@/app/(dashboard)/(private)/app/jadwal-pelajaran/slice/index'
 import shift_presensi from '@/app/(dashboard)/(private)/app/shift-presensi/slice/index'
 import master_slot_waktu from '@/app/(dashboard)/(private)/app/master-slot-waktu/slice/index'
+import geo_areas from '@/app/(dashboard)/(private)/app/location/slice/geoAreaSlice'
+
 
 export const store = configureStore({
   reducer: {
@@ -70,7 +72,8 @@ export const store = configureStore({
     jenis_penilaian_bobot,
     jadwal_pelajaran,
     shift_presensi,
-    master_slot_waktu
+    master_slot_waktu,
+    geo_areas
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false })
 })

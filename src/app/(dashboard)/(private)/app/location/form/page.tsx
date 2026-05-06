@@ -21,14 +21,6 @@ import QrPrintModal from './QrPrintModal'
 import dynamic from 'next/dynamic';
 import GeoLocation from './GeoLocation'
 
-// const GeoLocation = dynamic(() => import('./GeoLocation'), {
-//   ssr: false,
-//   loading: () => (
-//     <Box sx={{ display: 'flex', justifyContent: 'center', p: 10 }}>
-//       <CircularProgress />
-//     </Box>
-//   )
-// });
 
 const LocationForm = () => {
   const router = useRouter()
@@ -213,9 +205,9 @@ const LocationForm = () => {
     field({ type: 'numeral', key: 'map_zoom', label: 'Zoom Level Map', readOnly: !!view }), // Ditambahkan
 
     // --- Sistem ---
-    // field({ type: 'text', key: 'qr_code', label: 'QR Code / Barcode', placeholder: 'Otomatis dibuat sistem', readOnly: true }),
-    field({ type: 'image', key: 'qr_code_base64', base64: true, label: 'QR Code' }), // Ditambahkan
-
+    ...(id ? [
+      field({ type: 'image', key: 'qr_code_base64', base64: true, label: 'QR Code' })
+    ] : []),
 
     // --- Lainnya ---
     field({ type: 'textarea', key: 'keterangan', label: 'Keterangan', readOnly: !!view }),
@@ -231,24 +223,92 @@ const LocationForm = () => {
 
 
   return (
-    <>
-      <Card sx={{ mt: 4 }}>
-        <CardHeader
-          title={`Kelola Area Geo - ${state.nama_lokasi}`}
-          subheader={`Kode Lokasi: ${state.kode_lokasi}`}
-          action={
-            <IconButton onClick={() => setGeoModalOpen(false)}>
-              <i className="tabler-x" />
-            </IconButton>
-          }
-        />
-        <CardContent>
-          <GeoLocation data={state} onClose={() => setGeoModalOpen(false)} />
-        </CardContent>
-      </Card>
+    <Grid container spacing={6}>
+      <Grid item xs={12}>
+        <Card>
+          <CardHeader
+            title={id ? (view ? 'Detail Lokasi' : 'Edit Lokasi') : 'Tambah Lokasi'}
+            subheader='Pastikan data lokasi sesuai dengan hierarki cabang atau gedung'
+          />
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              {formColumn({ control, errors, state, setState, fields: fields() })}
 
+              <Grid container spacing={2} sx={{ mt: 4 }}>
+                <Grid item xs={12} className='demo-space-x'>
+                  {/* Tombol Submit */}
+                  <Button
+                    variant='contained'
+                    type='submit'
+                    disabled={store.loading || !!view}
+                  >
+                    {store.loading ? <CircularProgress size={20} color="inherit" /> : 'Simpan'}
+                  </Button>
 
-    </>
+                  {/* Tombol Cancel */}
+                  <Button
+                    variant='outlined'
+                    color='secondary'
+                    onClick={() => router.push('/app/location/list')}
+                  >
+                    Batal
+                  </Button>
+
+                  {/* Tombol Kelola Area (Hanya muncul saat Edit) */}
+                  {id && (
+                    <Button
+                      type='button'
+                      variant='outlined'
+                      color='primary'
+                      startIcon={<i className='tabler-map-pin' />}
+                      // onClick={() => router.push(`/app/location/geo?id=${id}`)}
+                      onClick={() => setGeoModalOpen(true)}
+                    >
+                      Kelola Area
+                    </Button>
+                  )}
+
+                  {/* Tombol Cetak QR (Hanya muncul saat Edit) */}
+                  {id && (
+                    <Button
+                      type='button'
+                      variant='contained'
+                      color='info'
+                      startIcon={<i className='tabler-qrcode' />}
+                      onClick={() => setQrModalOpen(true)}
+                    >
+                      Cetak QR
+                    </Button>
+                  )}
+                </Grid>
+              </Grid>
+            </form>
+          </CardContent>
+        </Card>
+        {isGeoModalOpen && (
+          <Card id={`map-container-card-${id || 'default'}`} sx={{ mt: 4 }}>
+            <CardHeader
+              title={`Kelola Area Geo - ${state.nama_lokasi}`}
+              subheader={`Kode Lokasi: ${state.kode_lokasi}`}
+              action={
+                <IconButton onClick={() => setGeoModalOpen(false)}>
+                  <i className="tabler-x" />
+                </IconButton>
+              }
+            />
+            <CardContent>
+              <GeoLocation data={state} onClose={() => setGeoModalOpen(false)} />
+            </CardContent>
+          </Card>
+        )}
+      </Grid>
+
+      <QrPrintModal
+        open={isQrModalOpen}
+        onClose={() => setQrModalOpen(false)}
+        data={state}
+      />
+    </Grid>
   )
 }
 

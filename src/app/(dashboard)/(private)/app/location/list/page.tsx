@@ -17,7 +17,8 @@ import {
   Menu,
   MenuItem,
   Box,
-  Chip
+  Chip,
+  Tooltip
 } from '@mui/material'
 
 import { toast } from 'react-toastify'
@@ -103,6 +104,9 @@ const LocationList = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const store = useAppSelector(state => state.location)
+  const canCreate = useCan('create')
+  const canImport = useCan('import')
+  const canExport = useCan('export')
 
   const [filter, setFilter] = useState('')
   const [page, setPage] = useState(1)
@@ -183,30 +187,85 @@ const LocationList = () => {
     }
   }
 
+  const onAddForm = () => {
+    router.replace('/app/location/form')
+  }
+
+  const onImport = () => {
+    router.replace('/app/location/import')
+  }
+
+  const onExport = async () => {
+    try {
+      setLoadingExport(true)
+      const res = await dispatch(postExportLocation({ q: filter })).unwrap()
+
+      if (res?.status && res?.data) {
+        const url = `${process.env.NEXT_PUBLIC_API_URL}${res.data}`
+        const link = document.createElement('a')
+
+        link.href = url
+        link.download = ''
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+    } catch {
+      toast.error('Gagal export data')
+    } finally {
+      setLoadingExport(false)
+    }
+  }
+
   return (
     <Grid container spacing={6}>
       <Grid size={12}>
         <Card>
           <CardHeader title='Master Data Lokasi' />
           <Toolbar sx={{ gap: 2, mb: 4, px: '1.5rem !important' }}>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button
-                variant='contained'
-                startIcon={<i className='tabler-plus' />}
-                onClick={() => router.push('/app/location/form')}
-              >
-                Tambah
-              </Button>
-            </Box>
-            <Typography sx={{ flex: '1 1 auto' }} />
-            <TextField
-              size='small'
-              placeholder='Cari lokasi, jenis, atau induk...'
-              onChange={(e) => {
-                setFilter(e.target.value)
-                setPage(1)
-              }}
-            />
+            {canCreate && (
+              <Tooltip title="Tambah">
+                <Button
+                  size="small"
+                  variant="outlined"
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onAddForm}
+                  startIcon={<i className="tabler-plus" />}
+                >
+                  Tambah
+                </Button>
+              </Tooltip>
+            )}
+
+            {canImport && (
+              <Tooltip title="Import CSV">
+                <Button
+                  size="small"
+                  color="success"
+                  variant="outlined"
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onImport}
+                  startIcon={<i className="tabler-file-import" />}
+                >
+                  Import CSV
+                </Button>
+              </Tooltip>
+            )}
+
+            {canExport && (
+              <Tooltip title="Export CSV">
+                <Button
+                  size="small"
+                  color="warning"
+                  variant="outlined"
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onExport}
+                  startIcon={<i className="tabler-file-export" />}
+                >
+                  {loadingExport ? 'Proses...' : 'Export CSV'}
+                </Button>
+              </Tooltip>
+            )}
           </Toolbar>
           <TableView changeSort={() => { }} model={buildTable()} />
         </Card>
