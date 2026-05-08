@@ -92,7 +92,6 @@ const FormValidationBasic = () => {
         const datas = { ...res?.payload?.data }
 
         if (datas) {
-          //console.log('prament', datas)
           datas.tingkat_type = typeOption.values.find(r => r.value === datas.tingkat_type)
           setState(datas)
           reset(datas)

@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "downlevelIteration": true,
     "lib": [
       "DOM",
       "DOM.Iterable",
@@ -61,7 +60,8 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.js",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "global.d.ts"
   ],
   "exclude": [
     "node_modules"

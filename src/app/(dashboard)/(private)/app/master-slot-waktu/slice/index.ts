@@ -47,7 +47,7 @@ const initialState: InitialState = {
 --------------------------- */
 
 export interface FetchParamAlls {
-  is_active: string
+  is_active: boolean
 }
 
 export const fetchMasterSlotWaktuAll = createAsyncThunk<any, FetchParamAlls>(

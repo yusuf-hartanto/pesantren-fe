@@ -1260,8 +1260,6 @@ const TextFieldEditor = form => {
 
       store[key] = html
       session.setState(store)
-
-      console.log('update', key, html)
     }
   })
 
@@ -1551,6 +1549,7 @@ const selectDateCustom = form => {
             dateFormat={props.dateFormat || 'dd/MM/yyyy'} // Format tampilan
             className='w-100'
             wrapperClassName='w-100'
+
             // Menggunakan CustomTextField agar styling MUI konsisten
             customInput={
               <CustomTextField

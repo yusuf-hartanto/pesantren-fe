@@ -1,7 +1,9 @@
 'use client'
 
 import React, { useCallback, useEffect, useState } from 'react'
+
 import { useSearchParams, useRouter } from 'next/navigation'
+
 import { Card, CardHeader, CardContent, Grid } from '@mui/material'
 import { toast } from 'react-toastify'
 import { useForm } from 'react-hook-form'
@@ -58,6 +60,7 @@ const JabatanForm = () => {
     try {
       // Fetch Unit Organisasi untuk dropdown
       const resOrg = await dispatch(fetchOrgUnitAll({ perPage: 1000 })).unwrap()
+
       const orgOptions = (resOrg?.data || [])
         .map((item: any) => ({ label: item.nama_orgunit, value: item.id_orgunit }))
 
@@ -71,10 +74,12 @@ const JabatanForm = () => {
         if (d) {
           const formatted = {
             ...d,
+
             // Format untuk react-select/autocomplete
             id_orgunit: d.id_orgunit ? orgOptions.find((o: any) => o.value === d.id_orgunit) : null,
             sifat_jabatan: d.sifat_jabatan ? { label: d.sifat_jabatan, value: d.sifat_jabatan } : null,
           }
+
           setState(formatted)
           reset(formatted)
         }

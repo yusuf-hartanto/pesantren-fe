@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+
 import { Button, Input, Box, Typography } from '@mui/material'
 
 const FileUpload = props => {
@@ -14,7 +15,6 @@ const FileUpload = props => {
   const handleUpload = () => {
     if (selectedFile) {
       // Perform PDF file upload logic here
-      console.log('Uploading file: ', selectedFile)
       handleChange(selectedFile)
     } else {
       console.log('No file selected')

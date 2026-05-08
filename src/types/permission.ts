@@ -18,7 +18,11 @@ export type AbilityItem = {
   role_menu_export: number
 }
 
-export type PermissionMap = Record<
-  Resource,
-  Partial<Record<Ability, boolean>>
->;
+/** old: object<string, boolean> */
+// export type PermissionMap = Record<
+//   Resource,
+//   Partial<Record<Ability, boolean>>
+// >;
+
+/** new: bitmask */
+export type PermissionMap = Record<string, number>

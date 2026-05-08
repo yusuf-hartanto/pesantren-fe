@@ -58,10 +58,8 @@ class AppForm {
         const state = this.form.state
 
         keys.forEach(key => {
-            console.log("key", key)
             let value = state[key]
 
-            console.log("validate field", key, value)
             let errorKey = key + "_error"
 
             if (debugFormMode) console.log("validate", key, value)
@@ -69,7 +67,6 @@ class AppForm {
             if (undefined === value || null === value || value.length === 0) {
                 this.store.error_form = true
                 this.store[errorKey] = message
-                console.log(this.store)
                 this.form.setState(this.store)
                 if (debugFormMode) console.log(this.store)
 
