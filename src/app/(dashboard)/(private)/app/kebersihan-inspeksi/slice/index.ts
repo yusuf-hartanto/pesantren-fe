@@ -23,6 +23,8 @@ export interface InitialState {
   delete: string | null
   import: any
   export: any
+  location_qrcode: any
+  location_latlong: any[]
 }
 
 /* --------------------------
@@ -39,7 +41,9 @@ const initialState: InitialState = {
   crud: null,
   delete: null,
   import: null,
-  export: null
+  export: null,
+  location_qrcode: null,
+  location_latlong: []
 }
 
 /* --------------------------
@@ -161,6 +165,32 @@ export const postExport = createAsyncThunk<any, any>('kebersihan-inspeksi/export
   }
 })
 
+export const locationQrCodeKebersihanInspeksi = createAsyncThunk<any, any>(
+  'location-qrcode-kebersihan-inspeksi/create',
+  async (params, thunkAPI) => {
+    try {
+      const response = await api.post(`/app/location_qrcode`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
+export const locationLatLongKebersihanInspeksi = createAsyncThunk<any, any>(
+  'location-latlong-kebersihan-inspeksi/create',
+  async (params, thunkAPI) => {
+    try {
+      const response = await api.post(`/app/location_latlong`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
 /* --------------------------
    4. Slice + Reducers
 --------------------------- */
@@ -209,6 +239,14 @@ export const slice = createSlice({
 
     builder.addCase(postExport.fulfilled, (state, action) => {
       state.export = action.payload
+    })
+
+    builder.addCase(locationQrCodeKebersihanInspeksi.fulfilled, (state, action) => {
+      state.location_qrcode = action.payload
+    })
+
+    builder.addCase(locationLatLongKebersihanInspeksi.fulfilled, (state, action) => {
+      state.location_latlong = action.payload.data
     })
   }
 })

@@ -234,7 +234,11 @@ const ItemForm = ({ temuanDetailsSelected, onAddTemuanDetail, onDeleteTemuanDeta
   }
 
   const imageView = (row, value) => {
-    return <img src={row.foto_path} alt='image' width={100} height={100} />
+    if (row.foto_path.match(/^data:(.+);base64,(.+)$/)) {
+      return <img src={row.foto_path} alt='image' width={100} height={100} />
+    }
+
+    return <img src={`${process.env.NEXT_PUBLIC_API_URL}${row.foto_path}`} alt='image' width={100} height={100} />
   }
 
   // table

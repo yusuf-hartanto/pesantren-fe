@@ -1,7 +1,7 @@
 'use client'
 
 // ** React Imports
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useRef } from 'react'
 
 import { useSearchParams, useRouter } from 'next/navigation'
 
@@ -9,6 +9,8 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
+import Grid from '@mui/material/Grid2'
+import FormControl from '@mui/material/FormControl'
 
 // ** Third Party Imports
 import { toast } from 'react-toastify'
@@ -24,15 +26,19 @@ import {
   fetchKebersihanInspeksiById,
   postKebersihanInspeksi,
   postKebersihanInspeksiUpdate,
+  locationQrCodeKebersihanInspeksi,
+  locationLatLongKebersihanInspeksi,
   resetRedux
 } from '../slice/index'
-import { field, fieldBuildSubmit, formColumn } from '@views/onevour/form/AppFormBuilder'
+import { field, fieldBuildSubmit, formColumn, formSingleColumn } from '@views/onevour/form/AppFormBuilder'
 import { fetchCabangAll } from '../../cabang/slice'
 import { fetchPegawaiAll } from '../../guru-mata-pelajaran/slice'
 import { fetchLocationAll } from '../../location/slice'
 import { fetchJadwalInspeksiKebersihanAll } from '../../jadwal-inspeksi-kebersihan/slice'
 import { fetchMasterSlotWaktuAll } from '../../master-slot-waktu/slice'
 import TemuanItemForm from '../../../../../../views/onevour/components/temuan-item-form'
+import QRScanner from '@/views/onevour/components/qr-scanner'
+import DetectLocation from '@/views/onevour/components/detect-location'
 
 const statusOption = {
   values: [
@@ -175,6 +181,10 @@ const FormValidationBasic = () => {
   const [state, setState] = useState<FormData>(defaultValues)
   const [loading, setLoading] = useState(false)
   const [item, setItem] = useState<FormItemData>({ values: [], element_total: 0 })
+  const [showQrScanner, setShowQrScanner] = useState(false)
+  const [showGps, setShowGps] = useState(false)
+  const [showForm, setShowForm] = useState(false)
+  const qrCode = useRef(null)
 
   const {
     control,
@@ -239,9 +249,35 @@ const FormValidationBasic = () => {
         }
       })
     }
+
+    return () => {
+      setShowQrScanner(false)
+    }
   }, [dispatch, id, reset])
 
   useEffect(() => {
+    if (store.location_qrcode) {
+      if (store.location_qrcode.data) {
+        setShowForm(true)
+        setShowQrScanner(false)
+        setValue('id_lokasi', {
+          value: store.location_qrcode.data.id_lokasi,
+          label: store.location_qrcode.data.nama_lokasi
+        })
+        setState(prevState => {
+          return {
+            ...prevState,
+            id_lokasi: {
+              value: store.location_qrcode.data.id_lokasi,
+              label: store.location_qrcode.data.nama_lokasi
+            }
+          }
+        })
+      } else {
+        toast.error('Error : ' + store.location_qrcode.message)
+      }
+    }
+
     if (!store.crud) return
 
     if (store.crud.status) {
@@ -275,9 +311,7 @@ const FormValidationBasic = () => {
                 tingkat: r.tingkat?.value ?? r.tingkat,
                 perlu_tindak_lanjut: r.perlu_tindak_lanjut,
                 deskripsi: r.deskripsi,
-                foto_path: 'dummy'
-
-                //foto_path: r.foto_path
+                foto_path: r.foto_path
               }
             })
           }
@@ -296,9 +330,7 @@ const FormValidationBasic = () => {
               tingkat: r.tingkat?.value ?? r.tingkat,
               perlu_tindak_lanjut: r.perlu_tindak_lanjut,
               deskripsi: r.deskripsi,
-              foto_path: 'dummy'
-
-              //foto_path: r.foto_path
+              foto_path: r.foto_path
             }
           })
         })
@@ -460,32 +492,145 @@ const FormValidationBasic = () => {
     })
   }
 
+  const handleScan = (data: any) => {
+    if (qrCode.current === data) return
+    qrCode.current = data
+    dispatch(
+      locationQrCodeKebersihanInspeksi({
+        qr_code: data
+      })
+    )
+  }
+
+  const handleLocation = (data: any) => {
+    dispatch(locationLatLongKebersihanInspeksi({ latitude: data.lat, longitude: data.lng }))
+  }
+
+  const handleSelectLocation = (data: any) => {
+    setShowForm(true)
+    setShowGps(false)
+    setValue('id_lokasi', data)
+    setState(prevState => {
+      return {
+        ...prevState,
+        id_lokasi: data
+      }
+    })
+  }
+
   return (
     <DatePickerWrapper>
-      <Card>
-        <CardHeader title='Form Kebersihan Inspeksi' />
+      <Card sx={{ minHeight: 300 }}>
+        {showForm && <CardHeader title='Form Kebersihan Inspeksi' />}
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} autoComplete='off'>
-            {formColumn({
-              control: control,
-              errors: errors,
-              state: state,
-              setState: setState,
-              fields: fields()
-            })}
-            <TemuanItemForm
-              temuanDetailsSelected={item.values}
-              onAddTemuanDetail={onAddTemuanDetail}
-              onDeleteTemuanDetail={onDeleteTemuanDetail}
-            />
-            {formColumn({
-              control: control,
-              errors: errors,
-              state: state,
-              setState: setState,
-              fields: [fieldBuildSubmit({ onCancel: onCancel, loading: loading, disabled: Boolean(view) })]
-            })}
-          </form>
+          {!showForm && (
+            <Grid container spacing={6} sx={{ marginBottom: 5 }}>
+              <Grid size={{ xs: 12, sm: 4 }}>
+                <FormControl fullWidth size='small'>
+                  {formSingleColumn({
+                    control: control,
+                    errors: errors,
+                    state: state,
+                    setState: setState,
+                    field: field({
+                      type: 'button',
+                      key: 'qr',
+                      label: 'Scan QR Inspeksi',
+                      placeholder: 'Scan QR Inspeksi',
+                      options: {
+                        onClick: (e: any) => {
+                          setShowGps(false)
+                          setShowQrScanner(true)
+                        }
+                      }
+                    })
+                  })}
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 4 }}>
+                <FormControl fullWidth size='small'>
+                  {formSingleColumn({
+                    control: control,
+                    errors: errors,
+                    state: state,
+                    setState: setState,
+                    field: field({
+                      type: 'button',
+                      key: 'gps',
+                      label: 'Deteksi GPS',
+                      placeholder: 'Deteksi GPS',
+                      options: {
+                        onClick: (e: any) => {
+                          setShowQrScanner(false)
+                          setShowGps(true)
+                        }
+                      }
+                    })
+                  })}
+                </FormControl>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 4 }}>
+                <FormControl fullWidth size='small'>
+                  {formSingleColumn({
+                    control: control,
+                    errors: errors,
+                    state: state,
+                    setState: setState,
+                    field: field({
+                      type: 'button',
+                      key: 'manual',
+                      label: 'Manual',
+                      placeholder: 'Manual',
+                      options: {
+                        onClick: (e: any) => {
+                          setShowGps(false)
+                          setShowQrScanner(false)
+                          setShowForm(true)
+                        }
+                      }
+                    })
+                  })}
+                </FormControl>
+              </Grid>
+            </Grid>
+          )}
+          {showForm ? (
+            <form onSubmit={handleSubmit(onSubmit)} autoComplete='off'>
+              {formColumn({
+                control: control,
+                errors: errors,
+                state: state,
+                setState: setState,
+                fields: fields()
+              })}
+              <TemuanItemForm
+                temuanDetailsSelected={item.values}
+                onAddTemuanDetail={onAddTemuanDetail}
+                onDeleteTemuanDetail={onDeleteTemuanDetail}
+              />
+              {formColumn({
+                control: control,
+                errors: errors,
+                state: state,
+                setState: setState,
+                fields: [fieldBuildSubmit({ onCancel: onCancel, loading: loading, disabled: Boolean(view) })]
+              })}
+            </form>
+          ) : (
+            <Grid>
+              <Grid size={12}>
+                <QRScanner result={handleScan} active={showQrScanner} />
+              </Grid>
+              <Grid size={12}>
+                <DetectLocation
+                  result={handleLocation}
+                  active={showGps}
+                  locations={store.location_latlong}
+                  selected={handleSelectLocation}
+                />
+              </Grid>
+            </Grid>
+          )}
         </CardContent>
       </Card>
     </DatePickerWrapper>
