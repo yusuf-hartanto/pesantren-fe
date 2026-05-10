@@ -176,14 +176,14 @@ const FormValidationBasic = () => {
       dispatch(
         postJadwalInspeksiKebersihanUpdate({
           id: id,
-          params: { ...state, hari: state.hari.value }
+          params: { ...state, hari: state.hari?.value }
         })
       )
     } else {
       dispatch(
         postJadwalInspeksiKebersihan({
           ...state,
-          hari: state.hari.value
+          hari: state.hari?.value
         })
       )
     }
