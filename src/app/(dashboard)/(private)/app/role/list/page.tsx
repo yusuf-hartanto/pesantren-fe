@@ -106,7 +106,7 @@ function RowAction(data: any) {
         >
           <i className='tabler-edit' />
           Edit
-        </MenuItem>,
+        </MenuItem>
 
         <MenuItem
           key='role-access'
