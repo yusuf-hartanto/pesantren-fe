@@ -145,7 +145,10 @@ const FormValidationBasic = () => {
   const defaultValues = {
     id_cabang: null,
     id_petugas: null,
-    id_lokasi: null,
+    id_lokasi: {
+      label: '',
+      value: ''
+    },
     id_jadwal: null,
     tanggal: new Date(),
     waktu: new Date(),
