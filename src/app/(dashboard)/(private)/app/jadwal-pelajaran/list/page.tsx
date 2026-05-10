@@ -312,7 +312,7 @@ const Table = () => {
         values: values?.map((row: any) => {
           return {
             ...row,
-            jam: `${row.jam_pelajaran.mulai?.slice(0, -3)} - ${row.jam_pelajaran.selesai?.slice(0, -3)}`,
+            jam: `${row.jam_pelajaran?.mulai?.slice(0, -3)} - ${row.jam_pelajaran?.selesai?.slice(0, -3)}`,
             kelas: `${row.kelas_formal ? row.kelas_formal?.nama_kelas : row.kelas_mda?.nama_kelas_mda} (${row.kelas_formal ? row.kelas_formal?.lembaga?.nama_lembaga : row.kelas_mda?.lembaga?.nama_lembaga})`,
             mapel: row.jenis_guru?.mata_pelajaran?.nama_mapel,
             guru: row.jenis_guru?.pegawai?.nama_lengkap,

@@ -115,61 +115,43 @@ const FormValidationBasic = () => {
     id_cabang: {
       value: string
       label: string
-    }
+    } | null
     id_petugas: {
       value: string
       label: string
-    }
+    } | null
     id_lokasi: {
       value: string
       label: string
-    }
+    } | null
     id_jadwal: {
       value: string
       label: string
-    }
+    } | null
     tanggal: Date
     waktu: Date
     kode_slot: {
       value: string
       label: string
-    }
+    } | null
     catatan_umum: string
     status_kondisi: {
       value: string
       label: string
-    }
+    } | null
     temuans: any[]
   }
 
   const defaultValues = {
-    id_cabang: {
-      value: '',
-      label: ''
-    },
-    id_petugas: {
-      value: '',
-      label: ''
-    },
-    id_lokasi: {
-      value: '',
-      label: ''
-    },
-    id_jadwal: {
-      value: '',
-      label: ''
-    },
+    id_cabang: null,
+    id_petugas: null,
+    id_lokasi: null,
+    id_jadwal: null,
     tanggal: new Date(),
     waktu: new Date(),
-    kode_slot: {
-      value: '',
-      label: ''
-    },
+    kode_slot: null,
     catatan_umum: '',
-    status_kondisi: {
-      value: '',
-      label: ''
-    },
+    status_kondisi: null,
     temuans: []
   }
 
@@ -209,6 +191,8 @@ const FormValidationBasic = () => {
     dispatch(fetchMasterSlotWaktuAll({ is_active: true }))
 
     if (id) {
+      setShowForm(true)
+
       dispatch(fetchKebersihanInspeksiById(id)).then(res => {
         const datas = { ...res?.payload?.data }
 
@@ -231,9 +215,12 @@ const FormValidationBasic = () => {
             value: datas.pegawai.id_pegawai,
             label: datas.pegawai.nama_lengkap
           }
-          datas.id_jadwal = {
-            value: datas.jadwal_inspeksi_kebersihan.id_jadwal,
-            label: `${haris.find(d => d.value === datas.jadwal_inspeksi_kebersihan.hari)?.label}`
+
+          if (datas.jadwal_inspeksi_kebersihan) {
+            datas.id_jadwal = {
+              value: datas.jadwal_inspeksi_kebersihan?.id_jadwal,
+              label: `${haris.find(d => d.value === datas.jadwal_inspeksi_kebersihan?.hari)?.label}`
+            }
           }
 
           setItem({
@@ -302,8 +289,8 @@ const FormValidationBasic = () => {
           id: id,
           params: {
             ...state,
-            status_kondisi: state.status_kondisi.value,
-            kode_slot: state.kode_slot.value,
+            status_kondisi: state.status_kondisi?.value,
+            kode_slot: state.kode_slot?.value,
             waktu: formatDate(state.waktu, 'HH:mm'),
             temuans: item.values.map(r => {
               return {
@@ -321,8 +308,8 @@ const FormValidationBasic = () => {
       dispatch(
         postKebersihanInspeksi({
           ...state,
-          status_kondisi: state.status_kondisi.value,
-          kode_slot: state.kode_slot.value,
+          status_kondisi: state.status_kondisi?.value,
+          kode_slot: state.kode_slot?.value,
           waktu: formatDate(state.waktu, 'HH:mm'),
           temuans: item.values.map(r => {
             return {
@@ -340,16 +327,10 @@ const FormValidationBasic = () => {
 
   const handleJadwal = (e: any) => {
     if (!e) return
-    setValue('id_jadwal', {
-      value: '',
-      label: ''
-    })
+    setValue('id_jadwal', null)
     setState(prevState => ({
       ...prevState,
-      id_jadwal: {
-        value: '',
-        label: ''
-      }
+      id_jadwal: null
     }))
     dispatch(fetchJadwalInspeksiKebersihanAll({ is_active: 'true', id_petugas: e.value }))
   }

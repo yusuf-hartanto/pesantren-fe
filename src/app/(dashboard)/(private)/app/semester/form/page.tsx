@@ -61,7 +61,7 @@ const FormValidationBasic = () => {
     nama_semester: {
       value: string
       label: string
-    }
+    } | null
     keterangan: string
     nomor_urut: any
     status: {
@@ -71,24 +71,18 @@ const FormValidationBasic = () => {
     id_tahunajaran: {
       value: string
       label: string
-    }
+    } | null
   }
 
   const defaultValues = {
-    nama_semester: {
-      value: '',
-      label: ''
-    },
+    nama_semester: null,
     keterangan: '',
     nomor_urut: '',
     status: {
       value: 'Aktif',
       label: 'Aktif'
     },
-    id_tahunajaran: {
-      value: '',
-      label: ''
-    }
+    id_tahunajaran: null
   }
 
   const [state, setState] = useState<FormData>(defaultValues)
@@ -157,7 +151,7 @@ const FormValidationBasic = () => {
             ...state,
             status: state.status.value,
             nomor_urut: parseInt(state.nomor_urut),
-            nama_semester: state.nama_semester.value
+            nama_semester: state.nama_semester?.value
           }
         })
       )
@@ -167,7 +161,7 @@ const FormValidationBasic = () => {
           ...state,
           status: state.status.value,
           nomor_urut: parseInt(state.nomor_urut),
-          nama_semester: state.nama_semester.value
+          nama_semester: state.nama_semester?.value
         })
       )
     }
