@@ -62,17 +62,14 @@ const FormValidationBasic = () => {
     tingkat_type: {
       value: string
       label: string
-    }
+    } | null
   }
 
   const defaultValues = {
     tingkat: '',
     keterangan: '',
     nomor_urut: '',
-    tingkat_type: {
-      value: '',
-      label: ''
-    }
+    tingkat_type: null
   }
 
   const [state, setState] = useState<FormData>(defaultValues)
@@ -124,7 +121,7 @@ const FormValidationBasic = () => {
           id: id,
           param: {
             ...state,
-            tingkat_type: state.tingkat_type.value,
+            tingkat_type: state.tingkat_type?.value,
             nomor_urut: parseInt(state.nomor_urut)
           }
         })
@@ -133,7 +130,7 @@ const FormValidationBasic = () => {
       dispatch(
         postTingkat({
           ...state,
-          tingkat_type: state.tingkat_type.value,
+          tingkat_type: state.tingkat_type?.value,
           nomor_urut: parseInt(state.nomor_urut)
         })
       )

@@ -197,7 +197,7 @@ const FormValidationBasic = () => {
     id_santri: {
       value: string
       label: string
-    }
+    } | null
   }
 
   const defaultValues = {
@@ -205,10 +205,7 @@ const FormValidationBasic = () => {
     hubungan: '',
     nik: '',
     keterangan: '',
-    id_santri: {
-      value: '',
-      label: ''
-    }
+    id_santri: null
   }
 
   const [state, setState] = useState<FormData>(defaultValues)

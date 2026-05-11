@@ -54,19 +54,19 @@ const FormValidationBasic = () => {
     id_lembaga: {
       value: string
       label: string
-    }
+    } | null
     id_tahunajaran: {
       value: string
       label: string
-    }
+    } | null
     id_tingkat: {
       value: string
       label: string
-    }
+    } | null
     id_wali_kelas: {
       value: string
       label: string
-    }
+    } | null
     keterangan: string
     nomor_urut: any
     status: {
@@ -77,22 +77,10 @@ const FormValidationBasic = () => {
 
   const defaultValues = {
     nama_kelas_mda: '',
-    id_lembaga: {
-      value: '',
-      label: ''
-    },
-    id_tahunajaran: {
-      value: '',
-      label: ''
-    },
-    id_tingkat: {
-      value: '',
-      label: ''
-    },
-    id_wali_kelas: {
-      value: '',
-      label: ''
-    },
+    id_lembaga: null,
+    id_tahunajaran: null,
+    id_tingkat: null,
+    id_wali_kelas: null,
     keterangan: '',
     nomor_urut: '',
     status: {

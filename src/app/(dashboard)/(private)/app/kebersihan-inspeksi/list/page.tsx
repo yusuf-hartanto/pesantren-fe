@@ -23,35 +23,19 @@ import { toast } from 'react-toastify'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
 import {
-  deleteJadwalPelajaran,
-  fetchJadwalPelajaranPage,
-  postJadwalPelajaranUpdate,
+  deleteKebersihanInspeksi,
+  fetchKebersihanInspeksiPage,
+  postKebersihanInspeksiUpdate,
   postExport,
   resetRedux
 } from '../slice/index'
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
-import CustomChip from '@core/components/mui/Chip'
 import DialogDelete from '@views/onevour/components/dialog-delete'
 
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
 import { useCan } from '@/hooks/useCan'
-
-const statusObj: Record<string, { color: any; value: string }> = {
-  Aktif: {
-    color: 'success',
-    value: 'Aktif'
-  },
-  Nonaktif: {
-    color: 'secondary',
-    value: 'Nonaktif'
-  },
-  Arsip: {
-    color: 'secondary',
-    value: 'Arsip'
-  }
-}
 
 function RowAction(data: any) {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -76,7 +60,7 @@ function RowAction(data: any) {
   }
 
   const handleDelete = (id: string) => {
-    dispatch(deleteJadwalPelajaran(id))
+    dispatch(deleteKebersihanInspeksi(id))
     optionsOnClose()
   }
 
@@ -99,7 +83,7 @@ function RowAction(data: any) {
         <MenuItem
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
-          href={`/app/jadwal-pelajaran/form?id=${data.row.id_jadwal}&view=true`}
+          href={`/app/kebersihan-inspeksi/form?id=${data.row.id_inspeksi}&view=true`}
           onClick={handleView}
         >
           <i className='tabler-eye' />
@@ -111,26 +95,12 @@ function RowAction(data: any) {
             key='edit'
             component={Link}
             sx={{ '& svg': { mr: 2 } }}
-            href={`/app/jadwal-pelajaran/form?id=${data.row.id_jadwal}`}
+            href={`/app/kebersihan-inspeksi/form?id=${data.row.id_inspeksi}`}
             onClick={handleView}
           >
             <i className='tabler-edit' />
             Edit
-          </MenuItem>,
-
-          data.row.status == 'Nonaktif' && (
-            <MenuItem onClick={() => data.handleAktifOrArsip(data.row, 'Aktif')} sx={{ '& svg': { mr: 2 } }}>
-              <i className='tabler-toggle-right' />
-              Set Aktif
-            </MenuItem>
-          ),
-
-          data.row.status == 'Nonaktif' && (
-            <MenuItem onClick={() => data.handleAktifOrArsip(data.row, 'Arsip')} sx={{ '& svg': { mr: 2 } }}>
-              <i className='tabler-archive' />
-              Arsip
-            </MenuItem>
-          )
+          </MenuItem>
         ]}
 
         {canDelete && (
@@ -140,7 +110,7 @@ function RowAction(data: any) {
           </MenuItem>
         )}
         <DialogDelete
-          id={data.row.hari}
+          id={'Kebersihan Inspeksi'}
           open={openConfirm}
           onClose={(event: any, reason: any) => {
             if (reason !== 'backdropClick') {
@@ -148,7 +118,7 @@ function RowAction(data: any) {
             }
           }}
           handleOk={() => {
-            handleDelete(data.row.id_jadwal)
+            handleDelete(data.row.id_inspeksi)
             setOpenConfirm(false)
           }}
           handleClose={() => {
@@ -165,7 +135,7 @@ const Table = () => {
   // ** Hooks
   const router = useRouter()
   const dispatch = useAppDispatch()
-  const store = useAppSelector(state => state.jadwal_pelajaran)
+  const store = useAppSelector(state => state.kebersihan_inspeksi)
 
   const canCreate = useCan('create')
   const canImport = useCan('import')
@@ -178,7 +148,7 @@ const Table = () => {
 
   useEffect(() => {
     if (store.delete) {
-      dispatch(fetchJadwalPelajaranPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(fetchKebersihanInspeksiPage({ page: 1, perPage: perPage, q: filter }))
       dispatch(resetRedux())
     }
   }, [dispatch, filter, perPage, store.delete])
@@ -186,7 +156,7 @@ const Table = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setPage(1)
-      dispatch(fetchJadwalPelajaranPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(fetchKebersihanInspeksiPage({ page: 1, perPage: perPage, q: filter }))
     }, 500)
 
     return () => clearTimeout(timer)
@@ -195,7 +165,7 @@ const Table = () => {
   const handleChangePage = useCallback(
     (newPage: number) => {
       setPage(newPage)
-      dispatch(fetchJadwalPelajaranPage({ page: newPage, perPage: perPage, q: filter }))
+      dispatch(fetchKebersihanInspeksiPage({ page: newPage, perPage: perPage, q: filter }))
     },
     [dispatch, perPage, filter]
   )
@@ -213,11 +183,11 @@ const Table = () => {
   }, [dispatch, handleChangePage, page, store.crud])
 
   const onAddForm = () => {
-    router.replace('/app/jadwal-pelajaran/form')
+    router.replace('/app/kebersihan-inspeksi/form')
   }
 
   const onImport = () => {
-    router.replace('/app/jadwal-pelajaran/import')
+    router.replace('/app/kebersihan-inspeksi/import')
   }
 
   const onExport = async () => {
@@ -242,31 +212,23 @@ const Table = () => {
     }
   }
 
-  const handleAktifOrArsip = (data: any, status: string) => {
+  const handleAktifOrArsip = (data: any, status: boolean) => {
+    delete data.hari_custom
     delete data.status_custom
     dispatch(
-      postJadwalPelajaranUpdate({
-        id: data.id_jadwal,
+      postKebersihanInspeksiUpdate({
+        id: data.id_inspeksi,
         params: {
           ...data,
-          status: status,
-          id_tahunajaran: {
-            value: data.id_tahunajaran
+          is_active: status,
+          id_cabang: {
+            value: data.id_cabang
           },
-          id_kelas: {
-            value: data.id_kelas
+          id_petugas: {
+            value: data.id_petugas
           },
-          id_gmapel: {
-            value: data.id_gmapel
-          },
-          id_jam_pelajaran: {
-            value: data.id_jam_pelajaran
-          },
-          id_lokasi: {
-            value: data.id_lokasi
-          },
-          id_semester: {
-            value: data.id_semester
+          kode_slot: {
+            value: data.kode_slot
           }
         }
       })
@@ -282,7 +244,7 @@ const Table = () => {
 
     setPage(1)
     setPerPage(newPerPage)
-    dispatch(fetchJadwalPelajaranPage({ page: 1, perPage: newPerPage, q: filter }))
+    dispatch(fetchKebersihanInspeksiPage({ page: 1, perPage: newPerPage, q: filter }))
   }
 
   const renderOption = (row: any) => {
@@ -299,33 +261,26 @@ const Table = () => {
         page: page,
         fields: [
           tableColumn('OPTION', 'act-x', 'left', renderOption as any),
-          tableColumn('HARI', 'hari'),
-          tableColumn('JAM', 'jam'),
-          tableColumn('KELAS/LEMBAGA', 'kelas'),
-          tableColumn('MATA PELAJARAN', 'mapel'),
-          tableColumn('GURU', 'guru'),
+          tableColumn('CABANG', 'cabang'),
           tableColumn('LOKASI', 'lokasi'),
-          tableColumn('STATUS', 'status_custom'),
-          tableColumn('KETERANGAN', 'keterangan'),
+          tableColumn('SLOT', 'kode_slot'),
+          tableColumn('TANGGAL', 'tanggal_custom'),
+          tableColumn('WAKTU', 'waktu_custom'),
+          tableColumn('PETUGAS', 'petugas'),
+          tableColumn('STATUS', 'status_kondisi'),
+          tableColumn('CATATAN UMUM', 'catatan_umum'),
           tableColumn('TERAKHIR DIUBAH', 'updated_at')
         ],
         values: values?.map((row: any) => {
+          const tanggalArr = row.tanggal?.split('-')
+
           return {
             ...row,
-            jam: `${row.jam_pelajaran?.mulai?.slice(0, -3)} - ${row.jam_pelajaran?.selesai?.slice(0, -3)}`,
-            kelas: `${row.kelas_formal ? row.kelas_formal?.nama_kelas : row.kelas_mda?.nama_kelas_mda} (${row.kelas_formal ? row.kelas_formal?.lembaga?.nama_lembaga : row.kelas_mda?.lembaga?.nama_lembaga})`,
-            mapel: row.jenis_guru?.mata_pelajaran?.nama_mapel,
-            guru: row.jenis_guru?.pegawai?.nama_lengkap,
-            lokasi: row.lokasi?.nama_lokasi,
-            status_custom: (
-              <CustomChip
-                round='true'
-                size='small'
-                label={statusObj[row.status]?.value}
-                color={statusObj[row.status]?.color}
-                sx={{ textTransform: 'capitalize' }}
-              />
-            )
+            cabang: row.cabang.nama_cabang,
+            lokasi: row.lokasi.nama_lokasi,
+            petugas: row.pegawai.nama_lengkap,
+            waktu_custom: row.waktu ? row.waktu.slice(0, -3) : '-',
+            tanggal_custom: row.tanggal ? `${tanggalArr[2]}/${tanggalArr[1]}/${tanggalArr[0]}` : '-'
           }
         }),
         count: total,
@@ -344,7 +299,7 @@ const Table = () => {
     <Grid container spacing={6} sx={{ width: '100%' }}>
       <Grid size={12}>
         <Card>
-          <CardHeader title='Jadwal Pelajaran' sx={{ paddingBottom: 0 }} />
+          <CardHeader title='Kebersihan Inspeksi' sx={{ paddingBottom: 0 }} />
           <Toolbar
             sx={{
               px: '1.5rem !important',
@@ -368,7 +323,7 @@ const Table = () => {
               </Tooltip>
             )}
 
-            {canImport && (
+            {/* {canImport && (
               <Tooltip title='Import CSV'>
                 <Button
                   size='small'
@@ -381,7 +336,7 @@ const Table = () => {
                   Import CSV
                 </Button>
               </Tooltip>
-            )}
+            )} */}
 
             {canExport && (
               <Tooltip title='Export CSV'>

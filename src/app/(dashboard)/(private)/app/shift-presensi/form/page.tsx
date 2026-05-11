@@ -90,7 +90,7 @@ const FormValidationBasic = () => {
     kategori_shift: {
       value: string
       label: string
-    }
+    } | null
     waktu_mulai: string
     waktu_selesai: string
     toleransi_menit: string
@@ -105,10 +105,7 @@ const FormValidationBasic = () => {
   const defaultValues = {
     kode_shift: '',
     nama_shift: '',
-    kategori_shift: {
-      value: '',
-      label: ''
-    },
+    kategori_shift: null,
     waktu_mulai: '',
     waktu_selesai: '',
     toleransi_menit: '',
@@ -179,10 +176,10 @@ const FormValidationBasic = () => {
           params: {
             ...state,
             status: state.status.value,
-            kategori_shift: state.kategori_shift.value,
+            kategori_shift: state.kategori_shift?.value,
             waktu_mulai: formatDate(state.waktu_mulai, 'HH:mm'),
             waktu_selesai: formatDate(state.waktu_selesai, 'HH:mm'),
-            toleransi_menit: parseInt(state.toleransi_menit)
+            toleransi_menit: parseInt(state.toleransi_menit) || 0
           }
         })
       )
@@ -191,10 +188,10 @@ const FormValidationBasic = () => {
         postShiftPresensi({
           ...state,
           status: state.status.value,
-          kategori_shift: state.kategori_shift.value,
+          kategori_shift: state.kategori_shift?.value,
           waktu_mulai: formatDate(state.waktu_mulai, 'HH:mm'),
           waktu_selesai: formatDate(state.waktu_selesai, 'HH:mm'),
-          toleransi_menit: parseInt(state.toleransi_menit)
+          toleransi_menit: parseInt(state.toleransi_menit) || 0
         })
       )
     }

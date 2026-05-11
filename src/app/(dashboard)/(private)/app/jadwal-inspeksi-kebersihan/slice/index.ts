@@ -48,6 +48,7 @@ const initialState: InitialState = {
 
 export interface FetchParamAlls {
   is_active: string
+  id_petugas: string
 }
 
 export const fetchJadwalInspeksiKebersihanAll = createAsyncThunk<any, FetchParamAlls>(

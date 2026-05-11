@@ -691,7 +691,7 @@ export function formColumnDetailField(form) {
 
     const { key, base64 } = props
 
-    const defaultImage = 'https://placehold.co/300x300?font=roboto&text=Upload image'
+    const defaultImage = `https://placehold.co/300x300?font=roboto&text=${props.placeholder}`
 
     let valueImage = ''
     if (base64) {
@@ -939,7 +939,15 @@ const textField = form => {
     <Controller
       control={control}
       name={props.key}
-      rules={{ required: props.required }}
+      rules={{
+        validate: value => {
+          if (props.required && !value) {
+            return `${props.label} wajib diisi`
+          }
+
+          return true
+        }
+      }}
       render={({ field: { value, onChange } }) => {
         const valueText = props?.options?.converter ? props.options.converter(value) : value
 
@@ -1018,7 +1026,7 @@ const checkboxField = form => {
     <FormControlLabel
       control={
         <Checkbox
-          checked={valueTmp || props.checked}
+          checked={valueTmp}
           onChange={e => {
             let val = {
               target: {
@@ -1085,7 +1093,15 @@ const numeralField = form => {
     <Controller
       control={control}
       name={props.key}
-      rules={{ required: props.required }}
+      rules={{
+        validate: value => {
+          if (props.required && !value) {
+            return `${props.label} wajib diisi`
+          }
+
+          return true
+        }
+      }}
       render={({ field: { value, onChange } }) => {
         const valueText = props?.options?.converter ? props.options.converter(value) : value
 
@@ -1096,6 +1112,7 @@ const numeralField = form => {
             label={props.label}
             placeholder={props.placeholder}
             error={Boolean(errors[props.key])}
+            helperText={errors[props.key]?.message}
             aria-describedby='validation-basic-first-name'
             onChange={e => {
               onChange(e) // trigger for default value useForm
@@ -1322,7 +1339,15 @@ const selectField = form => {
       name={props.key}
       value={selected}
       defaultValue={null}
-      rules={{ required: props.required }}
+      rules={{
+        validate: value => {
+          if (props.required && !value) {
+            return `${props.label} wajib diisi`
+          }
+
+          return true
+        }
+      }}
       render={({ field: { value, onChange } }) => {
         return (
           <Autocomplete
@@ -1354,6 +1379,7 @@ const selectField = form => {
                 {...params}
                 label={props.label}
                 error={Boolean(errors[props.key])}
+                helperText={errors[props.key]?.message}
                 placeholder={props.placeholder}
                 slotProps={{
                   htmlInput: {
@@ -1415,7 +1441,15 @@ const selectMultiField = form => {
       name={props.key}
       value={selected ?? []}
       defaultValue={[]}
-      rules={{ required: props.required }}
+      rules={{
+        validate: value => {
+          if (props.required && !value) {
+            return `${props.label} wajib diisi`
+          }
+
+          return true
+        }
+      }}
       render={({ field: { value, onChange } }) => {
         return (
           <Autocomplete
@@ -1445,6 +1479,7 @@ const selectMultiField = form => {
                 {...params}
                 label={props.label}
                 error={Boolean(errors[props.key])}
+                helperText={errors[props.key]?.message}
                 placeholder={props.placeholder}
                 slotProps={{
                   htmlInput: {
@@ -1488,7 +1523,15 @@ const selectDate = form => {
       name={props.key}
       value={selected}
       defaultValue={null}
-      rules={{ required: props.required }}
+      rules={{
+        validate: value => {
+          if (props.required && !value) {
+            return `${props.label} wajib diisi`
+          }
+
+          return true
+        }
+      }}
       render={({ field: { value, onChange } }) => {
         if (value && value?.value) {
           selected = value
@@ -1507,10 +1550,31 @@ const selectDate = form => {
                 props?.options?.onChange(date)
               }
             }}
+            dateFormat={'dd/MM/yyyy'}
             placeholderText='Click to select a date'
             disabled={props.readOnly}
             portalId={props.portalId}
             minDate={props.minDate}
+            customInput={
+              <TextField
+                fullWidth
+                size='small'
+                label={props.label}
+                slotProps={{
+                  input: {
+                    inputProps: {
+                      readOnly: props.readOnly,
+                      inputRef: props.ref
+                    }
+                  },
+
+                  inputLabel: {
+                    shrink: true,
+                    readOnly: props.readOnly
+                  }
+                }}
+              />
+            }
           />
         )
       }}
@@ -1525,7 +1589,15 @@ const selectDateCustom = form => {
     <Controller
       name={props.key}
       control={control}
-      rules={{ required: props.required }}
+      rules={{
+        validate: value => {
+          if (props.required && !value) {
+            return `${props.label} wajib diisi`
+          }
+
+          return true
+        }
+      }}
       render={({ field: { value, onChange } }) => {
         // Pastikan value adalah objek Date. Jika string (dari API), konversi ke Date.
         const currentValue = value || session.state[props.key] || null
@@ -1583,6 +1655,15 @@ const selectTime = form => {
     <Controller
       name={props.key}
       control={control}
+      rules={{
+        validate: value => {
+          if (props.required && !value) {
+            return `${props.label} wajib diisi`
+          }
+
+          return true
+        }
+      }}
       render={({ field: { value, onChange } }) => (
         <AppReactDatepicker
           selected={value ? new Date(value) : null}
@@ -1611,6 +1692,8 @@ const selectTime = form => {
               fullWidth
               size='small'
               label={props.label}
+              error={Boolean(errors[props.key])}
+              helperText={errors[props.key]?.message}
               slotProps={{
                 input: {
                   inputProps: {
@@ -1639,7 +1722,15 @@ export function textareaField(form) {
     <Controller
       control={control}
       name={props.key}
-      rules={{ required: props.required }}
+      rules={{
+        validate: value => {
+          if (props.required && !value) {
+            return `${props.label} wajib diisi`
+          }
+
+          return true
+        }
+      }}
       render={({ field: { value, onChange } }) => {
         return (
           <TextField
@@ -1650,6 +1741,7 @@ export function textareaField(form) {
             {...field}
             label={props.label}
             error={Boolean(errors[props.key])}
+            helperText={errors[props.key]?.message}
             aria-describedby='validation-basic-textarea'
             onChange={e => {
               onChange(e) // trigger for default value useForm

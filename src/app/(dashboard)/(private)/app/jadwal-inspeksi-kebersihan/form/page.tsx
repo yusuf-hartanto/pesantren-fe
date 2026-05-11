@@ -76,40 +76,28 @@ const FormValidationBasic = () => {
     id_cabang: {
       value: string
       label: string
-    }
+    } | null
     id_petugas: {
       value: string
       label: string
-    }
+    } | null
     kode_slot: {
       value: string
       label: string
-    }
+    } | null
     keterangan: string
     hari: {
       label: string
       value: number
-    }
+    } | null
     is_active: boolean
   }
 
   const defaultValues = {
-    id_cabang: {
-      value: '',
-      label: ''
-    },
-    id_petugas: {
-      value: '',
-      label: ''
-    },
-    kode_slot: {
-      value: '',
-      label: ''
-    },
-    hari: {
-      value: 0,
-      label: ''
-    },
+    id_cabang: null,
+    id_petugas: null,
+    kode_slot: null,
+    hari: null,
     keterangan: '',
     is_active: false
   }
@@ -188,14 +176,14 @@ const FormValidationBasic = () => {
       dispatch(
         postJadwalInspeksiKebersihanUpdate({
           id: id,
-          params: { ...state, hari: state.hari.value }
+          params: { ...state, hari: state.hari?.value }
         })
       )
     } else {
       dispatch(
         postJadwalInspeksiKebersihan({
           ...state,
-          hari: state.hari.value
+          hari: state.hari?.value
         })
       )
     }
