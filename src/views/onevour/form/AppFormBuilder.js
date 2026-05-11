@@ -79,6 +79,7 @@ export function field(props) {
     readOnly = false,
     options,
     callback,
+    onChange,
     ref,
     checked = false,
     startAdornment = null,
@@ -120,7 +121,8 @@ export function field(props) {
     urlImage: urlImage,
     render,
     interval,
-    base64
+    base64,
+    onChange
   }
 }
 
@@ -292,6 +294,7 @@ export function formColumnSingleDetailField(state, o, i) {
  * 2 column
  * */
 export function formColumnDetailField(form) {
+  console.log(form, 'FORM1')
   const { props, index = 0 } = form
 
   if (undefined === props || null === props) return
@@ -1337,6 +1340,10 @@ const selectField = form => {
               onChange(newValue) // Update the Controller's value
               updateValueSelect(session, props, newValue)
 
+              if (typeof props?.onChange === 'function') {
+                props?.onChange(newValue)
+              }
+
               if (typeof props?.options?.onChange === 'function') {
                 props?.options?.onChange(newValue)
               }
@@ -1549,7 +1556,6 @@ const selectDateCustom = form => {
             dateFormat={props.dateFormat || 'dd/MM/yyyy'} // Format tampilan
             className='w-100'
             wrapperClassName='w-100'
-
             // Menggunakan CustomTextField agar styling MUI konsisten
             customInput={
               <CustomTextField
