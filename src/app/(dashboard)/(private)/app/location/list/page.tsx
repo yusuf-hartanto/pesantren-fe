@@ -65,15 +65,15 @@ const RowAction = ({ row, onDeleteSuccess }: { row: any; onDeleteSuccess: (id: s
           <i className='tabler-eye' style={{ marginRight: 8 }} /> View
         </MenuItem>
 
-        {canEdit && (
-          <MenuItem
-            component={Link}
-            href={`/app/location/form?id=${row.id_lokasi}`}
-            onClick={handleClose}
-          >
-            <i className='tabler-edit' style={{ marginRight: 8 }} /> Edit
-          </MenuItem>
-        )}
+        {/* {canEdit && ( */}
+        <MenuItem
+          component={Link}
+          href={`/app/location/form?id=${row.id_lokasi}`}
+          onClick={handleClose}
+        >
+          <i className='tabler-edit' style={{ marginRight: 8 }} /> Edit
+        </MenuItem>
+        {/* )} */}
 
         {canDelete && (
           <MenuItem onClick={() => setOpenConfirm(true)} sx={{ color: 'error.main' }}>

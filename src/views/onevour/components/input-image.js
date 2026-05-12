@@ -6,19 +6,13 @@ import Grid from '@mui/material/Grid'
 
 const InputImage = props => {
   // ** Props
-  const { data, name, selected, gridProps, handleChange, color = 'grey' } = props
+  const { data, name, selected, gridProps, handleChange, className, color = 'grey' } = props
 
   const { alt, img, value } = data
 
   const [file, setFile] = useState(null)
 
   const hiddenFileInput = useRef(null)
-
-  useEffect(() => {
-    if (img.includes('placehold')) {
-      setFile(null)
-    }
-  }, [img])
 
   //
   const getBase64 = file => {
@@ -58,6 +52,13 @@ const InputImage = props => {
     getBase64(fileUploaded).then(r => {
       handleChange(r)
     })
+
+    //Promise(file => ).then(imageBase64 => {
+    //const img = await
+    //     console.log(img)
+    //})
+
+    // handleFile(fileUploaded);
   }
 
   const renderFilePreview = file => {
@@ -70,7 +71,7 @@ const InputImage = props => {
 
   const renderComponent = () => {
     return (
-      <Grid item {...gridProps}>
+      <Grid item {...gridProps} className={className}>
         <Box
           onClick={handleClick}
           sx={{

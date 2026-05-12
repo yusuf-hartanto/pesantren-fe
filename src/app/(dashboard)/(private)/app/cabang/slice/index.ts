@@ -56,7 +56,7 @@ export const fetchProvinces = createAsyncThunk('area/fetchProvinces', async (_, 
 
 
     // Backend mengembalikan array langsung dalam response.data.data
-      return response.data
+    return response.data
   } catch (e: any) {
     return thunkAPI.rejectWithValue(e.response?.data)
   }
@@ -66,8 +66,8 @@ export const fetchRegenciesByProvince = createAsyncThunk('area/fetchRegencies', 
   try {
     const response = await api.get(`/app/area/regency/${id}`)
 
-    
-  return response.data
+
+    return response.data
   } catch (e: any) {
     return thunkAPI.rejectWithValue(e.response?.data)
   }
@@ -80,8 +80,8 @@ export const fetchCabangAll = createAsyncThunk<any, any>(
     try {
       const response = await api.get(`/app/cabang/all-data`, { params })
 
-      
-  return response.data
+
+      return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
@@ -102,8 +102,8 @@ export const fetchCabangPage = createAsyncThunk<any, FetchParams>(
         }
       })
 
-      
-  return response.data
+
+      return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
@@ -116,8 +116,8 @@ export const fetchCabangById = createAsyncThunk<any, string>(
     try {
       const response = await api.get(`/app/cabang/${id}`)
 
-      
-  return response.data
+
+      return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
@@ -129,8 +129,8 @@ export const postCabang = createAsyncThunk<any, any>(
     try {
       const response = await api.post(`/app/cabang`, params)
 
-      
-  return response.data
+
+      return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
@@ -142,8 +142,8 @@ export const postCabangUpdate = createAsyncThunk<any, { id: string; params: any 
     try {
       const response = await api.put(`/app/cabang/${id}`, params)
 
-      
-  return response.data
+
+      return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
@@ -156,14 +156,14 @@ export const deleteCabang = createAsyncThunk<any, string>(
     try {
       const response = await api.delete(`/app/cabang/${id}`)
 
-      
-  return response.data
+
+      return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
   })
 
-  
+
 export const postBatchCabang = createAsyncThunk<any, any>(
   'app/cabang/insert',
   async (params, thunkAPI) => {
@@ -180,11 +180,10 @@ export const postBatchCabang = createAsyncThunk<any, any>(
 
 export const postImportCabang = createAsyncThunk<any, any>('cabang/import', async (params, thunkAPI) => {
   try {
-    // Gunakan header multipart/form-data jika mengirim file
     const response = await api.post(`/app/cabang/import`, params)
 
-    
-  return response.data
+
+    return response.data
   } catch (e: any) {
     return thunkAPI.fulfillWithValue(e.response?.data)
   }
@@ -197,15 +196,15 @@ export const postExportCabang = createAsyncThunk<any, any>(
       // Sesuaikan endpoint export jika ada
       const response = await api.post(`/app/cabang/export`, params)
 
-      
-  return response.data
+
+      return response.data
     } catch (e: any) {
       return thunkAPI.fulfillWithValue(e.response?.data)
     }
   })
 
 /* --------------------------
-   4. Slice + Reducers
+  Slice + Reducers
 --------------------------- */
 
 export const slice = createSlice({
