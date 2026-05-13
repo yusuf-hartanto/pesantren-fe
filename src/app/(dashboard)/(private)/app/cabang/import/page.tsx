@@ -209,7 +209,7 @@ export default function ImportExcelCabangPage() {
                   <td className='px-3 py-2 max-w-[150px] truncate'>{row.payload.alamat || '-'}</td>
                   <td className='px-3 py-2'>
                     {row.valid ? (
-                      <span className='text-green-600 font-semibold'>✓ Ready</span>
+                      <span className='text-green-600 font-semibold'>✓ Valid</span>
                     ) : (
                       <span className='text-red-600 text-[10px] leading-tight block'>{row.error}</span>
                     )}
