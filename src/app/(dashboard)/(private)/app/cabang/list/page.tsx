@@ -2,6 +2,7 @@
 
 // ** React Imports
 import React, { useCallback, useEffect, useState } from 'react'
+
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -124,7 +125,9 @@ const CabangList = () => {
     const timer = setTimeout(() => {
       fetchData()
     }, 500)
-    return () => clearTimeout(timer)
+
+    
+return () => clearTimeout(timer)
   }, [fetchData])
 
   // Handle Action Success
@@ -198,6 +201,7 @@ const CabangList = () => {
       ],
       values: values.map((row: any) => ({
         ...row,
+
         // Custom display untuk Kontak & Email
         contact_display: (
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -209,6 +213,7 @@ const CabangList = () => {
             </Typography>
           </Box>
         ),
+
         // Custom display untuk Nama Kota & Provinsi
         wilayah_display: (
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -218,6 +223,7 @@ const CabangList = () => {
             </Typography>
           </Box>
         ),
+
         // Ringkasan Alamat
         alamat_summary: (
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
@@ -293,8 +299,8 @@ const CabangList = () => {
               </Tooltip>
             )}
             <Typography sx={{ flex: '1 1 auto' }} />
-            <Tooltip title='Search'>
-              <TextField id='outlined-basic' label='Search' size='small' onChange={handleFilter} />
+            <Tooltip title='Cari...'>
+              <TextField id='outlined-basic' label='Cari...' size='small' onChange={handleFilter} />
             </Tooltip>
           </Toolbar>
 

@@ -294,7 +294,6 @@ export function formColumnSingleDetailField(state, o, i) {
  * 2 column
  * */
 export function formColumnDetailField(form) {
-  console.log(form, 'FORM1')
   const { props, index = 0 } = form
 
   if (undefined === props || null === props) return
@@ -694,6 +693,7 @@ export function formColumnDetailField(form) {
     const defaultImage = `https://placehold.co/300x300?font=roboto&text=${props.placeholder}`
 
     let valueImage = ''
+
     if (base64) {
       valueImage = session.state[key] ? session.state[key] : ''
     } else {
@@ -1628,6 +1628,7 @@ const selectDateCustom = form => {
             dateFormat={props.dateFormat || 'dd/MM/yyyy'} // Format tampilan
             className='w-100'
             wrapperClassName='w-100'
+
             // Menggunakan CustomTextField agar styling MUI konsisten
             customInput={
               <CustomTextField

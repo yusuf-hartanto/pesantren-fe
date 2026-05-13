@@ -271,8 +271,8 @@ const LembagaKepesantrenanList = () => {
               </Tooltip>
             )}
             <Typography sx={{ flex: '1 1 auto' }} />
-            <Tooltip title='Search'>
-              <TextField id='outlined-basic' label='Search' size='small' onChange={handleFilter} />
+            <Tooltip title='Cari...'>
+              <TextField id='outlined-basic' label='Cari...' size='small' onChange={handleFilter} />
             </Tooltip>
           </Toolbar>
           <TableView changeSort={() => {}} model={buildTable()} />

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useCallback, useEffect, useState } from 'react'
+
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -22,9 +23,9 @@ import {
 } from '@mui/material'
 
 import { toast } from 'react-toastify'
+
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
 import { deletePegawai, fetchPegawaiPage, resetRedux } from '../slice/index'
-import { useCan } from '@/hooks/useCan'
 
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
@@ -87,7 +88,9 @@ const PegawaiList = () => {
 
   useEffect(() => {
     const timer = setTimeout(fetchData, 500)
-    return () => clearTimeout(timer)
+
+    
+return () => clearTimeout(timer)
   }, [fetchData])
 
   useEffect(() => {
@@ -104,7 +107,9 @@ const PegawaiList = () => {
 
   const buildTable = () => {
     const { dataPage } = store
-    return {
+
+    
+return {
       page: page,
       fields: [
         tableColumn('OPTION', 'act-x', 'left', renderOption as any),
