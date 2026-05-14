@@ -117,13 +117,13 @@ const TableView = ({ model, changeSort, ...res }) => {
     return (
       <div>
         {model.values?.map((row, i) => {
-          const statusField = model.fields.find(f => f.key === "status");
+          const statusField = model.fields.find(f => ["status","status_label"].includes(f.key));
           const updatedField = model.fields.find(f => f.key === "updated_at");
           const actionField = model.fields.find(f => f.key === "act-x");
           const descriptionFields = model.fields.filter(f => ["keterangan", "description"].includes(f.key.toLowerCase()));
 
           const otherFields = model.fields.filter(
-            f => !["status", "updated_at", "act-x", "keterangan", "description"].includes(f.key)
+            f => !["status", "status_label", "updated_at", "act-x", "keterangan", "description"].includes(f.key)
           );
 
           return (

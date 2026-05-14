@@ -27,6 +27,7 @@ import menuSectionStyles from '@core/styles/vertical/menuSectionStyles'
 // Menu Data Imports
 import { verticalMenuData } from '@/data/navigation/verticalMenuData'
 import type { VerticalMenuDataType } from '@/types/menuTypes'
+import NavbarFooterMobile from './NavbarFooterMobile'
 
 type RenderExpandIconProps = {
   open?: boolean
@@ -66,27 +67,45 @@ const VerticalMenu = ({  scrollMenu }: Props) => {
   }, [])
 
   return (
-    <ScrollWrapper
-      {...(isBreakpointReached
-      ? {
-          className: 'bs-full overflow-y-auto overflow-x-hidden',
-          onScroll: container => scrollMenu(container, false)
-        }
-      : {
-          options: { wheelPropagation: false, suppressScrollX: true },
-          onScrollY: container => scrollMenu(container, true)
-        })}
-    >
-      <Menu
-        popoutMenuOffset={{ mainAxis: 23 }}
-        menuItemStyles={menuItemStyles(verticalNavOptions, theme)}
-        renderExpandIcon={({ open }) => <RenderExpandIcon open={open} transitionDuration={transitionDuration} />}
-        renderExpandedMenuItemIcon={{ icon: <i className='tabler-circle text-xs' /> }}
-        menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
+    <div className='flex flex-col h-full pb-20'>
+      <ScrollWrapper
+        {...(isBreakpointReached
+          ? {
+              className: 'flex-1 overflow-y-auto overflow-x-hidden',
+              onScroll: container => scrollMenu(container, false)
+            }
+          : {
+              options: {
+                wheelPropagation: false,
+                suppressScrollX: true
+              },
+              onScrollY: container => scrollMenu(container, true)
+            })}
       >
-        <GenerateVerticalMenu menuData={menuData} />
-      </Menu>
-    </ScrollWrapper>
+        <Menu
+          popoutMenuOffset={{ mainAxis: 23 }}
+          menuItemStyles={menuItemStyles(verticalNavOptions, theme)}
+          renderExpandIcon={({ open }) => (
+            <RenderExpandIcon
+              open={open}
+              transitionDuration={transitionDuration}
+            />
+          )}
+          renderExpandedMenuItemIcon={{
+            icon: <i className='tabler-circle text-xs' />
+          }}
+          menuSectionStyles={menuSectionStyles(
+            verticalNavOptions,
+            theme
+          )}
+        >
+          <GenerateVerticalMenu menuData={menuData} />
+        </Menu>
+      </ScrollWrapper>
+
+      {/* FOOTER */}
+      {isBreakpointReached ? (<NavbarFooterMobile />) : null}
+    </div>
   )
 }
 
