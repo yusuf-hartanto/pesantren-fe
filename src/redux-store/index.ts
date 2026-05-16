@@ -38,6 +38,7 @@ import master_slot_waktu from '@/app/(dashboard)/(private)/app/master-slot-waktu
 import jadwal_inspeksi_kebersihan from '@/app/(dashboard)/(private)/app/jadwal-inspeksi-kebersihan/slice/index'
 import kebersihan_inspeksi from '@/app/(dashboard)/(private)/app/kebersihan-inspeksi/slice/index'
 import santri from '@/app/(dashboard)/(private)/app/santri/slice/index'
+import kebersihan_temuan from '@/app/(dashboard)/(private)/app/kebersihan-temuan/slice/index'
 
 export const store = configureStore({
   reducer: {
@@ -76,7 +77,8 @@ export const store = configureStore({
     master_slot_waktu,
     jadwal_inspeksi_kebersihan,
     kebersihan_inspeksi,
-    santri
+    santri,
+    kebersihan_temuan
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false })
 })
