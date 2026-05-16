@@ -219,6 +219,7 @@ const ItemForm = ({ temuanDetailsSelected, onAddTemuanDetail, onDeleteTemuanDeta
         type: 'image',
         key: 'foto_path',
         label: 'Foto',
+        urlImage: '',
         placeholder: 'Upload foto',
         required: false
       },

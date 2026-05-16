@@ -20,6 +20,8 @@ export default function QRScanner({ result, active }) {
   }, [active])
 
   const startScanner = async () => {
+    if (qrRef.current) return
+
     const html5QrCode = new Html5Qrcode('reader')
 
     qrRef.current = html5QrCode

@@ -50,9 +50,7 @@ const initialState: InitialState = {
    3. Async Thunks (typed)
 --------------------------- */
 
-export interface FetchParamAlls {
-  is_active: string
-}
+export interface FetchParamAlls {}
 
 export const fetchKebersihanInspeksiAll = createAsyncThunk<any, FetchParamAlls>(
   'kebersihan-inspeksi/fetchAll',
