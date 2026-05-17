@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 import Paper from '@mui/material/Paper'
 import BottomNavigation from '@mui/material/BottomNavigation'
@@ -25,6 +25,7 @@ import { useAppDispatch } from '@/redux-store/hook'
 
 export default function MobileBottomNav() {
   const pathname = usePathname()
+  const router = useRouter()
   const theme = useTheme()
   const dispatch = useAppDispatch()
   const isBelowMdScreen = useMediaQuery(theme.breakpoints.down('md'))
@@ -67,7 +68,16 @@ export default function MobileBottomNav() {
         locationQrCodeKebersihanInspeksi({
           qr_code: data
         })
-      )
+      ).then(res => {
+        const result = { ...res?.payload }
+
+        if (result?.status) {
+          handleCloseScanner()
+          router.replace(`/app/kebersihan-inspeksi/form?qrcode=${data}`)
+        } else {
+          toast.error('QR Code tidak dikenali')
+        }
+      })
       handleBackCategory()
     }
 
@@ -105,8 +115,7 @@ export default function MobileBottomNav() {
             color: theme.palette.primary.main,
             border: `1px solid ${theme.palette.background.default}`,
             '&:hover': {
-              backgroundColor:
-                theme.palette.background.paper
+              backgroundColor: theme.palette.background.paper
             }
           }}
         >
@@ -158,19 +167,11 @@ export default function MobileBottomNav() {
             onClick={handleCloseSidebar}
           />
 
-          <BottomNavigationAction
-            label='Profile'
-            icon={<i className='tabler-user' />}
-            onClick={handleClick}
-          />
+          <BottomNavigationAction label='Profile' icon={<i className='tabler-user' />} onClick={handleClick} />
         </BottomNavigation>
       </Box>
       {showQrScanner && (
-        <Dialog
-          open={showQrScanner}
-          onClose={handleCloseScanner}
-          fullScreen
-        >
+        <Dialog open={showQrScanner} onClose={handleCloseScanner} fullScreen>
           <Box
             sx={{
               display: 'flex',
@@ -188,11 +189,7 @@ export default function MobileBottomNav() {
                 </IconButton>
               )}
 
-              <Typography variant='h6'>
-                {scannerType
-                  ? `Scan ${scannerType}`
-                  : 'Pilih Scanner'}
-              </Typography>
+              <Typography variant='h6'>{scannerType ? `Scan ${scannerType}` : 'Pilih Scanner'}</Typography>
             </Box>
 
             <IconButton onClick={handleCloseScanner}>
@@ -229,14 +226,9 @@ export default function MobileBottomNav() {
                   >
                     <i className='tabler-vacuum-cleaner text-4xl mb-2' />
 
-                    <Typography variant='h6'>
-                      Inspeksi
-                    </Typography>
+                    <Typography variant='h6'>Inspeksi</Typography>
 
-                    <Typography
-                      variant='body2'
-                      color='text.secondary'
-                    >
+                    <Typography variant='body2' color='text.secondary'>
                       Scan QR inspeksi
                     </Typography>
                   </Paper>
@@ -260,29 +252,22 @@ export default function MobileBottomNav() {
                   >
                     <i className='tabler-qrcode text-4xl mb-2' />
 
-                    <Typography variant='h6'>
-                      Presensi
-                    </Typography>
+                    <Typography variant='h6'>Presensi</Typography>
 
-                    <Typography
-                      variant='body2'
-                      color='text.secondary'
-                    >
+                    <Typography variant='body2' color='text.secondary'>
                       Scan QR presensi
                     </Typography>
                   </Paper>
                 </Grid>
               </Grid>
             ) : (
-              <QRScanner
-                result={handleScan}
-                active={showQrScanner}
-              />
+              <QRScanner result={handleScan} active={showQrScanner} />
             )}
           </DialogContent>
         </Dialog>
       )}
     </Paper>
-  ) : ''
+  ) : (
+    ''
+  )
 }
-

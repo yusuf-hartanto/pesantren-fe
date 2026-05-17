@@ -104,6 +104,7 @@ const FormValidationBasic = () => {
   const searchParams = useSearchParams()
   const id = searchParams.get('id')
   const view = searchParams.get('view')
+  const qrcode = searchParams.get('qrcode')
 
   const dispatch = useAppDispatch()
   const store = useAppSelector(state => state.kebersihan_inspeksi)
@@ -254,7 +255,12 @@ const FormValidationBasic = () => {
         }
       })
     } else {
-      setShowOption(true)
+      if (qrcode) {
+        setShowOption(false)
+        handleScan(qrcode)
+      } else {
+        setShowOption(true)
+      }
     }
   }, [dispatch, id, reset])
 
@@ -652,7 +658,7 @@ const FormValidationBasic = () => {
                 {foundLocationQrCode && (
                   <h4 className='mb-3 mt-3'>
                     Lokasi :{' '}
-                    {store.location_qrcode?.data?.parent ? `${store.location_qrcode?.data?.parent.nama_lokasi} /` : ''}
+                    {store.location_qrcode?.data?.parent ? `${store.location_qrcode?.data?.parent.nama_lokasi} / ` : ''}
                     {store.location_qrcode?.data?.nama_lokasi}
                   </h4>
                 )}
