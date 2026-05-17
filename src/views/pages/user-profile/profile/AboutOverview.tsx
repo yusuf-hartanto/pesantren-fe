@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 
 // Type Imports
-import type { ProfileTeamsType, ProfileCommonType, ProfileTabType } from '@/types/pages/profileTypes'
+import type { ProfileCommonType, ProfileTabType } from '@/types/pages/profileTypes'
 
 const renderList = (list: ProfileCommonType[]) => {
   return (
@@ -18,24 +18,8 @@ const renderList = (list: ProfileCommonType[]) => {
             <Typography className='font-medium'>
               {`${item.property.charAt(0).toUpperCase() + item.property.slice(1)}:`}
             </Typography>
-            <Typography> {item.value.charAt(0).toUpperCase() + item.value.slice(1)}</Typography>
+            <Typography> {item.value && item.value != '-' ? item.value.charAt(0).toUpperCase() + item.value.slice(1) : item.value}</Typography>
           </div>
-        </div>
-      )
-    })
-  )
-}
-
-const renderTeams = (teams: ProfileTeamsType[]) => {
-  return (
-    teams.length > 0 &&
-    teams.map((item, index) => {
-      return (
-        <div key={index} className='flex items-center flex-wrap gap-2'>
-          <Typography className='font-medium'>
-            {item.property.charAt(0).toUpperCase() + item.property.slice(1)}
-          </Typography>
-          <Typography>{item.value.charAt(0).toUpperCase() + item.value.slice(1)}</Typography>
         </div>
       )
     })
@@ -59,24 +43,6 @@ const AboutOverview = ({ data }: { data?: ProfileTabType }) => {
                 Contacts
               </Typography>
               {data?.contacts && renderList(data?.contacts)}
-            </div>
-            <div className='flex flex-col gap-4'>
-              <Typography className='uppercase' variant='body2' color='text.disabled'>
-                Teams
-              </Typography>
-              {data?.teams && renderTeams(data?.teams)}
-            </div>
-          </CardContent>
-        </Card>
-      </Grid>
-      <Grid size={{ xs: 12 }}>
-        <Card>
-          <CardContent className='flex flex-col gap-6'>
-            <div className='flex flex-col gap-4'>
-              <Typography className='uppercase' variant='body2' color='text.disabled'>
-                Overview
-              </Typography>
-              {data?.overview && renderList(data?.overview)}
             </div>
           </CardContent>
         </Card>

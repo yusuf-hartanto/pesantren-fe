@@ -12,6 +12,8 @@ import ListItemIcon from '@mui/material/ListItemIcon'
 
 import { signOut, useSession } from 'next-auth/react'
 
+import { ListItemText } from '@mui/material';
+
 import { useSettings } from '@core/hooks/useSettings'
 
 import useVerticalNav from '../../../@menu/hooks/useVerticalNav'
@@ -19,7 +21,7 @@ import useVerticalNav from '../../../@menu/hooks/useVerticalNav'
 export default function NavbarFooterMobile() {
   const { data: session } = useSession()
   const { updateSettings } = useSettings()
-  const { toggleVerticalNav } = useVerticalNav()
+  const { isToggled, toggleVerticalNav } = useVerticalNav()
 
   const handleUserLogout = async () => {
     try {
@@ -31,8 +33,10 @@ export default function NavbarFooterMobile() {
     }
   }
 
-  const handleClick = () => {
-    toggleVerticalNav()
+  const handleCloseSidebar = () => {
+    if (isToggled) {
+      toggleVerticalNav()
+    }
   }
 
   return (
@@ -44,7 +48,6 @@ export default function NavbarFooterMobile() {
         backgroundColor: 'background.paper'
       }}
     >
-      {/* USER */}
       <Box
         sx={{
           display: 'flex',
@@ -53,26 +56,33 @@ export default function NavbarFooterMobile() {
           mb: 2
         }}
       >
-        <Link
-          href='/pages/user-profile'
-          className='no-underline text-inherit rounded-lg p-1 hover:bg-actionHover transition-colors'
-          onClick={handleClick}
-        >
-          <div className='flex items-center pl-2 gap-2' tabIndex={-1}>
-            <Avatar alt={session?.userdata?.full_name || ''} src={session?.userdata?.image || ''} />
-            <div className='flex items-start flex-col'>
-              <Typography className='font-medium' color='text.primary'>
-                {session?.userdata?.full_name || ''}
-              </Typography>
-              <Typography variant='caption'>{session?.userdata?.email || ''}</Typography>
-            </div>
+        <div className='flex items-center pl-2 gap-2' tabIndex={-1}>
+          <Avatar alt={session?.userdata?.full_name || ''} src={session?.userdata?.image || ''} />
+          <div className='flex items-start flex-col'>
+            <Typography className='font-medium' color='text.primary'>
+              {session?.userdata?.full_name || ''}
+            </Typography>
+            <Typography variant='caption'>{session?.userdata?.email || ''}</Typography>
           </div>
-        </Link>
+        </div>
       </Box>
 
-      {/* MENU */}
       <List dense>
-        <ListItem sx={{ paddingLeft: 0 }}>
+        <ListItem disablePadding sx={{ marginBottom: 3 }}>
+          <ListItemButton
+            component={Link}
+            href='/pages/user-profile'
+            onClick={handleCloseSidebar}
+          >
+            <ListItemIcon>
+              <i className='tabler-user' />
+            </ListItemIcon>
+
+            <ListItemText primary='Profile' />
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem disablePadding>
           <ListItemButton
             onClick={handleUserLogout}
             sx={{
@@ -86,7 +96,8 @@ export default function NavbarFooterMobile() {
             >
               <i className='tabler-logout' />
             </ListItemIcon>
-              <span>Logout</span>
+
+            <ListItemText primary='Logout' />
           </ListItemButton>
         </ListItem>
       </List>

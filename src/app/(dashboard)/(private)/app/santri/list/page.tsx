@@ -138,7 +138,7 @@ function RowAction({row, onView}: {row: any, onView: (row: any) => void}) {
   )
 }
 
-const Table = () => {
+const TableSantri = () => {
   // ** Hooks
   const router = useRouter()
   const dispatch = useAppDispatch()
@@ -830,4 +830,4 @@ const Table = () => {
   )
 }
 
-export default Table
+export default TableSantri

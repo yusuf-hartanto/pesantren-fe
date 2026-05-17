@@ -41,6 +41,7 @@ export const authOptions: NextAuthOptions = {
             access_token: data.access_token,
             refresh_token: data.refresh_token,
             userdata: {
+              username: data.userdata.username,
               full_name: data.userdata.full_name,
               email: data.userdata.email,
               role_name: data.userdata.role.role_name,
