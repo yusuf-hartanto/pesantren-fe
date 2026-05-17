@@ -67,6 +67,7 @@ export default function QRScanner({ result, active }) {
     if (qrRef.current && active) {
       await qrRef.current.stop()
       await qrRef.current.clear()
+      qrRef.current = null
     }
   }
 

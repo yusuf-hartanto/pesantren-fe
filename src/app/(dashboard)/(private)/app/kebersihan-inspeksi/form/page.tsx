@@ -19,6 +19,8 @@ import { useForm } from 'react-hook-form'
 // ** Styled Component
 import { formatDate } from 'date-fns/format'
 
+import { Button } from '@mui/material'
+
 import DatePickerWrapper from '@core/styles/libs/react-datepicker'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
@@ -167,8 +169,11 @@ const FormValidationBasic = () => {
   const [loading, setLoading] = useState(false)
   const [item, setItem] = useState<FormItemData>({ values: [], element_total: 0 })
   const [showQrScanner, setShowQrScanner] = useState(false)
+  const [errorQrScanner, setErrorQrScanner] = useState(false)
+  const [foundLocationQrCode, setFoundLocationQrCode] = useState(false)
   const [showGps, setShowGps] = useState(false)
   const [showForm, setShowForm] = useState(false)
+  const [showOption, setShowOption] = useState(false)
   const qrCode = useRef(null)
 
   const {
@@ -183,6 +188,16 @@ const FormValidationBasic = () => {
     dispatch(resetRedux())
     router.replace('/app/kebersihan-inspeksi/list')
   }, [dispatch, router])
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetRedux())
+      setShowQrScanner(false)
+      setErrorQrScanner(false)
+      setShowOption(false)
+      setFoundLocationQrCode(false)
+    }
+  }, [dispatch])
 
   useEffect(() => {
     dispatch(fetchPegawaiAll({}))
@@ -238,17 +253,15 @@ const FormValidationBasic = () => {
           reset(datas)
         }
       })
-    }
-
-    return () => {
-      setShowQrScanner(false)
+    } else {
+      setShowOption(true)
     }
   }, [dispatch, id, reset])
 
   useEffect(() => {
     if (store.location_qrcode) {
       if (store.location_qrcode.data) {
-        setShowForm(true)
+        setFoundLocationQrCode(true)
         setShowQrScanner(false)
         setValue('id_lokasi', {
           value: store.location_qrcode.data.id_lokasi,
@@ -264,7 +277,9 @@ const FormValidationBasic = () => {
           }
         })
       } else {
-        toast.error('Error : ' + store.location_qrcode.message)
+        qrCode.current = null
+        setShowQrScanner(false)
+        setErrorQrScanner(true)
       }
     }
 
@@ -370,7 +385,7 @@ const FormValidationBasic = () => {
             }
           })
         },
-        readOnly: Boolean(view)
+        readOnly: Boolean(view) || foundLocationQrCode
       }),
       field({
         type: 'select',
@@ -502,12 +517,18 @@ const FormValidationBasic = () => {
     })
   }
 
+  const handleBack = () => {
+    setShowOption(true)
+    setShowQrScanner(false)
+    setShowGps(false)
+  }
+
   return (
     <DatePickerWrapper>
-      <Card sx={{ minHeight: 300 }}>
+      <Card>
         {showForm && <CardHeader title='Form Kebersihan Inspeksi' />}
         <CardContent>
-          {!showForm && (
+          {!showForm && showOption && (
             <Grid container spacing={6} sx={{ marginBottom: 5 }}>
               <Grid size={{ xs: 12, sm: 4 }}>
                 <FormControl fullWidth size='small'>
@@ -525,6 +546,7 @@ const FormValidationBasic = () => {
                         onClick: (e: any) => {
                           setShowGps(false)
                           setShowQrScanner(true)
+                          setShowOption(false)
                         }
                       }
                     })
@@ -547,6 +569,7 @@ const FormValidationBasic = () => {
                         onClick: (e: any) => {
                           setShowQrScanner(false)
                           setShowGps(true)
+                          setShowOption(false)
                         }
                       }
                     })
@@ -602,8 +625,50 @@ const FormValidationBasic = () => {
             </form>
           ) : (
             <Grid>
-              <Grid size={12}>
+              <Grid size={12} sx={{ textAlign: 'center' }}>
+                {showQrScanner && <h4 className='mb-3'>Arahkan Camera ke QR Code Lokasi</h4>}
                 <QRScanner result={handleScan} active={showQrScanner} />
+                {showQrScanner && (
+                  <Button size='small' variant='outlined' color='primary' className='mt-3' onClick={handleBack}>
+                    Kembali
+                  </Button>
+                )}
+                {errorQrScanner && <h4 className='mb-3 mt-3'>QR Code tidak terdaftar</h4>}
+                {errorQrScanner && (
+                  <Button
+                    size='small'
+                    variant='outlined'
+                    color='primary'
+                    className='mt-3'
+                    onClick={() => {
+                      setErrorQrScanner(false)
+                      setShowQrScanner(true)
+                    }}
+                  >
+                    Ulangi Scan
+                  </Button>
+                )}
+                {foundLocationQrCode && <h4 className='mb-3 mt-3'>QR Code dikenali</h4>}
+                {foundLocationQrCode && (
+                  <h4 className='mb-3 mt-3'>
+                    Lokasi :{' '}
+                    {store.location_qrcode?.data?.parent ? `${store.location_qrcode?.data?.parent.nama_lokasi} /` : ''}
+                    {store.location_qrcode?.data?.nama_lokasi}
+                  </h4>
+                )}
+                {foundLocationQrCode && (
+                  <Button
+                    size='small'
+                    variant='outlined'
+                    color='primary'
+                    className='mt-3'
+                    onClick={() => {
+                      setShowForm(true)
+                    }}
+                  >
+                    Lanjut Inspeksi
+                  </Button>
+                )}
               </Grid>
               <Grid size={12}>
                 <DetectLocation
@@ -611,6 +676,7 @@ const FormValidationBasic = () => {
                   active={showGps}
                   locations={store.location_latlong}
                   selected={handleSelectLocation}
+                  back={handleBack}
                 />
               </Grid>
             </Grid>
