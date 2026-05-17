@@ -1,7 +1,7 @@
 'use client'
 
 // ** React Imports
-import React, { useCallback, useEffect, useState, useRef } from 'react'
+import React, { useCallback, useEffect, useState, useRef, Fragment } from 'react'
 
 import { useSearchParams, useRouter } from 'next/navigation'
 
@@ -172,9 +172,11 @@ const FormValidationBasic = () => {
   const [showQrScanner, setShowQrScanner] = useState(false)
   const [errorQrScanner, setErrorQrScanner] = useState(false)
   const [foundLocationQrCode, setFoundLocationQrCode] = useState(false)
+  const [foundLocation, setFoundLocation] = useState(false)
   const [showGps, setShowGps] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [showOption, setShowOption] = useState(false)
+  const [showManual, setShowManual] = useState(false)
   const qrCode = useRef(null)
 
   const {
@@ -197,6 +199,8 @@ const FormValidationBasic = () => {
       setErrorQrScanner(false)
       setShowOption(false)
       setFoundLocationQrCode(false)
+      setFoundLocation(false)
+      setShowManual(false)
     }
   }, [dispatch])
 
@@ -271,14 +275,14 @@ const FormValidationBasic = () => {
         setShowQrScanner(false)
         setValue('id_lokasi', {
           value: store.location_qrcode.data.id_lokasi,
-          label: store.location_qrcode.data.nama_lokasi
+          label: `${store.location_qrcode.data.parent ? `${store.location_qrcode.data.parent.nama_lokasi} / ` : ''}${store.location_qrcode.data.nama_lokasi}`
         })
         setState(prevState => {
           return {
             ...prevState,
             id_lokasi: {
               value: store.location_qrcode.data.id_lokasi,
-              label: store.location_qrcode.data.nama_lokasi
+              label: `${store.location_qrcode.data.parent ? `${store.location_qrcode.data.parent.nama_lokasi} / ` : ''}${store.location_qrcode.data.nama_lokasi}`
             }
           }
         })
@@ -386,12 +390,12 @@ const FormValidationBasic = () => {
         options: {
           values: storeLokasi.datas.map(r => {
             return {
-              label: r.nama_lokasi,
+              label: `${r.parent ? `${r.parent.nama_lokasi} / ` : ''}${r.nama_lokasi}`,
               value: r.id_lokasi
             }
           })
         },
-        readOnly: Boolean(view) || foundLocationQrCode
+        readOnly: Boolean(view) || foundLocationQrCode || foundLocation
       }),
       field({
         type: 'select',
@@ -512,6 +516,7 @@ const FormValidationBasic = () => {
   }
 
   const handleSelectLocation = (data: any) => {
+    setFoundLocation(true)
     setShowForm(true)
     setShowGps(false)
     setValue('id_lokasi', data)
@@ -527,6 +532,7 @@ const FormValidationBasic = () => {
     setShowOption(true)
     setShowQrScanner(false)
     setShowGps(false)
+    setShowManual(false)
   }
 
   return (
@@ -598,7 +604,8 @@ const FormValidationBasic = () => {
                         onClick: (e: any) => {
                           setShowGps(false)
                           setShowQrScanner(false)
-                          setShowForm(true)
+                          setShowOption(false)
+                          setShowManual(true)
                         }
                       }
                     })
@@ -630,50 +637,56 @@ const FormValidationBasic = () => {
               })}
             </form>
           ) : (
-            <Grid>
+            <Grid container spacing={0}>
               <Grid size={12} sx={{ textAlign: 'center' }}>
-                {showQrScanner && <h4 className='mb-3'>Arahkan Camera ke QR Code Lokasi</h4>}
-                <QRScanner result={handleScan} active={showQrScanner} />
                 {showQrScanner && (
-                  <Button size='small' variant='outlined' color='primary' className='mt-3' onClick={handleBack}>
-                    Kembali
-                  </Button>
+                  <Fragment>
+                    <h4 className='mb-3'>Arahkan Camera ke QR Code Lokasi</h4>
+                    <QRScanner result={handleScan} active={showQrScanner} />
+                    <Button size='small' variant='outlined' color='primary' className='mt-3' onClick={handleBack}>
+                      Kembali
+                    </Button>
+                  </Fragment>
                 )}
-                {errorQrScanner && <h4 className='mb-3 mt-3'>QR Code tidak terdaftar</h4>}
                 {errorQrScanner && (
-                  <Button
-                    size='small'
-                    variant='outlined'
-                    color='primary'
-                    className='mt-3'
-                    onClick={() => {
-                      setErrorQrScanner(false)
-                      setShowQrScanner(true)
-                    }}
-                  >
-                    Ulangi Scan
-                  </Button>
-                )}
-                {foundLocationQrCode && <h4 className='mb-3 mt-3'>QR Code dikenali</h4>}
-                {foundLocationQrCode && (
-                  <h4 className='mb-3 mt-3'>
-                    Lokasi :{' '}
-                    {store.location_qrcode?.data?.parent ? `${store.location_qrcode?.data?.parent.nama_lokasi} / ` : ''}
-                    {store.location_qrcode?.data?.nama_lokasi}
-                  </h4>
+                  <Fragment>
+                    <h4 className='mb-3 mt-3'>QR Code tidak terdaftar</h4>
+                    <Button
+                      size='small'
+                      variant='outlined'
+                      color='primary'
+                      className='mt-3'
+                      onClick={() => {
+                        setErrorQrScanner(false)
+                        setShowQrScanner(true)
+                      }}
+                    >
+                      Ulangi Scan
+                    </Button>
+                  </Fragment>
                 )}
                 {foundLocationQrCode && (
-                  <Button
-                    size='small'
-                    variant='outlined'
-                    color='primary'
-                    className='mt-3'
-                    onClick={() => {
-                      setShowForm(true)
-                    }}
-                  >
-                    Lanjut Inspeksi
-                  </Button>
+                  <Fragment>
+                    <h4 className='mb-3 mt-3'>QR Code dikenali</h4>
+                    <h4 className='mb-3 mt-3'>
+                      Lokasi :{' '}
+                      {store.location_qrcode?.data?.parent
+                        ? `${store.location_qrcode?.data?.parent.nama_lokasi} / `
+                        : ''}
+                      {store.location_qrcode?.data?.nama_lokasi}
+                    </h4>
+                    <Button
+                      size='small'
+                      variant='outlined'
+                      color='primary'
+                      className='mt-3'
+                      onClick={() => {
+                        setShowForm(true)
+                      }}
+                    >
+                      Lanjut Inspeksi
+                    </Button>
+                  </Fragment>
                 )}
               </Grid>
               <Grid size={12}>
@@ -684,6 +697,54 @@ const FormValidationBasic = () => {
                   selected={handleSelectLocation}
                   back={handleBack}
                 />
+                {showManual && (
+                  <Fragment>
+                    <FormControl fullWidth size='small'>
+                      {formSingleColumn({
+                        control: control,
+                        errors: errors,
+                        state: state,
+                        setState: setState,
+                        field: field({
+                          type: 'select',
+                          key: 'id_lokasi',
+                          label: 'Lokasi',
+                          placeholder: 'Input Lokasi',
+                          required: true,
+                          options: {
+                            values: storeLokasi.datas.map(r => {
+                              return {
+                                label: `${r.parent ? `${r.parent.nama_lokasi} / ` : ''}${r.nama_lokasi}`,
+                                value: r.id_lokasi
+                              }
+                            })
+                          }
+                        })
+                      })}
+                    </FormControl>
+                    <div className='flex justify-between'>
+                      <Button
+                        size='small'
+                        variant='outlined'
+                        color='primary'
+                        className='mt-3'
+                        onClick={() => {
+                          if (state.id_lokasi?.value) {
+                            setShowForm(true)
+                            setFoundLocation(true)
+                          } else {
+                            toast.error('Pilih Lokasi terlebih dahulu')
+                          }
+                        }}
+                      >
+                        Lanjut Inspeksi
+                      </Button>
+                      <Button size='small' variant='outlined' color='primary' className='mt-3' onClick={handleBack}>
+                        Kembali
+                      </Button>
+                    </div>
+                  </Fragment>
+                )}
               </Grid>
             </Grid>
           )}

@@ -1396,6 +1396,7 @@ const selectField = form => {
             )}
             renderOption={(props, option) => (
               <Box
+                key={option.value}
                 component='li'
                 {...props}
                 sx={{
@@ -1628,7 +1629,6 @@ const selectDateCustom = form => {
             dateFormat={props.dateFormat || 'dd/MM/yyyy'} // Format tampilan
             className='w-100'
             wrapperClassName='w-100'
-
             // Menggunakan CustomTextField agar styling MUI konsisten
             customInput={
               <CustomTextField
