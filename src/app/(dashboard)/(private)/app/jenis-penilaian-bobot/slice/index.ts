@@ -45,8 +45,8 @@ export const fetchBobotPenilaianPage = createAsyncThunk('bobotPenilaian/fetchPag
   try {
     const response = await api.get(BASE_URL, { params })
 
-    
-return response.data
+
+    return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
@@ -55,8 +55,8 @@ export const fetchBobotPenilaianList = createAsyncThunk('bobotPenilaian/fetchLis
   try {
     const response = await api.get(`${BASE_URL}/list`, { params })
 
-    
-return response.data
+
+    return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
@@ -65,8 +65,8 @@ export const fetchBobotPenilaianById = createAsyncThunk('bobotPenilaian/fetchByI
   try {
     const response = await api.get(`${BASE_URL}/${id}`)
 
-    
-return response.data
+
+    return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
@@ -75,8 +75,8 @@ export const postBobotPenilaian = createAsyncThunk('bobotPenilaian/post', async 
   try {
     const response = await api.post(BASE_URL, params)
 
-    
-return response.data
+
+    return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
@@ -85,8 +85,8 @@ export const postBobotPenilaianUpdate = createAsyncThunk('bobotPenilaian/update'
   try {
     const response = await api.put(`${BASE_URL}/${id}`, params)
 
-    
-return response.data
+
+    return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
@@ -95,8 +95,8 @@ export const deleteBobotPenilaian = createAsyncThunk('bobotPenilaian/delete', as
   try {
     const response = await api.delete(`${BASE_URL}/${id}`)
 
-    
-return response.data
+
+    return response.data
   } catch (e: any) { return thunkAPI.rejectWithValue(e.response?.data) }
 })
 
@@ -105,7 +105,7 @@ export const postBatch = createAsyncThunk<any, any>(
   async (params, thunkAPI) => {
 
     try {
-      const response = await api.post(`${BASE_URL}/batch`, params)
+      const response = await api.post(`${BASE_URL}/insert`, params)
 
       return response.data
     } catch (e: any) {

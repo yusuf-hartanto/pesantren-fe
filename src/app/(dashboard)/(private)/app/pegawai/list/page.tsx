@@ -19,17 +19,19 @@ import {
   MenuItem,
   Box,
   Chip,
-  Avatar
+  Avatar,
+  Tooltip
 } from '@mui/material'
 
 import { toast } from 'react-toastify'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import { deletePegawai, fetchPegawaiPage, resetRedux } from '../slice/index'
+import { deletePegawai, fetchPegawaiPage, postExport, resetRedux } from '../slice/index'
 
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
 import DialogDelete from '@views/onevour/components/dialog-delete'
+import { useCan } from '@/hooks/useCan'
 
 const RowAction = ({ row, onDeleteSuccess }: { row: any; onDeleteSuccess: (id: string) => void }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -40,7 +42,7 @@ const RowAction = ({ row, onDeleteSuccess }: { row: any; onDeleteSuccess: (id: s
 
   return (
     <TableCell size='small' sx={{ borderBottom: 0 }}>
-      <IconButton size='small' onClick={(e) => setAnchorEl(e.currentTarget)}>
+      <IconButton size='small' onClick={e => setAnchorEl(e.currentTarget)}>
         <i className='tabler-dots-vertical' />
       </IconButton>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
@@ -78,9 +80,15 @@ const PegawaiList = () => {
   const dispatch = useAppDispatch()
   const store = useAppSelector(state => state.pegawai)
 
+  // Permission Hooks
+  const canCreate = useCan('create')
+  const canImport = useCan('import')
+  const canExport = useCan('export')
+
   const [filter, setFilter] = useState('')
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
+  const [loadingExport, setLoadingExport] = useState(false)
 
   const fetchData = useCallback(() => {
     dispatch(fetchPegawaiPage({ page, perPage, keyword: filter }))
@@ -89,8 +97,7 @@ const PegawaiList = () => {
   useEffect(() => {
     const timer = setTimeout(fetchData, 500)
 
-    
-return () => clearTimeout(timer)
+    return () => clearTimeout(timer)
   }, [fetchData])
 
   useEffect(() => {
@@ -101,45 +108,124 @@ return () => clearTimeout(timer)
     }
   }, [store.delete, dispatch, fetchData])
 
+  const onAddForm = () => {
+    router.replace('/app/pegawai/form')
+  }
+
+  const onImport = () => {
+    router.replace('/app/pegawai/import')
+  }
+
+  const onExport = async () => {
+    try {
+      setLoadingExport(true)
+      const res = await dispatch(postExport({ q: filter })).unwrap()
+
+      if (res?.status && res?.data) {
+        const url = `${process.env.NEXT_PUBLIC_API_URL}${res.data}`
+        const link = document.createElement('a')
+
+        link.href = url
+        link.download = ''
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+    } catch {
+      toast.error('Gagal export data')
+    } finally {
+      setLoadingExport(false)
+    }
+  }
+
+  const handleFilter = (event: any) => {
+    setFilter(event.target.value)
+  }
+
   const renderOption = (row: any) => {
-    return <RowAction row={row} onDeleteSuccess={(id) => dispatch(deletePegawai(id))} />
+    return <RowAction row={row} onDeleteSuccess={id => dispatch(deletePegawai(id))} />
   }
 
   const buildTable = () => {
     const { dataPage } = store
 
-    
-return {
+    return {
       page: page,
       fields: [
         tableColumn('OPTION', 'act-x', 'left', renderOption as any),
         tableColumn('PEGAWAI', 'nama_display'),
         tableColumn('KONTAK', 'kontak_display'),
         tableColumn('PENEMPATAN', 'posisi_display'),
-        tableColumn('STATUS', 'status_display'),
+        tableColumn('STATUS', 'status_display')
       ],
       values: (dataPage?.values || []).map((row: any) => ({
         ...row,
         nama_display: (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
             <Avatar src={row.foto} sx={{ width: 38, height: 38 }} />
-            <Box>
-              <Typography variant='body2' sx={{ fontWeight: 600, color: 'text.primary' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 0.3
+              }}
+            >
+              <Typography
+                variant='body2'
+                sx={{
+                  fontWeight: 700,
+                  color: 'text.primary',
+                  lineHeight: 1.2
+                }}
+              >
                 {row.nama_lengkap}
               </Typography>
-              <Typography variant='caption'>{row.nip || row.nik}</Typography>
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                <Typography
+                  variant='caption'
+                  sx={{
+                    px: 1,
+                    py: 0.2,
+                    borderRadius: 1,
+                    bgcolor: 'grey.100',
+                    color: 'text.secondary',
+                    fontWeight: 500
+                  }}
+                >
+                  NIK: {row.nik || '-'}
+                </Typography>
+
+                <Typography
+                  variant='caption'
+                  sx={{
+                    px: 1,
+                    py: 0.2,
+                    borderRadius: 1,
+                    bgcolor: 'primary.lighter',
+                    color: 'primary.main',
+                    fontWeight: 500
+                  }}
+                >
+                  NIP: {row.nip || '-'}
+                </Typography>
+              </Box>
             </Box>
           </Box>
         ),
         kontak_display: (
           <Box>
             <Typography variant='body2'>{row.email || '-'}</Typography>
-            <Typography variant='caption' color='text.disabled'>{row.no_hp || '-'}</Typography>
+            <Typography variant='caption' color='text.disabled'>
+              {row.no_hp || '-'}
+            </Typography>
           </Box>
         ),
         posisi_display: (
           <Box>
-            <Typography variant='body2' sx={{ fontWeight: 500 }}>{row.jabatan?.nama_jabatan || '-'}</Typography>
+            <Typography variant='body2' sx={{ fontWeight: 500 }}>
+              {row.jabatan?.nama_jabatan || '-'}
+            </Typography>
             <Typography variant='caption'>{row.organizationUnit?.nama_orgunit || '-'}</Typography>
           </Box>
         ),
@@ -166,15 +252,65 @@ return {
     <Grid container spacing={6}>
       <Grid size={12}>
         <Card>
-          <CardHeader title='Master Data Pegawai' subheader='Manajemen SDM dan struktur organisasi' />
-          <Toolbar sx={{ gap: 2, mb: 4, px: '1.5rem !important' }}>
-            <Button variant='contained' startIcon={<i className='tabler-plus' />} onClick={() => router.push('/app/pegawai/form')}>
-              Tambah Pegawai
-            </Button>
+          <CardHeader title='Data Pegawai' sx={{ paddingBottom: 0 }} />
+          <Toolbar
+            sx={{
+              px: '1.5rem !important',
+              minHeight: 'auto',
+              gap: 2,
+              flexWrap: 'wrap',
+              mb: '10px'
+            }}
+          >
+            {canCreate && (
+              <Tooltip title='Tambah'>
+                <Button
+                  size='small'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onAddForm}
+                  startIcon={<i className='tabler-plus' />}
+                >
+                  Tambah
+                </Button>
+              </Tooltip>
+            )}
+
+            {canImport && (
+              <Tooltip title='Import CSV'>
+                <Button
+                  size='small'
+                  color='success'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onImport}
+                  startIcon={<i className='tabler-file-import' />}
+                >
+                  Import CSV
+                </Button>
+              </Tooltip>
+            )}
+
+            {canExport && (
+              <Tooltip title='Export CSV'>
+                <Button
+                  size='small'
+                  color='warning'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onExport}
+                  startIcon={<i className='tabler-file-export' />}
+                >
+                  {loadingExport ? 'Proses...' : 'Export CSV'}
+                </Button>
+              </Tooltip>
+            )}
             <Typography sx={{ flex: '1 1 auto' }} />
-            <TextField size='small' placeholder='Cari NIP, Nama, atau Unit...' onChange={(e) => { setFilter(e.target.value); setPage(1); }} />
+            <Tooltip title='Cari...'>
+              <TextField id='outlined-basic' label='Cari...' size='small' onChange={handleFilter} />
+            </Tooltip>
           </Toolbar>
-          <TableView changeSort={() => { }} model={buildTable()} />
+          <TableView changeSort={() => {}} model={buildTable()} />
         </Card>
       </Grid>
     </Grid>

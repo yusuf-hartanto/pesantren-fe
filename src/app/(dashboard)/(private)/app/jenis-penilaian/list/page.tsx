@@ -17,27 +17,29 @@ import {
   Menu,
   MenuItem,
   Box,
-  Chip
+  Chip,
+  Tooltip
 } from '@mui/material'
 
 import { toast } from 'react-toastify'
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import { deleteJenisPenilaian, fetchJenisPenilaianPage, resetRedux } from '../slice/index'
+import { deleteJenisPenilaian, fetchJenisPenilaianPage, postExport, resetRedux } from '../slice/index'
 
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
 import DialogDelete from '@views/onevour/components/dialog-delete'
+import { useCan } from '@/hooks/useCan'
 
 const RowAction = ({ row, onDeleteSuccess }: { row: any; onDeleteSuccess: (id: string) => void }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [openConfirm, setOpenConfirm] = useState(false)
 
-  const canEdit = true
-  const canDelete = true
+  const canEdit = useCan('edit')
+  const canDelete = useCan('delete')
 
   return (
     <TableCell size='small' sx={{ borderBottom: 0 }}>
-      <IconButton size='small' onClick={(e) => setAnchorEl(e.currentTarget)}>
+      <IconButton size='small' onClick={e => setAnchorEl(e.currentTarget)}>
         <i className='tabler-dots-vertical' />
       </IconButton>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
@@ -75,9 +77,15 @@ const JenisPenilaianList = () => {
   const dispatch = useAppDispatch()
   const store = useAppSelector(state => state.jenis_penilaian) // Pastikan nama state sesuai di store
 
+  // Permission Hooks
+  const canCreate = useCan('create')
+  const canImport = useCan('import')
+  const canExport = useCan('export')
+
   const [filter, setFilter] = useState('')
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
+  const [loadingExport, setLoadingExport] = useState(false)
 
   const fetchData = useCallback(() => {
     dispatch(fetchJenisPenilaianPage({ page, perPage, keyword: filter }))
@@ -96,8 +104,42 @@ const JenisPenilaianList = () => {
     }
   }, [store.delete, dispatch, fetchData])
 
+  const onAddForm = () => {
+    router.replace('/app/jenis-penilaian/form')
+  }
+
+  const onImport = () => {
+    router.replace('/app/jenis-penilaian/import')
+  }
+
+  const onExport = async () => {
+    try {
+      setLoadingExport(true)
+      const res = await dispatch(postExport({ q: filter })).unwrap()
+
+      if (res?.status && res?.data) {
+        const url = `${process.env.NEXT_PUBLIC_API_URL}${res.data}`
+        const link = document.createElement('a')
+
+        link.href = url
+        link.download = ''
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+    } catch {
+      toast.error('Gagal export data')
+    } finally {
+      setLoadingExport(false)
+    }
+  }
+
+  const handleFilter = (event: any) => {
+    setFilter(event.target.value)
+  }
+
   const renderOption = (row: any) => {
-    return <RowAction row={row} onDeleteSuccess={(id) => dispatch(deleteJenisPenilaian(id))} />
+    return <RowAction row={row} onDeleteSuccess={id => dispatch(deleteJenisPenilaian(id))} />
   }
 
   const buildTable = () => {
@@ -109,7 +151,7 @@ const JenisPenilaianList = () => {
         tableColumn('JENIS PENGUJIAN', 'pengujian_display'),
         tableColumn('LEMBAGA', 'lembaga_display'),
         tableColumn('UJIAN', 'ujian_display'),
-        tableColumn('STATUS', 'status_display'),
+        tableColumn('STATUS', 'status_display')
       ],
       values: (dataPage?.values || []).map((row: any) => ({
         ...row,
@@ -159,26 +201,65 @@ const JenisPenilaianList = () => {
     <Grid container spacing={6}>
       <Grid size={12}>
         <Card>
-          <CardHeader
-            title='Master Jenis Penilaian'
-            subheader='Pengaturan kategori pengujian untuk lembaga Formal dan Pesantren'
-          />
-          <Toolbar sx={{ gap: 2, mb: 4, px: '1.5rem !important' }}>
-            <Button
-              variant='contained'
-              startIcon={<i className='tabler-plus' />}
-              onClick={() => router.push('/app/jenis-penilaian/form')}
-            >
-              Tambah Jenis
-            </Button>
+          <CardHeader title='Jenis Penilaian' sx={{ paddingBottom: 0 }} />
+          <Toolbar
+            sx={{
+              px: '1.5rem !important',
+              minHeight: 'auto',
+              gap: 2,
+              flexWrap: 'wrap',
+              mb: '10px'
+            }}
+          >
+            {canCreate && (
+              <Tooltip title='Tambah'>
+                <Button
+                  size='small'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onAddForm}
+                  startIcon={<i className='tabler-plus' />}
+                >
+                  Tambah
+                </Button>
+              </Tooltip>
+            )}
+
+            {canImport && (
+              <Tooltip title='Import CSV'>
+                <Button
+                  size='small'
+                  color='success'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onImport}
+                  startIcon={<i className='tabler-file-import' />}
+                >
+                  Import CSV
+                </Button>
+              </Tooltip>
+            )}
+
+            {canExport && (
+              <Tooltip title='Export CSV'>
+                <Button
+                  size='small'
+                  color='warning'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onExport}
+                  startIcon={<i className='tabler-file-export' />}
+                >
+                  {loadingExport ? 'Proses...' : 'Export CSV'}
+                </Button>
+              </Tooltip>
+            )}
             <Typography sx={{ flex: '1 1 auto' }} />
-            <TextField
-              size='small'
-              placeholder='Cari jenis atau singkatan...'
-              onChange={(e) => { setFilter(e.target.value); setPage(1); }}
-            />
+            <Tooltip title='Cari...'>
+              <TextField id='outlined-basic' label='Cari...' size='small' onChange={handleFilter} />
+            </Tooltip>
           </Toolbar>
-          <TableView changeSort={() => { }} model={buildTable()} />
+          <TableView changeSort={() => {}} model={buildTable()} />
         </Card>
       </Grid>
     </Grid>
