@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
@@ -21,7 +21,7 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import { fetchSantriPage, fetchSantriById, postExport, resetRedux } from '../slice/index'
+import { fetchSantriPage, fetchSantriById, postSantriUpdate, postExport, resetRedux } from '../slice/index'
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
 
@@ -43,6 +43,8 @@ const statusObj: Record<string, { color: any; value: string }> = {
 
 function RowAction({row, onView}: {row: any, onView: (row: any) => void}) {
   const dispatch = useAppDispatch()
+
+  const canEdit = useCan('edit')
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [loading, setLoading] = useState(false)
@@ -72,6 +74,17 @@ function RowAction({row, onView}: {row: any, onView: (row: any) => void}) {
       setLoading(false)
       optionsOnClose()
     }
+  }
+
+  const handleStatusSantri = (data: any, status: string) => {
+    dispatch(
+      postSantriUpdate({
+        id: data.id_santri,
+        params: {
+          status: status
+        }
+      })
+    )
   }
 
   return (
@@ -104,6 +117,22 @@ function RowAction({row, onView}: {row: any, onView: (row: any) => void}) {
           <i className='tabler-eye' />
           {loading ? 'Loading...' : 'View'}
         </MenuItem>
+
+        {canEdit && [
+          row.status == '0' && (
+            <MenuItem onClick={() => handleStatusSantri(row, '1')} sx={{ '& svg': { mr: 2 }, color: 'success.main' }}>
+              <i className='tabler-circle-check' />
+              Set Aktif
+            </MenuItem>
+          ),
+
+          row.status == '1' && (
+            <MenuItem onClick={() => handleStatusSantri(row, '0')} sx={{ '& svg': { mr: 2 }, color: 'error.main' }}>
+              <i className='tabler-circle-x' />
+              Set Non Aktif
+            </MenuItem>
+          )
+        ]}
       </Menu>
     </TableCell>
   )
@@ -126,6 +155,26 @@ const Table = () => {
   const [openDetail, setOpenDetail] = useState(false)
   const [detail, setDetail] = useState<any>(null)
 
+  const handleFilter = (event: any) => {
+    setFilter(event.target.value)
+  }
+
+  const handleChangePage = useCallback(
+    (newPage: number) => {
+      setPage(newPage)
+      dispatch(fetchSantriPage({ page: newPage, perPage: perPage, q: filter }))
+    },
+    [dispatch, perPage, filter]
+  )
+
+  const handleChangePerPage = (event: any) => {
+    const newPerPage = parseInt(event.target.value, 10)
+
+    setPage(1)
+    setPerPage(newPerPage)
+    dispatch(fetchSantriPage({ page: 1, perPage: newPerPage, q: filter }))
+  }
+
   useEffect(() => {
     if (store.delete) {
       dispatch(fetchSantriPage({ page: 1, perPage: perPage, q: filter }))
@@ -133,6 +182,19 @@ const Table = () => {
       dispatch(resetRedux())
     }
   }, [dispatch, filter, perPage, store.delete])
+
+
+  useEffect(() => {
+    if (!store.crud) return
+
+    if (store.crud.status) {
+      toast.success('Success saved')
+      handleChangePage(page)
+      dispatch(resetRedux())
+    } else {
+      toast.error('Error saved: ' + store.crud.message)
+    }
+  }, [dispatch, handleChangePage, page, store.crud])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -174,23 +236,6 @@ const Table = () => {
       month: 'long',
       year: 'numeric'
     });
-  }
-
-  const handleFilter = (event: any) => {
-    setFilter(event.target.value)
-  }
-
-  const handleChangePage = (newPage: number) => {
-    setPage(newPage)
-    dispatch(fetchSantriPage({ page: newPage, perPage: perPage, q: filter }))
-  }
-
-  const handleChangePerPage = (event: any) => {
-    const newPerPage = parseInt(event.target.value, 10)
-
-    setPage(1)
-    setPerPage(newPerPage)
-    dispatch(fetchSantriPage({ page: 1, perPage: newPerPage, q: filter }))
   }
 
   const renderOption = (row: any) => {
@@ -321,7 +366,7 @@ const Table = () => {
           tableColumn('CABANG', 'nama_cabang'),
           tableColumn('JENIS KELAMIN', 'gender'),
           tableColumn('KARTU SANTRI', 'kartu_santri'),
-          tableColumn('STATUS', 'status'),
+          tableColumn('STATUS', 'status_label'),
           tableColumn('TERAKHIR DIUBAH', 'updated_at'),
         ],
         values: values?.map((row: any) => {
@@ -341,13 +386,13 @@ const Table = () => {
                   <Typography
                     variant='body2'
                     sx={{
-                    fontWeight: 600,
-                    color: 'text.primary',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                  }}
-                >
+                      fontWeight: 600,
+                      color: 'text.primary',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      wordBreak: 'break-all',
+                    }}
+                  >
                     {row.fullname}
                   </Typography>
                   <Typography
@@ -400,7 +445,7 @@ const Table = () => {
                 }
               </Box>
             ),
-            status: (
+            status_label: (
               <CustomChip
                 round='true'
                 size='small'

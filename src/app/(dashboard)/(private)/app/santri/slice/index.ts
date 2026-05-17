@@ -20,6 +20,7 @@ export interface InitialState {
   }
   data: any
   datas: any[]
+  crud: any
   delete: string | null
   export: any
 }
@@ -35,6 +36,7 @@ const initialState: InitialState = {
   },
   data: {},
   datas: [],
+  crud: null,
   delete: null,
   export: null,
 }
@@ -85,6 +87,20 @@ export const fetchSantriById = createAsyncThunk<any, string>(
   }
 )
 
+export const postSantriUpdate = createAsyncThunk<any, { id: string; params: any }>(
+  'santri/update',
+  async ({ id, params }, thunkAPI) => {
+
+    try {
+      const response = await api.put(`/app/santri/${id}`, params)
+
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
+  }
+)
+
 export const postExport = createAsyncThunk<any, any>(
   'santri/export',
   async (params, thunkAPI) => {
@@ -123,6 +139,10 @@ export const slice = createSlice({
 
     builder.addCase(fetchSantriById.fulfilled, (state, action) => {
       state.data = action.payload.data
+    })
+
+    builder.addCase(postSantriUpdate.fulfilled, (state, action) => {
+      state.crud = action.payload
     })
 
     builder.addCase(postExport.fulfilled, (state, action) => {

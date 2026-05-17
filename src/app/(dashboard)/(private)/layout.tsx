@@ -21,6 +21,7 @@ import ScrollToTop from '@core/components/scroll-to-top'
 import AuthGuard from '@/hocs/AuthGuard'
 
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
+import MobileBottomNav from '@/components/layout/vertical/MobileBottomNav'
 
 const Layout = async (props: ChildrenType ) => {
   const { children } = props
@@ -50,6 +51,7 @@ const Layout = async (props: ChildrenType ) => {
             </HorizontalLayout>
           }
         />
+        {<MobileBottomNav />}
         <ScrollToTop className='mui-fixed'>
           <Button
             variant='contained'
