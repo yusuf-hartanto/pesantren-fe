@@ -1585,6 +1585,13 @@ const selectDate = form => {
 
 const selectDateCustom = form => {
   const { control, errors, session, props } = form
+  
+  const currentYear = new Date().getFullYear()
+  const minDate = new Date(currentYear - 10, 0, 1)
+  const maxDate = new Date(currentYear + 10, 11, 31)
+
+  if (!props.minDate) props.minDate = minDate
+  if (!props.maxDate) props.maxDate = maxDate
 
   return (
     <Controller
@@ -1629,6 +1636,13 @@ const selectDateCustom = form => {
             dateFormat={props.dateFormat || 'dd/MM/yyyy'} // Format tampilan
             className='w-100'
             wrapperClassName='w-100'
+
+            showMonthDropdown
+            showYearDropdown
+            scrollableYearDropdown
+            yearDropdownItemNumber={21}
+            dropdownMode='select'
+
             // Menggunakan CustomTextField agar styling MUI konsisten
             customInput={
               <CustomTextField

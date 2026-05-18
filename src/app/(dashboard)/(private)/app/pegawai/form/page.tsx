@@ -1,10 +1,14 @@
 'use client'
 
 import React, { useCallback, useEffect, useState } from 'react'
+
 import { useSearchParams, useRouter } from 'next/navigation'
-import { Card, CardHeader, CardContent, Grid, Divider, Typography } from '@mui/material'
+
+import { Card, CardHeader, CardContent, Grid, Divider } from '@mui/material'
 import { toast } from 'react-toastify'
 import { useForm } from 'react-hook-form'
+
+import { formatDate } from 'date-fns/format'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
 import { fetchPegawaiById, postPegawai, postPegawaiUpdate, resetRedux } from '../slice'
@@ -12,7 +16,6 @@ import { fetchOrgUnitPage } from '../../organisasi/slice'
 import { fetchJabatanPage } from '../../jabatan/slice'
 
 import { field, fieldBuildSubmit, formColumn } from '@views/onevour/form/AppFormBuilder'
-import { formatDate } from 'date-fns/format'
 import {
   fetchDistrictsByRegency,
   fetchProvinces,
@@ -40,6 +43,7 @@ const PegawaiForm = () => {
       { label: 'Tidak Aktif', value: 'Tidak Aktif' },
       { label: 'Pensiun', value: 'Pensiun' }
     ],
+
     // Tambahan Opsi Wilayah
     provinces: [],
     cities: [],
@@ -58,6 +62,7 @@ const PegawaiForm = () => {
     status_pegawai: { label: 'Aktif', value: 'Aktif' },
     tanggal_lahir: '',
     umur: 0,
+
     // Tambahan State Awal sesuai JSON
     tempat_lahir: '',
     no_hp: '',
@@ -83,6 +88,7 @@ const PegawaiForm = () => {
   const loadCities = async (provId: string) => {
     try {
       const res = await dispatch(fetchRegenciesByProvince(provId)).unwrap() // sesuaikan action Anda
+
       setOpt((prev: any) => ({ ...prev, cities: (res?.data || []).map((i: any) => ({ label: i.name, value: i.id })) }))
     } catch (err) {
       console.error(err)
@@ -92,6 +98,7 @@ const PegawaiForm = () => {
   const loadDistricts = async (cityId: string) => {
     try {
       const res = await dispatch(fetchDistrictsByRegency(cityId)).unwrap() // sesuaikan action Anda
+
       setOpt((prev: any) => ({
         ...prev,
         districts: (res?.data || []).map((i: any) => ({ label: i.name, value: i.id }))
@@ -104,6 +111,7 @@ const PegawaiForm = () => {
   const loadSubDistricts = async (distId: string) => {
     try {
       const res = await dispatch(fetchSubDistrictsByDistrict(distId)).unwrap() // sesuaikan action Anda
+
       setOpt((prev: any) => ({
         ...prev,
         subDistricts: (res?.data || []).map((i: any) => ({ label: i.name, value: i.id }))
@@ -130,6 +138,7 @@ const PegawaiForm = () => {
       if (id) {
         const resDetail = await dispatch(fetchPegawaiById(id)).unwrap()
         const d = resDetail?.data
+
         if (d) {
           // Trigger pemuatan data wilayah berdasarkan data detail yang ada
           if (d.province_id) await loadCities(d.province_id)
@@ -144,12 +153,14 @@ const PegawaiForm = () => {
             status_pegawai: d.status_pegawai
               ? { label: d.status_pegawai, value: d.status_pegawai }
               : { label: 'Aktif', value: 'Aktif' },
+
             // Format data select objek wilayah dari detail API
             province_id: d.province ? { label: d.province.name, value: d.province.id } : null,
             city_id: d.city ? { label: d.city.name, value: d.city.id } : null,
             district_id: d.district ? { label: d.district.name, value: d.district.id } : null,
             sub_district_id: d.subDistrict ? { label: d.subDistrict.name, value: d.subDistrict.id } : null
           }
+
           setState(formatted)
           reset(formatted)
         }
@@ -184,6 +195,7 @@ const PegawaiForm = () => {
       id_jabatan: state.id_jabatan?.value,
       jenis_kelamin: state.jenis_kelamin?.value,
       status_pegawai: state.status_pegawai?.value,
+
       // Mapping value id wilayah ke string standar database
       province_id: state.province_id?.value || null,
       city_id: state.city_id?.value || null,

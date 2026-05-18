@@ -395,15 +395,35 @@ const TableSantri = () => {
                   >
                     {row.fullname}
                   </Typography>
-                  <Typography
-                    variant='caption'
-                    sx={{
-                      display: 'block',
-                      wordBreak: 'break-all',
-                    }}
-                  >
-                    {row.nis && row.nis != '0' ? row.nis : row.nik}
-                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Typography
+                      variant='caption'
+                      sx={{
+                        px: 1,
+                        py: 0.2,
+                        borderRadius: 1,
+                        bgcolor: 'grey.100',
+                        color: 'text.secondary',
+                        fontWeight: 500
+                      }}
+                    >
+                      NIK: {row.nik || '-'}
+                    </Typography>
+
+                    <Typography
+                      variant='caption'
+                      sx={{
+                        px: 1,
+                        py: 0.2,
+                        borderRadius: 1,
+                        bgcolor: 'primary.lighter',
+                        color: 'primary.main',
+                        fontWeight: 500
+                      }}
+                    >
+                      NIS: {row.nis || '-'}
+                    </Typography>
+                  </Box>
                 </Box>
               </Box>
             ),
