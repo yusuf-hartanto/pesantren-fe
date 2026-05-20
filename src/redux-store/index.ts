@@ -40,6 +40,7 @@ import kebersihan_inspeksi from '@/app/(dashboard)/(private)/app/kebersihan-insp
 import santri from '@/app/(dashboard)/(private)/app/santri/slice/index'
 import kebersihan_temuan from '@/app/(dashboard)/(private)/app/kebersihan-temuan/slice/index'
 import user from '@/app/(dashboard)/(private)/app/user/slice/index'
+import kebersihan_scan_log from '@/app/(dashboard)/(private)/app/kebersihan-scan-log/slice/index'
 
 export const store = configureStore({
   reducer: {
@@ -81,6 +82,7 @@ export const store = configureStore({
     santri,
     kebersihan_temuan,
     user,
+    kebersihan_scan_log
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false })
 })

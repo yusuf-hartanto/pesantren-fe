@@ -41,6 +41,7 @@ import { fetchMasterSlotWaktuAll } from '../../master-slot-waktu/slice'
 import TemuanItemForm from '../../../../../../views/onevour/components/temuan-item-form'
 import QRScanner from '@/views/onevour/components/qr-scanner'
 import DetectLocation from '@/views/onevour/components/detect-location'
+import { postKebersihanScanLog } from '../../kebersihan-scan-log/slice'
 
 const statusOption = {
   values: [
@@ -143,6 +144,11 @@ const FormValidationBasic = () => {
       label: string
     } | null
     temuans: any[]
+    latitude: number
+    longitude: number
+    qr_code: string
+    scan_type: string
+    distance: number
   }
 
   const defaultValues = {
@@ -158,7 +164,12 @@ const FormValidationBasic = () => {
     kode_slot: null,
     catatan_umum: '',
     status_kondisi: null,
-    temuans: []
+    temuans: [],
+    latitude: 0,
+    longitude: 0,
+    qr_code: '',
+    scan_type: '',
+    distance: 0
   }
 
   interface FormItemData {
@@ -205,6 +216,8 @@ const FormValidationBasic = () => {
   }, [dispatch])
 
   useEffect(() => {
+    startGps()
+
     dispatch(fetchPegawaiAll({}))
 
     dispatch(fetchCabangAll({}))
@@ -349,7 +362,28 @@ const FormValidationBasic = () => {
             }
           })
         })
-      )
+      ).then(res => {
+        const result = { ...res?.payload }
+
+        dispatch(
+          postKebersihanScanLog({
+            id_inspeksi: {
+              value: result.data?.id_inspeksi
+            },
+            id_lokasi: state.id_lokasi,
+            id_petugas: state.id_petugas,
+            qr_code: state.qr_code,
+            scan_latitude: state.latitude,
+            scan_longitude: state.longitude,
+            jarak_meter: state.distance,
+            valid_qr: state.scan_type === 'QR',
+            valid_geo: state.scan_type === 'GPS',
+            metode_scan: state.scan_type,
+            scan_source: isPWA() ? 'PWA' : 'WEB',
+            keterangan: 'Inspeksi'
+          })
+        )
+      })
     }
   }
 
@@ -508,11 +542,81 @@ const FormValidationBasic = () => {
       locationQrCodeKebersihanInspeksi({
         qr_code: data
       })
-    )
+    ).then(res => {
+      const result = { ...res?.payload }
+
+      if (result?.status) {
+        dispatch(
+          postKebersihanScanLog({
+            qr_code: state.qr_code,
+            scan_latitude: state.latitude,
+            scan_longitude: state.longitude,
+            valid_qr: true,
+            metode_scan: 'QR',
+            scan_source: isPWA() ? 'PWA' : 'WEB',
+            keterangan: 'QR Code dikenali'
+          })
+        )
+      } else {
+        dispatch(
+          postKebersihanScanLog({
+            qr_code: state.qr_code,
+            scan_latitude: state.latitude,
+            scan_longitude: state.longitude,
+            valid_qr: false,
+            metode_scan: 'QR',
+            scan_source: isPWA() ? 'PWA' : 'WEB',
+            keterangan: 'QR Code tidak terdaftar'
+          })
+        )
+      }
+    })
+    setState(prevState => {
+      return {
+        ...prevState,
+        qr_code: data
+      }
+    })
   }
 
   const handleLocation = (data: any) => {
-    dispatch(locationLatLongKebersihanInspeksi({ latitude: data.lat, longitude: data.lng }))
+    dispatch(locationLatLongKebersihanInspeksi({ latitude: data.lat, longitude: data.lng })).then(res => {
+      const result = { ...res?.payload }
+
+      if (result?.data.length > 0) {
+        dispatch(
+          postKebersihanScanLog({
+            id_lokasi: {
+              value: result.data[0].id_lokasi
+            },
+            scan_latitude: state.latitude,
+            scan_longitude: state.longitude,
+            jarak_meter: result.data[0].distance,
+            valid_geo: true,
+            metode_scan: 'GPS',
+            scan_source: isPWA() ? 'PWA' : 'WEB',
+            keterangan: 'Lokasi di temukan'
+          })
+        )
+        setState(prevState => {
+          return {
+            ...prevState,
+            distance: result.data[0].distance
+          }
+        })
+      } else {
+        dispatch(
+          postKebersihanScanLog({
+            scan_latitude: state.latitude,
+            scan_longitude: state.longitude,
+            valid_geo: false,
+            metode_scan: 'GPS',
+            scan_source: isPWA() ? 'PWA' : 'WEB',
+            keterangan: 'Lokasi tidak ditemukan'
+          })
+        )
+      }
+    })
   }
 
   const handleSelectLocation = (data: any) => {
@@ -533,6 +637,38 @@ const FormValidationBasic = () => {
     setShowQrScanner(false)
     setShowGps(false)
     setShowManual(false)
+  }
+
+  const startGps = async () => {
+    if (!navigator.geolocation) {
+      console.log('Geolocation is not supported by your browser')
+
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        setState(prevState => {
+          return {
+            ...prevState,
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          }
+        })
+      },
+      err => {
+        console.log(err.message)
+      }
+    )
+  }
+
+  const isPWA = () => {
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.matchMedia('(display-mode: minimal-ui)').matches ||
+      window.matchMedia('(display-mode: fullscreen)').matches ||
+      window.navigator.standalone === true
+    ) // Specific to iOS Safari
   }
 
   return (
@@ -559,6 +695,12 @@ const FormValidationBasic = () => {
                           setShowGps(false)
                           setShowQrScanner(true)
                           setShowOption(false)
+                          setState(prevState => {
+                            return {
+                              ...prevState,
+                              scan_type: 'QR'
+                            }
+                          })
                         }
                       }
                     })
@@ -582,6 +724,12 @@ const FormValidationBasic = () => {
                           setShowQrScanner(false)
                           setShowGps(true)
                           setShowOption(false)
+                          setState(prevState => {
+                            return {
+                              ...prevState,
+                              scan_type: 'GPS'
+                            }
+                          })
                         }
                       }
                     })
@@ -606,6 +754,12 @@ const FormValidationBasic = () => {
                           setShowQrScanner(false)
                           setShowOption(false)
                           setShowManual(true)
+                          setState(prevState => {
+                            return {
+                              ...prevState,
+                              scan_type: 'MANUAL'
+                            }
+                          })
                         }
                       }
                     })
@@ -659,6 +813,7 @@ const FormValidationBasic = () => {
                       onClick={() => {
                         setErrorQrScanner(false)
                         setShowQrScanner(true)
+                        dispatch(resetRedux())
                       }}
                     >
                       Ulangi Scan
@@ -732,6 +887,18 @@ const FormValidationBasic = () => {
                           if (state.id_lokasi?.value) {
                             setShowForm(true)
                             setFoundLocation(true)
+                            dispatch(
+                              postKebersihanScanLog({
+                                id_lokasi: {
+                                  value: state.id_lokasi?.value
+                                },
+                                scan_latitude: state.latitude,
+                                scan_longitude: state.longitude,
+                                metode_scan: 'MANUAL',
+                                scan_source: isPWA() ? 'PWA' : 'WEB',
+                                keterangan: 'Manual'
+                              })
+                            )
                           } else {
                             toast.error('Pilih Lokasi terlebih dahulu')
                           }
