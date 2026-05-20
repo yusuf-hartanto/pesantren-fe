@@ -666,9 +666,8 @@ const FormValidationBasic = () => {
     return (
       window.matchMedia('(display-mode: standalone)').matches ||
       window.matchMedia('(display-mode: minimal-ui)').matches ||
-      window.matchMedia('(display-mode: fullscreen)').matches ||
-      window.navigator.standalone === true
-    ) // Specific to iOS Safari
+      window.matchMedia('(display-mode: fullscreen)').matches
+    )
   }
 
   return (

@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getSession } from 'next-auth/react'
 
 import api from '@/libs/axios'
 
@@ -48,11 +47,8 @@ const initialState: InitialState = {
 --------------------------- */
 
 export const fetchJenisBeasiswaAll = createAsyncThunk<any>('jenis-beasiswa/fetchAll', async (params, thunkAPI) => {
-  const session = await getSession()
-
   try {
     const response = await api.get(`/app/jenis-beasiswa/all-data`, {
-      headers: { Authorization: `Bearer ${session?.access_token}` },
       params
     })
 
@@ -65,11 +61,8 @@ export const fetchJenisBeasiswaAll = createAsyncThunk<any>('jenis-beasiswa/fetch
 export const fetchJenisBeasiswaPage = createAsyncThunk<any, FetchParams>(
   'jenis-beasiswa/fetchPage',
   async (params, thunkAPI) => {
-    const session = await getSession()
-
     try {
       const response = await api.get(`/app/jenis-beasiswa`, {
-        headers: { Authorization: `Bearer ${session?.access_token}` },
         params
       })
 
@@ -83,12 +76,8 @@ export const fetchJenisBeasiswaPage = createAsyncThunk<any, FetchParams>(
 export const fetchJenisBeasiswaById = createAsyncThunk<any, string>(
   'jenis-beasiswa/fetchById',
   async (id, thunkAPI) => {
-    const session = await getSession()
-
     try {
-      const response = await api.get(`/app/jenis-beasiswa/${id}`, {
-        headers: { Authorization: `Bearer ${session?.access_token}` }
-      })
+      const response = await api.get(`/app/jenis-beasiswa/${id}`, {})
 
       return response.data
     } catch (e: any) {
@@ -98,12 +87,8 @@ export const fetchJenisBeasiswaById = createAsyncThunk<any, string>(
 )
 
 export const postJenisBeasiswa = createAsyncThunk<any, any>('jenis-beasiswa/create', async (params, thunkAPI) => {
-  const session = await getSession()
-
   try {
-    const response = await api.post(`/app/jenis-beasiswa`, params, {
-      headers: { Authorization: `Bearer ${session?.access_token}` }
-    })
+    const response = await api.post(`/app/jenis-beasiswa`, params, {})
 
     return response.data
   } catch (e: any) {
@@ -124,12 +109,8 @@ export const postBatchJenisBeasiswa = createAsyncThunk<any, any>('jenis-beasiswa
 export const postJenisBeasiswaUpdate = createAsyncThunk<any, { id: string; param: any }>(
   'jenis-beasiswa/update',
   async ({ id, param }, thunkAPI) => {
-    const session = await getSession()
-
     try {
-      const response = await api.put(`/app/jenis-beasiswa/${id}`, param, {
-        headers: { Authorization: `Bearer ${session?.access_token}` }
-      })
+      const response = await api.put(`/app/jenis-beasiswa/${id}`, param, {})
 
       return response.data
     } catch (e: any) {
@@ -139,12 +120,8 @@ export const postJenisBeasiswaUpdate = createAsyncThunk<any, { id: string; param
 )
 
 export const deleteJenisBeasiswa = createAsyncThunk<any, string>('jenis-beasiswa/delete', async (id, thunkAPI) => {
-  const session = await getSession()
-
   try {
-    const response = await api.delete(`/app/jenis-beasiswa/${id}`, {
-      headers: { Authorization: `Bearer ${session?.access_token}` }
-    })
+    const response = await api.delete(`/app/jenis-beasiswa/${id}`, {})
 
     return response.data
   } catch (e: any) {
