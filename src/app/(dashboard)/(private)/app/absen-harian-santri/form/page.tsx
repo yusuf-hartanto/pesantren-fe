@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
@@ -25,14 +26,19 @@ import {
   CircularProgress,
   IconButton,
   Divider,
-  Alert
+  Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent
 } from '@mui/material'
 import Grid from '@mui/material/Grid2'
 import { toast } from 'react-toastify'
 
+import { format } from 'date-fns'
+
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
 import { fetchSantriKamarReady, postAbsenScanQR } from '../slice'
-import { format } from 'date-fns'
+import QRScanner from '@/views/onevour/components/qr-scanner'
 
 // Interface untuk baris data di Form Kolektif
 interface AbsenItemInput {
@@ -78,6 +84,10 @@ const PresensiFormPage = () => {
   const [qrCodeInput, setQrCodeInput] = useState('')
   const [scannedLogs, setScannedLogs] = useState<ScanQrResponseData[]>([])
 
+  const [openModalScanQrCode, setOpenModalScanQrCode] = useState(false)
+  const qrCode = useRef(null)
+  const formRef = useRef<HTMLFormElement>(null)
+
   // Fetch data antrean santri siap absen jika memilih mode kolektif
   useEffect(() => {
     if (mode === 'kolektif' && idLokasiKamar) {
@@ -95,6 +105,7 @@ const PresensiFormPage = () => {
         status_kehadiran: 'Hadir', // Default awal diset Hadir semua
         keterangan: '' // Default keterangan kosong
       }))
+
       setListSantriAbsen(formatted as AbsenItemInput[])
     }
   }, [store.santriKamar, mode])
@@ -135,6 +146,7 @@ const PresensiFormPage = () => {
           keterangan: s.keterangan
         }))
       }
+
       // Integrasi Redux Thunk API Anda:
       // await dispatch(postAbsenKolektif(payload)).unwrap()
 
@@ -187,6 +199,20 @@ const PresensiFormPage = () => {
     } catch (error: any) {
       toast.error(error?.message || 'Gagal memproses kartu scan santri')
     }
+  }
+
+  const handleOpenScanQrCode = () => {
+    qrCode.current = null
+    setOpenModalScanQrCode(!openModalScanQrCode)
+  }
+
+  const handleScanQrCode = (qrcode: any) => {
+    if (qrCode.current === qrcode) return
+    qrCode.current = qrcode
+    setQrCodeInput(qrcode)
+    setOpenModalScanQrCode(false)
+
+    formRef.current && formRef.current.requestSubmit()
   }
 
   return (
@@ -260,7 +286,7 @@ const PresensiFormPage = () => {
               <Card>
                 <CardHeader title='Mesin Pemindai QR' />
                 <CardContent>
-                  <form onSubmit={handleQrSubmit}>
+                  <form onSubmit={handleQrSubmit} ref={formRef}>
                     <Alert severity='info' sx={{ mb: 4 }}>
                       Pastikan kolom input aktif, arahkan alat scanner/tembak barcode fisik langsung pada kartu santri.
                     </Alert>
@@ -271,6 +297,7 @@ const PresensiFormPage = () => {
                       placeholder='Tembak scanner kartu disini...'
                       value={qrCodeInput}
                       onChange={e => setQrCodeInput(e.target.value)}
+                      onClick={() => handleOpenScanQrCode()}
                       slotProps={{
                         input: {
                           endAdornment: (
@@ -282,6 +309,25 @@ const PresensiFormPage = () => {
                       }}
                     />
                   </form>
+                  <Dialog
+                    open={openModalScanQrCode}
+                    onClose={() => setOpenModalScanQrCode(false)}
+                    maxWidth='xs'
+                    fullWidth
+                  >
+                    <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 2 }}>
+                      <Typography variant='h6' sx={{ fontWeight: 700 }}>
+                        Scan QR Code Kartu Santri
+                      </Typography>
+                      <IconButton onClick={() => setOpenModalScanQrCode(false)} size='small'>
+                        <i className='tabler-x' />
+                      </IconButton>
+                    </DialogTitle>
+
+                    <DialogContent dividers sx={{ p: 4 }}>
+                      <QRScanner result={handleScanQrCode} active={openModalScanQrCode} />
+                    </DialogContent>
+                  </Dialog>
                 </CardContent>
               </Card>
             </Grid>
