@@ -12,3 +12,8 @@ export const tableColumn = (title, key = '', align = 'left', formatter = null, s
 export const formatThousand = (row, value) => {
   return Number(value).toLocaleString()
 }
+
+export const getNestedValue = (obj, path) => {
+  if (!obj || !path) return ''
+  return path.split('.').reduce((acc, part) => acc && acc[part], obj) || ''
+}

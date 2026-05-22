@@ -9,7 +9,6 @@ const InputImage = props => {
   const { data, name, selected, gridProps, handleChange, className, color = 'grey' } = props
 
   const { alt, img, value } = data
-  console.log(alt, img, value)
 
   const [file, setFile] = useState(null)
 

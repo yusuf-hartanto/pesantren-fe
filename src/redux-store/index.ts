@@ -39,6 +39,7 @@ import jadwal_inspeksi_kebersihan from '@/app/(dashboard)/(private)/app/jadwal-i
 import kebersihan_inspeksi from '@/app/(dashboard)/(private)/app/kebersihan-inspeksi/slice/index'
 import santri from '@/app/(dashboard)/(private)/app/santri/slice/index'
 import kebersihan_temuan from '@/app/(dashboard)/(private)/app/kebersihan-temuan/slice/index'
+import absen_harian_santri from '@/app/(dashboard)/(private)/app/absen-harian-santri/slice/index'
 
 export const store = configureStore({
   reducer: {
@@ -78,7 +79,8 @@ export const store = configureStore({
     jadwal_inspeksi_kebersihan,
     kebersihan_inspeksi,
     santri,
-    kebersihan_temuan
+    kebersihan_temuan,
+    absen_harian_santri
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false })
 })

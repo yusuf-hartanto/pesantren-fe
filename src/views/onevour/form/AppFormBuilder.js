@@ -697,7 +697,11 @@ export function formColumnDetailField(form) {
     if (base64) {
       valueImage = session.state[key] ? session.state[key] : ''
     } else {
-      valueImage = session.state[key] ? process.env.NEXT_PUBLIC_API_URL + props.urlImage + session.state[key] : ''
+      valueImage = session.state[key]
+        ? session.state[key].includes(props.urlImage)
+          ? process.env.NEXT_PUBLIC_API_URL + session.state[key]
+          : process.env.NEXT_PUBLIC_API_URL + props.urlImage + session.state[key]
+        : ''
     }
 
     const imageData = { value: 'img', img: valueImage ? valueImage : defaultImage }
@@ -1628,7 +1632,6 @@ const selectDateCustom = form => {
             dateFormat={props.dateFormat || 'dd/MM/yyyy'} // Format tampilan
             className='w-100'
             wrapperClassName='w-100'
-
             // Menggunakan CustomTextField agar styling MUI konsisten
             customInput={
               <CustomTextField
