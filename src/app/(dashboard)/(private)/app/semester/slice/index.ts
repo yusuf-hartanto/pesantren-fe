@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getSession } from 'next-auth/react'
 
 import api from '@/libs/axios'
 
@@ -48,11 +47,8 @@ const initialState: InitialState = {
 --------------------------- */
 
 export const fetchSemesterAll = createAsyncThunk<any, any>('semester/fetchAll', async (params, thunkAPI) => {
-  const session = await getSession()
-
   try {
     const response = await api.get(`/app/semester/all-data`, {
-      headers: { Authorization: `Bearer ${session?.access_token}` },
       params
     })
 
@@ -63,11 +59,8 @@ export const fetchSemesterAll = createAsyncThunk<any, any>('semester/fetchAll', 
 })
 
 export const fetchSemesterPage = createAsyncThunk<any, FetchParams>('semester/fetchPage', async (params, thunkAPI) => {
-  const session = await getSession()
-
   try {
     const response = await api.get(`/app/semester`, {
-      headers: { Authorization: `Bearer ${session?.access_token}` },
       params
     })
 
@@ -78,12 +71,8 @@ export const fetchSemesterPage = createAsyncThunk<any, FetchParams>('semester/fe
 })
 
 export const fetchSemesterById = createAsyncThunk<any, string>('semester/fetchById', async (id, thunkAPI) => {
-  const session = await getSession()
-
   try {
-    const response = await api.get(`/app/semester/${id}`, {
-      headers: { Authorization: `Bearer ${session?.access_token}` }
-    })
+    const response = await api.get(`/app/semester/${id}`, {})
 
     return response.data
   } catch (e: any) {
@@ -92,12 +81,8 @@ export const fetchSemesterById = createAsyncThunk<any, string>('semester/fetchBy
 })
 
 export const postSemester = createAsyncThunk<any, any>('semester/create', async (params, thunkAPI) => {
-  const session = await getSession()
-
   try {
-    const response = await api.post(`/app/semester`, params, {
-      headers: { Authorization: `Bearer ${session?.access_token}` }
-    })
+    const response = await api.post(`/app/semester`, params, {})
 
     return response.data
   } catch (e: any) {
@@ -118,12 +103,8 @@ export const postBatchSemester = createAsyncThunk<any, any>('semester/insert', a
 export const postSemesterUpdate = createAsyncThunk<any, { id: string; params: any }>(
   'semester/update',
   async ({ id, params }, thunkAPI) => {
-    const session = await getSession()
-
     try {
-      const response = await api.put(`/app/semester/${id}`, params, {
-        headers: { Authorization: `Bearer ${session?.access_token}` }
-      })
+      const response = await api.put(`/app/semester/${id}`, params, {})
 
       return response.data
     } catch (e: any) {
@@ -133,12 +114,8 @@ export const postSemesterUpdate = createAsyncThunk<any, { id: string; params: an
 )
 
 export const deleteSemester = createAsyncThunk<any, string>('semester/delete', async (id, thunkAPI) => {
-  const session = await getSession()
-
   try {
-    const response = await api.delete(`/app/semester/${id}`, {
-      headers: { Authorization: `Bearer ${session?.access_token}` }
-    })
+    const response = await api.delete(`/app/semester/${id}`, {})
 
     return response.data
   } catch (e: any) {

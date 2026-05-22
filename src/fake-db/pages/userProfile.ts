@@ -680,9 +680,8 @@ export const db: DB = {
     fullName: 'John Doe',
     location: 'Vatican City',
     joiningDate: 'April 2021',
-    designation: 'UX Designer',
+    role: 'UX Designer',
     profileImg: '/images/avatars/1.png',
-    designationIcon: 'tabler-palette',
     coverImg: '/images/pages/profile-banner.png'
   }
 }

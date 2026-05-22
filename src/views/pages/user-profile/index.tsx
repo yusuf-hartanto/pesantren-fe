@@ -1,12 +1,12 @@
 'use client'
 
 // React Imports
-import { useState } from 'react'
-import type { ReactElement, SyntheticEvent } from 'react'
+import { useState, type ReactElement, type SyntheticEvent } from 'react'
 
 // MUI Imports
 import Grid from '@mui/material/Grid2'
 import Tab from '@mui/material/Tab'
+import Skeleton from '@mui/material/Skeleton'
 import TabContext from '@mui/lab/TabContext'
 import TabPanel from '@mui/lab/TabPanel'
 
@@ -17,67 +17,71 @@ import type { Data } from '@/types/pages/profileTypes'
 import UserProfileHeader from './UserProfileHeader'
 import CustomTabList from '@core/components/mui/TabList'
 
-const UserProfile = ({ tabContentList, data }: { tabContentList: { [key: string]: ReactElement }; data?: Data }) => {
+type Props = {
+  tabContentList: { [key: string]: ReactElement }
+  data?: Data | null
+  loading?: boolean
+}
+
+const UserProfile = ({ tabContentList, data, loading = false }: Props) => {
   // States
   const [activeTab, setActiveTab] = useState('profile')
 
-  const handleChange = (event: SyntheticEvent, value: string) => {
+  const handleChange = (_event: SyntheticEvent, value: string) => {
     setActiveTab(value)
   }
 
   return (
     <Grid container spacing={6}>
+      {/* HEADER */}
       <Grid size={{ xs: 12 }}>
-        <UserProfileHeader data={data?.profileHeader} />
+        {loading ? (
+          <Skeleton variant='rounded' height={220} />
+        ) : (
+          <UserProfileHeader data={data?.profileHeader} />
+        )}
       </Grid>
-      {activeTab === undefined ? null : (
-        <Grid size={{ xs: 12 }} className='flex flex-col gap-6'>
-          <TabContext value={activeTab}>
-            <CustomTabList onChange={handleChange} variant='scrollable' pill='true'>
-              <Tab
-                label={
-                  <div className='flex items-center gap-1.5'>
-                    <i className='tabler-user-check text-lg' />
-                    Profile
-                  </div>
-                }
-                value='profile'
-              />
-              <Tab
-                label={
-                  <div className='flex items-center gap-1.5'>
-                    <i className='tabler-users text-lg' />
-                    Teams
-                  </div>
-                }
-                value='teams'
-              />
-              <Tab
-                label={
-                  <div className='flex items-center gap-1.5'>
-                    <i className='tabler-layout-grid text-lg' />
-                    Projects
-                  </div>
-                }
-                value='projects'
-              />
-              <Tab
-                label={
-                  <div className='flex items-center gap-1.5'>
-                    <i className='tabler-link text-lg' />
-                    Connections
-                  </div>
-                }
-                value='connections'
-              />
-            </CustomTabList>
 
-            <TabPanel value={activeTab} className='p-0'>
-              {tabContentList[activeTab]}
-            </TabPanel>
-          </TabContext>
-        </Grid>
-      )}
+      {/* CONTENT */}
+      <Grid size={{ xs: 12 }} className='flex flex-col gap-6'>
+        <TabContext value={activeTab}>
+          <CustomTabList
+            onChange={handleChange}
+            variant='scrollable'
+            pill='true'
+          >
+            <Tab
+              value='profile'
+              label={
+                <div className='flex items-center gap-1.5'>
+                  <i className='tabler-user-check text-lg' />
+                  <span>Profile</span>
+                </div>
+              }
+            />
+          </CustomTabList>
+
+          <TabPanel value={activeTab} className='p-0'>
+            {loading ? (
+              <Grid container spacing={4}>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Skeleton variant='rounded' height={180} />
+                </Grid>
+
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <Skeleton variant='rounded' height={180} />
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                  <Skeleton variant='rounded' height={300} />
+                </Grid>
+              </Grid>
+            ) : (
+              tabContentList[activeTab]
+            )}
+          </TabPanel>
+        </TabContext>
+      </Grid>
     </Grid>
   )
 }

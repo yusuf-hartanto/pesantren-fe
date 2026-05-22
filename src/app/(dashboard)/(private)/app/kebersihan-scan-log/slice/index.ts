@@ -46,13 +46,13 @@ const initialState: InitialState = {
    3. Async Thunks (typed)
 --------------------------- */
 
-export const fetchStatusAwalSantriAll = createAsyncThunk<any>(
-  'status-awal-santri/fetchAll',
+export interface FetchParamAlls {}
+
+export const fetchKebersihanScanLogAll = createAsyncThunk<any, FetchParamAlls>(
+  'kebersihan-scan-log/fetchAll',
   async (params, thunkAPI) => {
     try {
-      const response = await api.get(`/app/status-awal-santri/all-data`, {
-        params
-      })
+      const response = await api.get(`/app/kebersihan-scan-log/all-data`, { params })
 
       return response.data
     } catch (e: any) {
@@ -61,13 +61,11 @@ export const fetchStatusAwalSantriAll = createAsyncThunk<any>(
   }
 )
 
-export const fetchStatusAwalSantriPage = createAsyncThunk<any, FetchParams>(
-  'status-awal-santri/fetchPage',
+export const fetchKebersihanScanLogPage = createAsyncThunk<any, FetchParams>(
+  'kebersihan-scan-log/fetchPage',
   async (params, thunkAPI) => {
     try {
-      const response = await api.get(`/app/status-awal-santri`, {
-        params
-      })
+      const response = await api.get(`/app/kebersihan-scan-log`, { params })
 
       return response.data
     } catch (e: any) {
@@ -76,11 +74,11 @@ export const fetchStatusAwalSantriPage = createAsyncThunk<any, FetchParams>(
   }
 )
 
-export const fetchStatusAwalSantriById = createAsyncThunk<any, string>(
-  'status-awal-santri/fetchById',
+export const fetchKebersihanScanLogById = createAsyncThunk<any, string>(
+  'kebersihan-scan-log/fetchById',
   async (id, thunkAPI) => {
     try {
-      const response = await api.get(`/app/status-awal-santri/${id}`, {})
+      const response = await api.get(`/app/kebersihan-scan-log/${id}`)
 
       return response.data
     } catch (e: any) {
@@ -89,11 +87,11 @@ export const fetchStatusAwalSantriById = createAsyncThunk<any, string>(
   }
 )
 
-export const postStatusAwalSantri = createAsyncThunk<any, any>(
-  'status-awal-santri/create',
+export const postKebersihanScanLog = createAsyncThunk<any, any>(
+  'kebersihan-scan-log/create',
   async (params, thunkAPI) => {
     try {
-      const response = await api.post(`/app/status-awal-santri`, params, {})
+      const response = await api.post(`/app/kebersihan-scan-log`, params)
 
       return response.data
     } catch (e: any) {
@@ -102,11 +100,11 @@ export const postStatusAwalSantri = createAsyncThunk<any, any>(
   }
 )
 
-export const postBatchStatusAwalSantri = createAsyncThunk<any, any>(
-  'status-awal-santri/insert',
+export const postBatchKebersihanScanLog = createAsyncThunk<any, any>(
+  'kebersihan-scan-log/insert',
   async (params, thunkAPI) => {
     try {
-      const response = await api.post(`/app/status-awal-santri/insert`, params)
+      const response = await api.post(`/app/kebersihan-scan-log/insert`, params)
 
       return response.data
     } catch (e: any) {
@@ -115,11 +113,11 @@ export const postBatchStatusAwalSantri = createAsyncThunk<any, any>(
   }
 )
 
-export const postStatusAwalSantriUpdate = createAsyncThunk<any, { id: string; param: any }>(
-  'status-awal-santri/update',
-  async ({ id, param }, thunkAPI) => {
+export const postKebersihanScanLogUpdate = createAsyncThunk<any, { id: string; params: any }>(
+  'kebersihan-scan-log/update',
+  async ({ id, params }, thunkAPI) => {
     try {
-      const response = await api.put(`/app/status-awal-santri/${id}`, param, {})
+      const response = await api.put(`/app/kebersihan-scan-log/${id}`, params)
 
       return response.data
     } catch (e: any) {
@@ -128,11 +126,11 @@ export const postStatusAwalSantriUpdate = createAsyncThunk<any, { id: string; pa
   }
 )
 
-export const deleteStatusAwalSantri = createAsyncThunk<any, string>(
-  'status-awal-santri/delete',
+export const deleteKebersihanScanLog = createAsyncThunk<any, string>(
+  'kebersihan-scan-log/delete',
   async (id, thunkAPI) => {
     try {
-      const response = await api.delete(`/app/status-awal-santri/${id}`, {})
+      const response = await api.delete(`/app/kebersihan-scan-log/${id}`)
 
       return response.data
     } catch (e: any) {
@@ -141,9 +139,9 @@ export const deleteStatusAwalSantri = createAsyncThunk<any, string>(
   }
 )
 
-export const postImport = createAsyncThunk<any, any>('status-awal-santri/import', async (params, thunkAPI) => {
+export const postImport = createAsyncThunk<any, any>('kebersihan-scan-log/import', async (params, thunkAPI) => {
   try {
-    const response = await api.post(`/app/status-awal-santri/import`, params)
+    const response = await api.post(`/app/kebersihan-scan-log/import`, params)
 
     return response.data
   } catch (e: any) {
@@ -151,9 +149,9 @@ export const postImport = createAsyncThunk<any, any>('status-awal-santri/import'
   }
 })
 
-export const postExport = createAsyncThunk<any, any>('status-awal-santri/export', async (params, thunkAPI) => {
+export const postExport = createAsyncThunk<any, any>('kebersihan-scan-log/export', async (params, thunkAPI) => {
   try {
-    const response = await api.post(`/app/status-awal-santri/export`, params)
+    const response = await api.post(`/app/kebersihan-scan-log/export`, params)
 
     return response.data
   } catch (e: any) {
@@ -166,40 +164,40 @@ export const postExport = createAsyncThunk<any, any>('status-awal-santri/export'
 --------------------------- */
 
 export const slice = createSlice({
-  name: 'status_awal_santri',
+  name: 'kebersihan_scan_log',
   initialState,
   reducers: {
     resetRedux: () => initialState
   },
   extraReducers: builder => {
-    builder.addCase(fetchStatusAwalSantriAll.fulfilled, (state, action) => {
+    builder.addCase(fetchKebersihanScanLogAll.fulfilled, (state, action) => {
       state.datas = action.payload.data || []
     })
 
-    builder.addCase(fetchStatusAwalSantriPage.fulfilled, (state, action) => {
+    builder.addCase(fetchKebersihanScanLogPage.fulfilled, (state, action) => {
       state.dataPage = {
         values: action.payload.data?.values || [],
         total: action.payload.data?.total || 0
       }
     })
 
-    builder.addCase(fetchStatusAwalSantriById.fulfilled, (state, action) => {
+    builder.addCase(fetchKebersihanScanLogById.fulfilled, (state, action) => {
       state.data = action.payload.data
     })
 
-    builder.addCase(deleteStatusAwalSantri.fulfilled, (state, action) => {
+    builder.addCase(deleteKebersihanScanLog.fulfilled, (state, action) => {
       state.delete = action.payload.message
     })
 
-    builder.addCase(postStatusAwalSantri.fulfilled, (state, action) => {
+    builder.addCase(postKebersihanScanLog.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
-    builder.addCase(postStatusAwalSantriUpdate.fulfilled, (state, action) => {
+    builder.addCase(postKebersihanScanLogUpdate.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 
-    builder.addCase(postBatchStatusAwalSantri.fulfilled, (state, action) => {
+    builder.addCase(postBatchKebersihanScanLog.fulfilled, (state, action) => {
       state.crud = action.payload
     })
 

@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getSession } from 'next-auth/react'
 
 import api from '@/libs/axios'
 
@@ -48,11 +47,8 @@ const initialState: InitialState = {
 --------------------------- */
 
 export const fetchOrangTuaWaliAll = createAsyncThunk<any>('orang-tua-wali/fetchAll', async (params, thunkAPI) => {
-  const session = await getSession()
-
   try {
     const response = await api.get(`/app/orang-tua-wali/all-data`, {
-      headers: { Authorization: `Bearer ${session?.access_token}` },
       params
     })
 
@@ -65,11 +61,8 @@ export const fetchOrangTuaWaliAll = createAsyncThunk<any>('orang-tua-wali/fetchA
 export const fetchOrangTuaWaliPage = createAsyncThunk<any, FetchParams>(
   'orang-tua-wali/fetchPage',
   async (params, thunkAPI) => {
-    const session = await getSession()
-
     try {
       const response = await api.get(`/app/orang-tua-wali`, {
-        headers: { Authorization: `Bearer ${session?.access_token}` },
         params
       })
 
@@ -81,12 +74,8 @@ export const fetchOrangTuaWaliPage = createAsyncThunk<any, FetchParams>(
 )
 
 export const fetchOrangTuaWaliById = createAsyncThunk<any, string>('orang-tua-wali/fetchById', async (id, thunkAPI) => {
-  const session = await getSession()
-
   try {
-    const response = await api.get(`/app/orang-tua-wali/${id}`, {
-      headers: { Authorization: `Bearer ${session?.access_token}` }
-    })
+    const response = await api.get(`/app/orang-tua-wali/${id}`, {})
 
     return response.data
   } catch (e: any) {
@@ -95,12 +84,8 @@ export const fetchOrangTuaWaliById = createAsyncThunk<any, string>('orang-tua-wa
 })
 
 export const postOrangTuaWali = createAsyncThunk<any, any>('orang-tua-wali/create', async (params, thunkAPI) => {
-  const session = await getSession()
-
   try {
-    const response = await api.post(`/app/orang-tua-wali`, params, {
-      headers: { Authorization: `Bearer ${session?.access_token}` }
-    })
+    const response = await api.post(`/app/orang-tua-wali`, params, {})
 
     return response.data
   } catch (e: any) {
@@ -111,12 +96,8 @@ export const postOrangTuaWali = createAsyncThunk<any, any>('orang-tua-wali/creat
 export const postOrangTuaWaliUpdate = createAsyncThunk<any, { id: string; param: any }>(
   'orang-tua-wali/update',
   async ({ id, param }, thunkAPI) => {
-    const session = await getSession()
-
     try {
-      const response = await api.put(`/app/orang-tua-wali/${id}`, param, {
-        headers: { Authorization: `Bearer ${session?.access_token}` }
-      })
+      const response = await api.put(`/app/orang-tua-wali/${id}`, param, {})
 
       return response.data
     } catch (e: any) {
@@ -136,12 +117,8 @@ export const postBatchOrangTuaWali = createAsyncThunk<any, any>('orang-tua-wali/
 })
 
 export const deleteOrangTuaWali = createAsyncThunk<any, string>('orang-tua-wali/delete', async (id, thunkAPI) => {
-  const session = await getSession()
-
   try {
-    const response = await api.delete(`/app/orang-tua-wali/${id}`, {
-      headers: { Authorization: `Bearer ${session?.access_token}` }
-    })
+    const response = await api.delete(`/app/orang-tua-wali/${id}`, {})
 
     return response.data
   } catch (e: any) {

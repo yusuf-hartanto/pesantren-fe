@@ -1,29 +1,64 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 
 import Grid from '@mui/material/Grid2'
 
 import { useForm } from 'react-hook-form'
 
+import { Button, Typography } from '@mui/material'
+
 import { field, formSingleColumn } from '../form/AppFormBuilder'
 
-export default function GetLocation({ result, active, locations, selected }) {
-  const defaultValues = {}
+export default function GetLocation({ result, active, locations, selected, back }) {
+  const defaultValues = {
+    latitude: null,
+    longitude: null
+  }
 
   const [state, setState] = useState(defaultValues)
   const [error, setError] = useState(null)
+  const [jarak, setJarak] = useState('-')
 
   const {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
     reset
   } = useForm({ defaultValues })
 
   useEffect(() => {
+    setError(null)
+
     if (active) {
       startGps()
     }
+
+    return () => {
+      setError(null)
+    }
   }, [active])
+
+  useEffect(() => {
+    if (locations.length > 0) {
+      setValue('location', {
+        label: `${locations[0].nama_lokasi_parent ? `${locations[0].nama_lokasi_parent} / ` : ''}${locations[0].nama_lokasi}`,
+        value: locations[0].id_lokasi
+      })
+      setState(prevState => {
+        return {
+          ...prevState,
+          location: {
+            label: `${locations[0].nama_lokasi_parent ? `${locations[0].nama_lokasi_parent} / ` : ''}${locations[0].nama_lokasi}`,
+            value: locations[0].id_lokasi
+          }
+        }
+      })
+      setJarak(locations[0].distance?.toFixed(2))
+      setError(null)
+    } else {
+      setError('Di luar area lokasi')
+    }
+  }, [locations])
 
   const startGps = async () => {
     if (!navigator.geolocation) {
@@ -38,6 +73,13 @@ export default function GetLocation({ result, active, locations, selected }) {
           lat: position.coords.latitude,
           lng: position.coords.longitude
         })
+        setState(prevState => {
+          return {
+            ...prevState,
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          }
+        })
       },
       err => {
         setError(err.message)
@@ -46,34 +88,86 @@ export default function GetLocation({ result, active, locations, selected }) {
   }
 
   return (
-    <Grid container spacing={6}>
-      <Grid item size={12}>
-        {active &&
-          formSingleColumn({
-            control: control,
-            errors: errors,
-            state: state,
-            setState: setState,
-            field: field({
-              type: 'select',
-              key: 'location',
-              label: 'Lokasi',
-              placeholder: 'Input Lokasi',
-              required: true,
-              options: {
-                values: locations.map(r => {
-                  return {
-                    label: r.nama_lokasi,
-                    value: r.id_lokasi
-                  }
-                }),
-                onChange: e => {
-                  selected(e)
+    <Grid container spacing={2}>
+      {active && (
+        <Fragment>
+          <Grid item size={12}>
+            <h4>Lokasi Anda :</h4>
+            <h4>Lat : {state?.latitude}</h4>
+            <h4>Lng : {state?.longitude}</h4>
+            <h4 className='mt-1'>Radius Valid : 50 m</h4>
+            <h4>Jarak Anda : {jarak} m</h4>
+          </Grid>
+          <Grid item size={12}>
+            {formSingleColumn({
+              control: control,
+              errors: errors,
+              state: state,
+              setState: setState,
+              field: field({
+                type: 'select',
+                key: 'location',
+                label: 'Lokasi',
+                placeholder: 'Input Lokasi',
+                required: true,
+                options: {
+                  values: locations.map(r => {
+                    return {
+                      label: `${r.nama_lokasi_parent ? `${r.nama_lokasi_parent} / ` : ''}${r.nama_lokasi}`,
+                      value: r.id_lokasi
+                    }
+                  })
                 }
-              }
-            })
-          })}
-      </Grid>
+              })
+            })}
+          </Grid>
+          <Grid item size={12}>
+            {error && (
+              <Fragment>
+                <h4 className='mb-3'>{error}</h4>
+                <Typography variant='body2' color='text.secondary'>
+                  Alasan: Di luar radius toleransi, Lokasi tidak akurat? Hubungi Admin.
+                </Typography>
+              </Fragment>
+            )}
+          </Grid>
+          <Grid item size={12} className='flex justify-between'>
+            {error ? (
+              <Button
+                size='small'
+                variant='outlined'
+                color='primary'
+                onClick={() => {
+                  startGps()
+                }}
+              >
+                Re-Scan Lokasi
+              </Button>
+            ) : (
+              <Button
+                size='small'
+                variant='outlined'
+                color='primary'
+                onClick={() => {
+                  selected(state.location)
+                }}
+              >
+                Lanjut Inspeksi
+              </Button>
+            )}
+            <Button
+              size='small'
+              variant='outlined'
+              color='primary'
+              onClick={() => {
+                back()
+              }}
+            >
+              Kembali
+            </Button>
+          </Grid>
+        </Fragment>
+      )}
     </Grid>
   )
 }

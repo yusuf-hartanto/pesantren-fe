@@ -11,6 +11,7 @@ export interface FetchParams {
   perPage?: number
   q?: string
   parent?: string
+  status?: string
 }
 
 export interface InitialState {

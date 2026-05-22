@@ -17,8 +17,7 @@ export type ProfileHeaderType = {
   location: string
   profileImg: string
   joiningDate: string
-  designation: string
-  designationIcon?: string
+  role: string
 }
 export type ProfileAvatarGroupType = {
   name: string

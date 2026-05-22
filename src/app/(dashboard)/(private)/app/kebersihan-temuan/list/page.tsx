@@ -125,7 +125,7 @@ function RowAction(data: any) {
   )
 }
 
-const Table = () => {
+const TableTemuan = () => {
   // ** Hooks
   const router = useRouter()
   const dispatch = useAppDispatch()
@@ -336,4 +336,4 @@ const Table = () => {
   )
 }
 
-export default Table
+export default TableTemuan

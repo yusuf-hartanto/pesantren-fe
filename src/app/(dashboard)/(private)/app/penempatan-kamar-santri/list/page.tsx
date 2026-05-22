@@ -1,16 +1,18 @@
 'use client'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+
+import { toast } from 'react-toastify'
 
 // ** MUI Imports
 import Grid from '@mui/material/Grid2'
 import Card from '@mui/material/Card'
 
 import CardHeader from '@mui/material/CardHeader'
-import { TextField, Toolbar } from '@mui/material'
+import { Avatar, Box, TextField, Toolbar } from '@mui/material'
 import Tooltip from '@mui/material/Tooltip'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
@@ -19,16 +21,8 @@ import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 
-import { toast } from 'react-toastify'
-
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import {
-  deleteKebersihanInspeksi,
-  fetchKebersihanInspeksiPage,
-  postKebersihanInspeksiUpdate,
-  postExport,
-  resetRedux
-} from '../slice/index'
+import { deletePenempatanKamarSantri, fetchPenempatanKamarSantriPage, postExport, resetRedux } from '../slice/index'
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
 import DialogDelete from '@views/onevour/components/dialog-delete'
@@ -36,6 +30,18 @@ import DialogDelete from '@views/onevour/components/dialog-delete'
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
 import { useCan } from '@/hooks/useCan'
+import CustomChip from '@/@core/components/mui/Chip'
+
+const statusObj: Record<string, { color: any; value: string }> = {
+  'Aktif': {
+    color: 'success',
+    value: 'Aktif'
+  },
+  'Non-Aktif': {
+    color: 'secondary',
+    value: 'Non-Aktif'
+  }
+}
 
 function RowAction(data: any) {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -60,7 +66,7 @@ function RowAction(data: any) {
   }
 
   const handleDelete = (id: string) => {
-    dispatch(deleteKebersihanInspeksi(id))
+    dispatch(deletePenempatanKamarSantri(id))
     optionsOnClose()
   }
 
@@ -83,59 +89,62 @@ function RowAction(data: any) {
         <MenuItem
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
-          href={`/app/kebersihan-inspeksi/form?id=${data.row.id_inspeksi}&view=true`}
+          href={`/app/penempatan-kamar-santri/form?id=${data.row.id_penempatan}&view=true`}
           onClick={handleView}
         >
           <i className='tabler-eye' />
           View
         </MenuItem>
 
-        {canEdit && [
+        {canEdit &&
           <MenuItem
-            key='edit'
+            key="edit"
             component={Link}
             sx={{ '& svg': { mr: 2 } }}
-            href={`/app/kebersihan-inspeksi/form?id=${data.row.id_inspeksi}`}
+            href={`/app/penempatan-kamar-santri/form?id=${data.row.id_penempatan}`}
             onClick={handleView}
           >
             <i className='tabler-edit' />
             Edit
           </MenuItem>
-        ]}
+        }
 
-        {canDelete && (
-          <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 }, color: 'error.main' }}>
+        {canDelete && [
+          <MenuItem
+            key="delete"
+            onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 }, color: 'error.main' }}>
             <i className='tabler-trash' />
             Delete
-          </MenuItem>
-        )}
-        <DialogDelete
-          id={'Kebersihan Inspeksi'}
-          open={openConfirm}
-          onClose={(event: any, reason: any) => {
-            if (reason !== 'backdropClick') {
+          </MenuItem>,
+          <DialogDelete
+            key="dialog-delete"
+            id={data.row.nama_mapel}
+            open={openConfirm}
+            onClose={(event: any, reason: any) => {
+              if (reason !== 'backdropClick') {
+                setOpenConfirm(false)
+              }
+            }}
+            handleOk={() => {
+              handleDelete(data.row.id_penempatan)
               setOpenConfirm(false)
-            }
-          }}
-          handleOk={() => {
-            handleDelete(data.row.id_inspeksi)
-            setOpenConfirm(false)
-          }}
-          handleClose={() => {
-            setOpenConfirm(false)
-          }}
-          disableEscapeKeyDown={true}
-        />
+            }}
+            handleClose={() => {
+              setOpenConfirm(false)
+            }}
+            disableEscapeKeyDown={true}
+          />
+        ]}
       </Menu>
     </TableCell>
   )
 }
 
-const TableInspeksi = () => {
+const TablePenempatanKamarSantri = () => {
   // ** Hooks
   const router = useRouter()
   const dispatch = useAppDispatch()
-  const store = useAppSelector(state => state.kebersihan_inspeksi)
+  const store = useAppSelector(state => state.penempatan_kamar_santri)
 
   const canCreate = useCan('create')
   const canImport = useCan('import')
@@ -148,7 +157,8 @@ const TableInspeksi = () => {
 
   useEffect(() => {
     if (store.delete) {
-      dispatch(fetchKebersihanInspeksiPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(fetchPenempatanKamarSantriPage({ page: 1, perPage: perPage, q: filter }))
+
       dispatch(resetRedux())
     }
   }, [dispatch, filter, perPage, store.delete])
@@ -156,38 +166,19 @@ const TableInspeksi = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setPage(1)
-      dispatch(fetchKebersihanInspeksiPage({ page: 1, perPage: perPage, q: filter }))
+
+      dispatch(fetchPenempatanKamarSantriPage({ page: 1, perPage: perPage, q: filter }))
     }, 500)
 
     return () => clearTimeout(timer)
   }, [dispatch, filter, perPage])
 
-  const handleChangePage = useCallback(
-    (newPage: number) => {
-      setPage(newPage)
-      dispatch(fetchKebersihanInspeksiPage({ page: newPage, perPage: perPage, q: filter }))
-    },
-    [dispatch, perPage, filter]
-  )
-
-  useEffect(() => {
-    if (!store.crud) return
-
-    if (store.crud.status) {
-      toast.success('Success saved')
-      handleChangePage(page)
-      dispatch(resetRedux())
-    } else {
-      toast.error('Error saved: ' + store.crud.message)
-    }
-  }, [dispatch, handleChangePage, page, store.crud])
-
   const onAddForm = () => {
-    router.replace('/app/kebersihan-inspeksi/form')
+    router.replace('/app/penempatan-kamar-santri/form')
   }
 
   const onImport = () => {
-    router.replace('/app/kebersihan-inspeksi/import')
+    router.replace('/app/penempatan-kamar-santri/import')
   }
 
   const onExport = async () => {
@@ -212,31 +203,13 @@ const TableInspeksi = () => {
     }
   }
 
-  const handleAktifOrArsip = (data: any, status: boolean) => {
-    delete data.hari_custom
-    delete data.status_custom
-    dispatch(
-      postKebersihanInspeksiUpdate({
-        id: data.id_inspeksi,
-        params: {
-          ...data,
-          is_active: status,
-          id_cabang: {
-            value: data.id_cabang
-          },
-          id_petugas: {
-            value: data.id_petugas
-          },
-          kode_slot: {
-            value: data.kode_slot
-          }
-        }
-      })
-    )
-  }
-
   const handleFilter = (event: any) => {
     setFilter(event.target.value)
+  }
+
+  const handleChangePage = (newPage: number) => {
+    setPage(newPage)
+    dispatch(fetchPenempatanKamarSantriPage({ page: newPage, perPage: perPage, q: filter }))
   }
 
   const handleChangePerPage = (event: any) => {
@@ -244,11 +217,11 @@ const TableInspeksi = () => {
 
     setPage(1)
     setPerPage(newPerPage)
-    dispatch(fetchKebersihanInspeksiPage({ page: 1, perPage: newPerPage, q: filter }))
+    dispatch(fetchPenempatanKamarSantriPage({ page: 1, perPage: newPerPage, q: filter }))
   }
 
   const renderOption = (row: any) => {
-    return <RowAction row={row} handleAktifOrArsip={handleAktifOrArsip} />
+    return <RowAction row={row} />
   }
 
   const buildTable = () => {
@@ -261,32 +234,100 @@ const TableInspeksi = () => {
         page: page,
         fields: [
           tableColumn('OPTION', 'act-x', 'left', renderOption as any),
-          tableColumn('CABANG', 'cabang'),
+          tableColumn('SANTRI', 'santri'),
           tableColumn('LOKASI', 'lokasi'),
-          tableColumn('SLOT', 'kode_slot'),
-          tableColumn('TANGGAL', 'tanggal_custom'),
-          tableColumn('WAKTU', 'waktu_custom'),
-          tableColumn('PETUGAS', 'petugas'),
-          tableColumn('STATUS', 'status_kondisi'),
-          tableColumn('CATATAN UMUM', 'catatan_umum'),
-          tableColumn('TERAKHIR DIUBAH', 'updated_at')
+          tableColumn('TAHUN AJARAN', 'tahun_ajaran'),
+          tableColumn('MASUK', 'tanggal_masuk'),
+          tableColumn('KELUAR', 'tanggal_keluar'),
+          tableColumn('KETERANGAN', 'keterangan'),
+          tableColumn('STATUS', 'status'),
+          tableColumn('TERAKHIR DIUBAH', 'updated_at'),
         ],
         values: values?.map((row: any) => {
-          const tanggalArr = row.tanggal?.split('-')
-
           return {
             ...row,
-            cabang: row.cabang.nama_cabang,
-            lokasi: row.lokasi.nama_lokasi,
-            petugas: row.pegawai.nama_lengkap,
-            waktu_custom: row.waktu ? row.waktu.slice(0, -3) : '-',
-            tanggal_custom: row.tanggal ? `${tanggalArr[2]}/${tanggalArr[1]}/${tanggalArr[0]}` : '-'
+            santri:  (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 3,
+                  minWidth: 0
+                }}
+              >
+                <Avatar src={row.foto} sx={{ width: 38, height: 38 }} />
+                <Box>
+                  <Typography
+                    variant='body2'
+                    sx={{
+                      fontWeight: 600,
+                      color: 'text.primary',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      wordBreak: 'break-all',
+                    }}
+                  >
+                    {row.santri.fullname}
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Typography
+                      variant='caption'
+                      sx={{
+                        px: 1,
+                        py: 0.2,
+                        borderRadius: 1,
+                        bgcolor: 'grey.100',
+                        color: 'text.secondary',
+                        fontWeight: 500
+                      }}
+                    >
+                      NIK: {row.santri.nik || '-'}
+                    </Typography>
+
+                    <Typography
+                      variant='caption'
+                      sx={{
+                        px: 1,
+                        py: 0.2,
+                        borderRadius: 1,
+                        bgcolor: 'primary.lighter',
+                        color: 'primary.main',
+                        fontWeight: 500
+                      }}
+                    >
+                      NIS: {row.santri.nis || '-'}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            ),
+            lokasi: (
+              <Box>
+                <Typography variant='body2'>{row.lokasi?.nama_lokasi || '-'}</Typography>
+                <Typography variant='caption' color='text.disabled'>{row.lokasi && row?.lokasi?.parent ? row?.lokasi?.parent?.nama_lokasi : ''}</Typography>
+              </Box>
+            ),
+            tahun_ajaran: (
+              <Box>
+                <Typography variant='body2'>{row.tahunAjaran?.tahun_ajaran || '-'}</Typography>
+                <Typography variant='caption' color='text.disabled'>{row.tahunAjaran?.keterangan || ''}</Typography>
+              </Box>
+            ),
+            status: (
+              <CustomChip
+                round='true'
+                size='small'
+                label={statusObj[row.status]?.value}
+                color={statusObj[row.status]?.color}
+                sx={{ textTransform: 'capitalize' }}
+              />
+            ),
           }
         }),
         count: total,
         perPage: perPage,
         changePage: (_: any, newPage: number) => {
-          handleChangePage(newPage + 1)
+          handleChangePage(newPage + 1);
         },
         changePerPage: (event: any, o: any) => {
           handleChangePerPage(event)
@@ -299,54 +340,54 @@ const TableInspeksi = () => {
     <Grid container spacing={6} sx={{ width: '100%' }}>
       <Grid size={12}>
         <Card>
-          <CardHeader title='Kebersihan Inspeksi' sx={{ paddingBottom: 0 }} />
+          <CardHeader title='Penempatan Kamar Santri' sx={{ paddingBottom: 0 }} />
           <Toolbar
             sx={{
               px: '1.5rem !important',
               minHeight: 'auto',
               gap: 2,
               flexWrap: 'wrap',
-              mb: '10px'
+              mb: '10px',
             }}
           >
             {canCreate && (
-              <Tooltip title='Tambah'>
+              <Tooltip title="Tambah">
                 <Button
-                  size='small'
-                  variant='outlined'
+                  size="small"
+                  variant="outlined"
                   sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
                   onClick={onAddForm}
-                  startIcon={<i className='tabler-plus' />}
+                  startIcon={<i className="tabler-plus" />}
                 >
                   Tambah
                 </Button>
               </Tooltip>
             )}
 
-            {/* {canImport && (
-              <Tooltip title='Import CSV'>
+            {canImport && (
+              <Tooltip title="Import CSV">
                 <Button
-                  size='small'
-                  color='success'
-                  variant='outlined'
+                  size="small"
+                  color="success"
+                  variant="outlined"
                   sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
                   onClick={onImport}
-                  startIcon={<i className='tabler-file-import' />}
+                  startIcon={<i className="tabler-file-import" />}
                 >
                   Import CSV
                 </Button>
               </Tooltip>
-            )} */}
+            )}
 
             {canExport && (
-              <Tooltip title='Export CSV'>
+              <Tooltip title="Export CSV">
                 <Button
-                  size='small'
-                  color='warning'
-                  variant='outlined'
+                  size="small"
+                  color="warning"
+                  variant="outlined"
                   sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
                   onClick={onExport}
-                  startIcon={<i className='tabler-file-export' />}
+                  startIcon={<i className="tabler-file-export" />}
                 >
                   {loadingExport ? 'Proses...' : 'Export CSV'}
                 </Button>
@@ -364,4 +405,4 @@ const TableInspeksi = () => {
   )
 }
 
-export default TableInspeksi
+export default TablePenempatanKamarSantri
