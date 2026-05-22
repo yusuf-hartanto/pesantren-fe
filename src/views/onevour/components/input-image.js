@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -63,9 +63,9 @@ const InputImage = props => {
 
   const renderFilePreview = file => {
     if (file.type.startsWith('image')) {
-      return <img width={38} height={38} alt={file.name} src={URL.createObjectURL(file)} />
+      return <img alt={file.name} src={URL.createObjectURL(file)} />
     } else {
-      return <i className='tabler-file-description' />
+      return <i className='tabler-file-description' style={{ fontSize: '2.5rem' }} />
     }
   }
 

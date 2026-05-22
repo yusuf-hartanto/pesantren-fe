@@ -37,6 +37,14 @@ import shift_presensi from '@/app/(dashboard)/(private)/app/shift-presensi/slice
 import master_slot_waktu from '@/app/(dashboard)/(private)/app/master-slot-waktu/slice/index'
 import geo_areas from '@/app/(dashboard)/(private)/app/location/slice/geoAreaSlice'
 
+import jadwal_inspeksi_kebersihan from '@/app/(dashboard)/(private)/app/jadwal-inspeksi-kebersihan/slice/index'
+import kebersihan_inspeksi from '@/app/(dashboard)/(private)/app/kebersihan-inspeksi/slice/index'
+import santri from '@/app/(dashboard)/(private)/app/santri/slice/index'
+import kebersihan_temuan from '@/app/(dashboard)/(private)/app/kebersihan-temuan/slice/index'
+import absen_harian_santri from '@/app/(dashboard)/(private)/app/absen-harian-santri/slice/index'
+import user from '@/app/(dashboard)/(private)/app/user/slice/index'
+import kebersihan_scan_log from '@/app/(dashboard)/(private)/app/kebersihan-scan-log/slice/index'
+import penempatan_kamar_santri from '@/app/(dashboard)/(private)/app/penempatan-kamar-santri/slice/index'
 
 export const store = configureStore({
   reducer: {
@@ -73,7 +81,15 @@ export const store = configureStore({
     jadwal_pelajaran,
     shift_presensi,
     master_slot_waktu,
-    geo_areas
+    geo_areas,
+    jadwal_inspeksi_kebersihan,
+    kebersihan_inspeksi,
+    santri,
+    kebersihan_temuan,
+    absen_harian_santri,
+    user,
+    kebersihan_scan_log,
+    penempatan_kamar_santri
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false })
 })

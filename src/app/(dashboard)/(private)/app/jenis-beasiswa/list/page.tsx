@@ -109,7 +109,7 @@ function RowAction(data: any) {
         )}
 
         {canDelete && (
-          <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}>
+          <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 }, color: 'error.main' }}>
             <i className='tabler-trash' />
             Delete
           </MenuItem>
@@ -325,8 +325,8 @@ const Table = () => {
               </Tooltip>
             )}
             <Typography sx={{ flex: '1 1 auto' }} />
-            <Tooltip title='Search'>
-              <TextField id='outlined-basic' label='Search' size='small' onChange={handleFilter} />
+            <Tooltip title='Cari...'>
+              <TextField id='outlined-basic' label='Cari...' size='small' onChange={handleFilter} />
             </Tooltip>
           </Toolbar>
           <TableView model={buildTable()} changeSort={null} />

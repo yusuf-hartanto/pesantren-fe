@@ -6,7 +6,6 @@ import type { ReactNode } from 'react'
 
 // Next Imports
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
 
 // MUI Imports
 import IconButton from '@mui/material/IconButton'

@@ -134,7 +134,7 @@ function RowAction(data: any) {
         ]}
 
         {canDelete && (
-          <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}>
+          <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 }, color: 'error.main' }}>
             <i className='tabler-trash' />
             Delete
           </MenuItem>
@@ -312,7 +312,7 @@ const Table = () => {
         values: values?.map((row: any) => {
           return {
             ...row,
-            jam: `${row.jam_pelajaran.mulai?.slice(0, -3)} - ${row.jam_pelajaran.selesai?.slice(0, -3)}`,
+            jam: `${row.jam_pelajaran?.mulai?.slice(0, -3)} - ${row.jam_pelajaran?.selesai?.slice(0, -3)}`,
             kelas: `${row.kelas_formal ? row.kelas_formal?.nama_kelas : row.kelas_mda?.nama_kelas_mda} (${row.kelas_formal ? row.kelas_formal?.lembaga?.nama_lembaga : row.kelas_mda?.lembaga?.nama_lembaga})`,
             mapel: row.jenis_guru?.mata_pelajaran?.nama_mapel,
             guru: row.jenis_guru?.pegawai?.nama_lengkap,
@@ -398,8 +398,8 @@ const Table = () => {
               </Tooltip>
             )}
             <Typography sx={{ flex: '1 1 auto' }} />
-            <Tooltip title='Search'>
-              <TextField id='outlined-basic' label='Search' size='small' onChange={handleFilter} />
+            <Tooltip title='Cari...'>
+              <TextField id='outlined-basic' label='Cari...' size='small' onChange={handleFilter} />
             </Tooltip>
           </Toolbar>
           <TableView model={buildTable()} changeSort={null} />

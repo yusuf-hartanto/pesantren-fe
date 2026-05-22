@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getSession } from 'next-auth/react'
 
 import api from '@/libs/axios'
 
@@ -50,11 +49,8 @@ const initialState: InitialState = {
 export const fetchStatusAwalSantriAll = createAsyncThunk<any>(
   'status-awal-santri/fetchAll',
   async (params, thunkAPI) => {
-    const session = await getSession()
-
     try {
       const response = await api.get(`/app/status-awal-santri/all-data`, {
-        headers: { Authorization: `Bearer ${session?.access_token}` },
         params
       })
 
@@ -68,11 +64,8 @@ export const fetchStatusAwalSantriAll = createAsyncThunk<any>(
 export const fetchStatusAwalSantriPage = createAsyncThunk<any, FetchParams>(
   'status-awal-santri/fetchPage',
   async (params, thunkAPI) => {
-    const session = await getSession()
-
     try {
       const response = await api.get(`/app/status-awal-santri`, {
-        headers: { Authorization: `Bearer ${session?.access_token}` },
         params
       })
 
@@ -86,12 +79,8 @@ export const fetchStatusAwalSantriPage = createAsyncThunk<any, FetchParams>(
 export const fetchStatusAwalSantriById = createAsyncThunk<any, string>(
   'status-awal-santri/fetchById',
   async (id, thunkAPI) => {
-    const session = await getSession()
-
     try {
-      const response = await api.get(`/app/status-awal-santri/${id}`, {
-        headers: { Authorization: `Bearer ${session?.access_token}` }
-      })
+      const response = await api.get(`/app/status-awal-santri/${id}`, {})
 
       return response.data
     } catch (e: any) {
@@ -103,12 +92,8 @@ export const fetchStatusAwalSantriById = createAsyncThunk<any, string>(
 export const postStatusAwalSantri = createAsyncThunk<any, any>(
   'status-awal-santri/create',
   async (params, thunkAPI) => {
-    const session = await getSession()
-
     try {
-      const response = await api.post(`/app/status-awal-santri`, params, {
-        headers: { Authorization: `Bearer ${session?.access_token}` }
-      })
+      const response = await api.post(`/app/status-awal-santri`, params, {})
 
       return response.data
     } catch (e: any) {
@@ -133,12 +118,8 @@ export const postBatchStatusAwalSantri = createAsyncThunk<any, any>(
 export const postStatusAwalSantriUpdate = createAsyncThunk<any, { id: string; param: any }>(
   'status-awal-santri/update',
   async ({ id, param }, thunkAPI) => {
-    const session = await getSession()
-
     try {
-      const response = await api.put(`/app/status-awal-santri/${id}`, param, {
-        headers: { Authorization: `Bearer ${session?.access_token}` }
-      })
+      const response = await api.put(`/app/status-awal-santri/${id}`, param, {})
 
       return response.data
     } catch (e: any) {
@@ -150,12 +131,8 @@ export const postStatusAwalSantriUpdate = createAsyncThunk<any, { id: string; pa
 export const deleteStatusAwalSantri = createAsyncThunk<any, string>(
   'status-awal-santri/delete',
   async (id, thunkAPI) => {
-    const session = await getSession()
-
     try {
-      const response = await api.delete(`/app/status-awal-santri/${id}`, {
-        headers: { Authorization: `Bearer ${session?.access_token}` }
-      })
+      const response = await api.delete(`/app/status-awal-santri/${id}`, {})
 
       return response.data
     } catch (e: any) {

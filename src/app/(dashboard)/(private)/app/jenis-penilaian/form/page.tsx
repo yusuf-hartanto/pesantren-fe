@@ -7,12 +7,7 @@ import { toast } from 'react-toastify'
 import { useForm } from 'react-hook-form'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import {
-  fetchJenisPenilaianById,
-  postJenisPenilaian,
-  postJenisPenilaianUpdate,
-  resetRedux
-} from '../slice'
+import { fetchJenisPenilaianById, postJenisPenilaian, postJenisPenilaianUpdate, resetRedux } from '../slice'
 
 import { field, fieldBuildSubmit, formColumn } from '@views/onevour/form/AppFormBuilder'
 
@@ -50,7 +45,12 @@ const JenisPenilaianForm = () => {
     keterangan: ''
   })
 
-  const { control, handleSubmit, formState: { errors }, reset } = useForm({ values: state })
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm({ values: state })
 
   const initForm = useCallback(async () => {
     try {
@@ -69,11 +69,13 @@ const JenisPenilaianForm = () => {
         }
       }
     } catch (err) {
-      toast.error("Gagal memuat data detail")
+      toast.error('Gagal memuat data detail')
     }
   }, [id, dispatch, reset, opt])
 
-  useEffect(() => { initForm() }, [initForm])
+  useEffect(() => {
+    initForm()
+  }, [initForm])
 
   useEffect(() => {
     if (store.crud) {
@@ -82,7 +84,7 @@ const JenisPenilaianForm = () => {
         dispatch(resetRedux())
         router.replace('/app/jenis-penilaian/list')
       } else {
-        toast.error(store.crud.message || "Terjadi kesalahan")
+        toast.error(store.crud.message || 'Terjadi kesalahan')
         dispatch(resetRedux())
       }
     }
@@ -93,7 +95,7 @@ const JenisPenilaianForm = () => {
       ...state,
       lembaga_type: state.lembaga_type?.value,
       is_ujian: state.is_ujian?.value,
-      status: state.status?.value,
+      status: state.status?.value
     }
 
     if (id) {
@@ -164,7 +166,9 @@ const JenisPenilaianForm = () => {
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
-          <CardHeader title={id ? (view ? 'Detail Jenis Penilaian' : 'Edit Jenis Penilaian') : 'Tambah Jenis Penilaian'} />
+          <CardHeader
+            title={id ? (view ? 'Detail Jenis Penilaian' : 'Edit Jenis Penilaian') : 'Tambah Jenis Penilaian'}
+          />
           <Divider sx={{ m: '0 !important' }} />
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)}>

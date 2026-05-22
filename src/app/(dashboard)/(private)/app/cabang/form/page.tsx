@@ -13,7 +13,7 @@ import {
   fetchRegenciesByProvince,
   fetchDistrictsByRegency,
   fetchSubDistrictsByDistrict
-} from '../../areas/slice/index';
+} from '../../areas/slice/index'
 
 import { field, fieldBuildSubmit, formColumn } from '@views/onevour/form/AppFormBuilder'
 
@@ -46,7 +46,12 @@ const CabangForm = () => {
     sub_district_id: null
   })
 
-  const { control, handleSubmit, formState: { errors }, reset } = useForm({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm({
     values: state // Menggunakan 'values' agar form sinkron dengan state lokal
   })
 
@@ -92,7 +97,7 @@ const CabangForm = () => {
             province_id: provinceOptions.find(o => o.value === d.province_id) || null,
             city_id: cityOptions.find(o => o.value === d.city_id) || null,
             district_id: distOptions.find(o => o.value === d.district_id) || null,
-            sub_district_id: subOptions.find(o => o.value === d.sub_district_id) || null,
+            sub_district_id: subOptions.find(o => o.value === d.sub_district_id) || null
           }
 
           // 6. Set state dan reset dengan delay kecil (agar UI sempat merender opsi)
@@ -105,39 +110,65 @@ const CabangForm = () => {
         setOpt(prev => ({ ...prev, provinces: provinceOptions }))
       }
     } catch (err) {
-      toast.error("Gagal memuat data")
+      toast.error('Gagal memuat data')
     }
   }, [id, dispatch, reset])
   useEffect(() => {
     initForm()
   }, [initForm])
 
-
   /* -----------------------------------------------------------
      2. EVENT HANDLERS: Perubahan Dropdown (Reset Child)
   ----------------------------------------------------------- */
 
   const handleProvinceChange = async (val: any) => {
-    setState((p: any) => ({ ...p, province_id: val, city_id: null, district_id: null, sub_district_id: null }))
+    const newState = { ...state, province_id: val, city_id: null, district_id: null, sub_district_id: null }
+    setState(newState)
+    reset(newState)
+
     if (val?.value) {
       const res = await dispatch(fetchRegenciesByProvince(val.value)).unwrap()
-      setOpt(prev => ({ ...prev, cities: mapToDropdown(res?.data), districts: [], subDistricts: [] }))
+      setOpt(prev => ({
+        ...prev,
+        cities: mapToDropdown(res?.data),
+        districts: [],
+        subDistricts: []
+      }))
+    } else {
+      setOpt(prev => ({ ...prev, cities: [], districts: [], subDistricts: [] }))
     }
   }
 
   const handleCityChange = async (val: any) => {
-    setState((p: any) => ({ ...p, city_id: val, district_id: null, sub_district_id: null }))
+    const newState = { ...state, city_id: val, district_id: null, sub_district_id: null }
+    setState(newState)
+    reset(newState)
+
     if (val?.value) {
       const res = await dispatch(fetchDistrictsByRegency(val.value)).unwrap()
-      setOpt(prev => ({ ...prev, districts: mapToDropdown(res?.data), subDistricts: [] }))
+      setOpt(prev => ({
+        ...prev,
+        districts: mapToDropdown(res?.data),
+        subDistricts: []
+      }))
+    } else {
+      setOpt(prev => ({ ...prev, districts: [], subDistricts: [] }))
     }
   }
 
   const handleDistrictChange = async (val: any) => {
-    setState((p: any) => ({ ...p, district_id: val, sub_district_id: null }))
+    const newState = { ...state, district_id: val, sub_district_id: null }
+    setState(newState)
+    reset(newState)
+
     if (val?.value) {
       const res = await dispatch(fetchSubDistrictsByDistrict(val.value)).unwrap()
-      setOpt(prev => ({ ...prev, subDistricts: mapToDropdown(res?.data) }))
+      setOpt(prev => ({
+        ...prev,
+        subDistricts: mapToDropdown(res?.data)
+      }))
+    } else {
+      setOpt(prev => ({ ...prev, subDistricts: [] }))
     }
   }
 
@@ -165,7 +196,7 @@ const CabangForm = () => {
       province_id: state.province_id?.value,
       city_id: state.city_id?.value,
       district_id: state.district_id?.value,
-      sub_district_id: state.sub_district_id?.value,
+      sub_district_id: state.sub_district_id?.value
     }
     if (id) {
       dispatch(postCabangUpdate({ id, params: payload }))
@@ -184,7 +215,7 @@ const CabangForm = () => {
       label: 'Provinsi',
       options: { values: opt.provinces },
       readOnly: !!view,
-      onChange: handleProvinceChange
+      onChange: (val: any) => handleProvinceChange(val)
     }),
     field({
       type: 'select',
@@ -193,7 +224,7 @@ const CabangForm = () => {
       options: { values: opt.cities },
       disabled: !state.province_id,
       readOnly: !!view,
-      onChange: handleCityChange
+      onChange: (val: any) => handleCityChange(val)
     }),
     field({
       type: 'select',
@@ -202,7 +233,7 @@ const CabangForm = () => {
       options: { values: opt.districts },
       disabled: !state.city_id,
       readOnly: !!view,
-      onChange: handleDistrictChange
+      onChange: (val: any) => handleDistrictChange(val)
     }),
     field({
       type: 'select',
@@ -211,7 +242,11 @@ const CabangForm = () => {
       options: { values: opt.subDistricts },
       disabled: !state.district_id,
       readOnly: !!view,
-      onChange: (val: any) => setState((p: any) => ({ ...p, sub_district_id: val }))
+      onChange: (val: any) => {
+        const newState = { ...state, sub_district_id: val }
+        setState(newState)
+        reset(newState)
+      }
     }),
 
     field({ type: 'textarea', key: 'alamat', label: 'Alamat Lengkap', required: true, readOnly: !!view }),

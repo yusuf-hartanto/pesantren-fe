@@ -99,7 +99,7 @@ function RowAction(data: any) {
           Edit
         </MenuItem>
 
-        <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 } }}>
+        <MenuItem onClick={() => setOpenConfirm(true)} sx={{ '& svg': { mr: 2 }, color: 'error.main' }}>
           <i className='tabler-trash' />
           Delete
         </MenuItem>
@@ -225,8 +225,8 @@ const Table = () => {
               </Button>
             </Tooltip>
             <Typography sx={{ flex: '1 1 100%' }} variant='h6' id='tableTitle' component='div'></Typography>
-            <Tooltip title='Search'>
-              <TextField id='outlined-basic' fullWidth label='Search' size='small' onChange={handleFilter} />
+            <Tooltip title='Cari...'>
+              <TextField id='outlined-basic' fullWidth label='Cari...' size='small' onChange={handleFilter} />
             </Tooltip>
           </Toolbar>
           <TableView model={buildTable()} changeSort={null} />

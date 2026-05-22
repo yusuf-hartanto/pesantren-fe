@@ -25,10 +25,11 @@ export const authOptions: NextAuthOptions = {
 
           const json = await res.json()
 
-          if (!res.ok) {
+          if (!res.ok || !json?.data) {
             throw new Error(
               JSON.stringify({
-                message: 'Username atau password salah'
+                message: 'Username atau password salah',
+                message_dev: json?.message || 'Login gagal',
               })
             )
           }
@@ -40,16 +41,17 @@ export const authOptions: NextAuthOptions = {
             access_token: data.access_token,
             refresh_token: data.refresh_token,
             userdata: {
-              resource_id: data.userdata.resource_id,
+              username: data.userdata.username,
               full_name: data.userdata.full_name,
               email: data.userdata.email,
-              username: data.userdata.username,
               role_name: data.userdata.role.role_name,
             },
 
             permissions: normalizeAbility(data.userdata.ability)
           }
         } catch (err) {
+          console.error("LOGIN ERROR:", err);
+          
           return null
         }
       }
@@ -62,7 +64,6 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.access_token = user.access_token
-        token.refresh_token = user.refresh_token
         token.userdata = user.userdata
         token.permissions = user.permissions
       }

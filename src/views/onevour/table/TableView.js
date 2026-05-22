@@ -10,12 +10,13 @@ import TableBody from '@mui/material/TableBody'
 import TablePagination from '@mui/material/TablePagination'
 import TableSortLabel from '@mui/material/TableSortLabel'
 
-import { useIsMobile } from "@core/hooks/useIsMobile"
+import { useIsMobile } from '@core/hooks/useIsMobile'
+import { getNestedValue } from './TableViewBuilder'
 
 const TableView = ({ model, changeSort, ...res }) => {
   const [order, setOrder] = useState('asc') // "asc" | "desc"
   const [orderBy, setOrderBy] = useState('') // field name
-  const isMobile = useIsMobile(1000);
+  const isMobile = useIsMobile(1000)
 
   useEffect(() => {
     if (changeSort) {
@@ -71,30 +72,25 @@ const TableView = ({ model, changeSort, ...res }) => {
                 hover={res.hover || false}
               >
                 {model.fields.map((x, y) => {
+                  // Mengambil nilai nested jika ada dot notation (misal: 'santri.fullname')
+                  const rawValue = getNestedValue(o, x.key)
+
                   if (x.key === 'act-x') {
-                    return <Fragment key={y}>{x.format(o, o[x.key])}</Fragment>
+                    return <Fragment key={y}>{x.format(o, rawValue)}</Fragment>
                   }
 
-                  // has format
+                  // Jika kolom memiliki fungsi format custom
                   if (x.format) {
-                    if (x.key) {
-                      return (
-                        <TableCell key={y} align={x.align}>
-                          {x.format(o, o[x.key])}
-                        </TableCell>
-                      )
-                    }
-
                     return (
                       <TableCell key={y} align={x.align}>
-                        {x.format(o, null)}
+                        {x.format(o, x.key ? rawValue : null)}
                       </TableCell>
                     )
                   }
 
                   return (
                     <TableCell key={y} align={x.align}>
-                      {o[x.key]}
+                      {rawValue}
                     </TableCell>
                   )
                 })}
@@ -105,99 +101,94 @@ const TableView = ({ model, changeSort, ...res }) => {
     )
   }
 
-  const renderMobileRows = (model) => {
+  const renderMobileRows = model => {
     if (!model?.values || model.values.length === 0) {
-      return (
-        <div className="text-center py-8 text-gray-500">
-          Tidak Ada Data
-        </div>
-      )
+      return <div className='text-center py-8 text-gray-500'>Tidak Ada Data</div>
     }
 
     return (
       <div>
         {model.values?.map((row, i) => {
-          const statusField = model.fields.find(f => f.key === "status");
-          const updatedField = model.fields.find(f => f.key === "updated_at");
-          const actionField = model.fields.find(f => f.key === "act-x");
-          const descriptionFields = model.fields.filter(f => ["keterangan", "description"].includes(f.key.toLowerCase()));
+          const statusField = model.fields.find(f => ['status', 'status_label', 'status_display'].includes(f.key))
+          const updatedField = model.fields.find(f => f.key === 'updated_at')
+          const actionField = model.fields.find(f => f.key === 'act-x')
+          const descriptionFields = model.fields.filter(f =>
+            ['keterangan', 'description'].includes(f.key.toLowerCase())
+          )
 
           const otherFields = model.fields.filter(
-            f => !["status", "updated_at", "act-x", "keterangan", "description"].includes(f.key)
-          );
+            f =>
+              ![
+                'status',
+                'status_label',
+                'status_display',
+                'updated_at',
+                'act-x',
+                'keterangan',
+                'description'
+              ].includes(f.key)
+          )
 
           return (
-            <div
-              key={i}
-              className="border rounded-xl p-4 mb-3 bg-white shadow-sm relative"
-            >
+            <div key={i} className='border rounded-xl p-4 mb-3 bg-white shadow-sm relative'>
               {statusField && (
-                <div className="absolute top-2 right-2 text-xs px-2 py-1 rounded">
-                  {statusField.format ? statusField.format(row, row[statusField.key]) : row[statusField.key]}
+                <div className='absolute top-2 right-2 text-xs px-2 py-1 rounded'>
+                  {statusField.format
+                    ? statusField.format(row, getNestedValue(row, statusField.key))
+                    : getNestedValue(row, statusField.key)}
                 </div>
               )}
 
-              <div className="flex-1 grid grid-cols-2 gap-3 mt-2">
+              <div className='flex-1 grid grid-cols-2 gap-3 mt-2'>
                 {otherFields.map((f, idx) => {
+                  const val = getNestedValue(row, f.key)
                   return (
-                    <div
-                      key={idx}
-                      className="text-sm col-span-1"
-                    >
-                      <div className="text-gray-500 text-xs">{f.title}</div>
-                      <div className="font-medium">
-                        {f.format ? f.format(row, row[f.key]) : row[f.key]}
-                      </div>
+                    <div key={idx} className='text-sm col-span-1'>
+                      <div className='text-gray-500 text-xs'>{f.title}</div>
+                      <div className='font-medium'>{f.format ? f.format(row, val) : val}</div>
                     </div>
-                  );
+                  )
                 })}
-                {descriptionFields.map((f, idx) => (
-                  <div key={`desc-${idx}`} className="text-sm col-span-2">
-                    <div className="text-gray-500 text-xs">{f.title}</div>
-                    <div className="font-medium">
-                      {f.format ? f.format(row, row[f.key]) : row[f.key]}
+                {descriptionFields.map((f, idx) => {
+                  const val = getNestedValue(row, f.key)
+                  return (
+                    <div key={`desc-${idx}`} className='text-sm col-span-2'>
+                      <div className='text-gray-500 text-xs'>{f.title}</div>
+                      <div className='font-medium'>{f.format ? f.format(row, val) : val}</div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
 
-              <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-200">
+              <div className='flex justify-between items-center mt-4 pt-3 border-t border-gray-200'>
                 {updatedField ? (
-                  <div className="text-xs text-gray-500">
-                    <div className="text-gray-500 text-xs">{updatedField.title}</div>
+                  <div className='text-xs text-gray-500'>
+                    <div className='text-gray-500 text-xs'>{updatedField.title}</div>
                     {updatedField.format
-                      ? updatedField.format(row, row[updatedField.key])
-                      : row[updatedField.key]
-                    }
+                      ? updatedField.format(row, getNestedValue(row, updatedField.key))
+                      : getNestedValue(row, updatedField.key)}
                   </div>
                 ) : (
                   <div></div>
                 )}
 
                 {actionField && (
-                  <div className="shrink-0">
-                    {actionField.format(row, row[actionField.key])}
-                  </div>
+                  <div className='shrink-0'>{actionField.format(row, getNestedValue(row, actionField.key))}</div>
                 )}
               </div>
-
             </div>
-          );
+          )
         })}
       </div>
-    );
+    )
   }
 
-  const renderEmptyRow = (model) => {
+  const renderEmptyRow = model => {
     const colSpan = model?.fields?.length || 1
 
     return (
       <TableRow>
-        <TableCell
-          colSpan={colSpan}
-          align="center"
-          sx={{ py: 4, color: 'text.secondary' }}
-        >
+        <TableCell colSpan={colSpan} align='center' sx={{ py: 4, color: 'text.secondary' }}>
           Tidak Ada Data
         </TableCell>
       </TableRow>

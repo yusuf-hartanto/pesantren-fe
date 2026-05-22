@@ -17,16 +17,13 @@ import {
   Menu,
   MenuItem,
   Box,
-  Chip
+  Chip,
+  Tooltip
 } from '@mui/material'
 
 import { toast } from 'react-toastify'
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import {
-  deleteJabatan,
-  fetchJabatanPage,
-  resetRedux
-} from '../slice/index'
+import { deleteJabatan, fetchJabatanPage, postExport, resetRedux } from '../slice/index'
 import { useCan } from '@/hooks/useCan'
 
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
@@ -51,25 +48,13 @@ const RowAction = ({ row, onDeleteSuccess }: { row: any; onDeleteSuccess: (id: s
       <IconButton size='small' onClick={handleOpen}>
         <i className='tabler-dots-vertical' />
       </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem
-          component={Link}
-          href={`/app/jabatan/form?id=${row.id_jabatan}&view=true`}
-          onClick={handleClose}
-        >
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+        <MenuItem component={Link} href={`/app/jabatan/form?id=${row.id_jabatan}&view=true`} onClick={handleClose}>
           <i className='tabler-eye' style={{ marginRight: 8 }} /> View
         </MenuItem>
 
         {canEdit && (
-          <MenuItem
-            component={Link}
-            href={`/app/jabatan/form?id=${row.id_jabatan}`}
-            onClick={handleClose}
-          >
+          <MenuItem component={Link} href={`/app/jabatan/form?id=${row.id_jabatan}`} onClick={handleClose}>
             <i className='tabler-edit' style={{ marginRight: 8 }} /> Edit
           </MenuItem>
         )}
@@ -103,9 +88,15 @@ const JabatanList = () => {
   const dispatch = useAppDispatch()
   const store = useAppSelector(state => state.jabatan)
 
+  // Permission Hooks
+  const canCreate = useCan('create')
+  const canImport = useCan('import')
+  const canExport = useCan('export')
+
   const [filter, setFilter] = useState('')
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
+  const [loadingExport, setLoadingExport] = useState(false)
 
   const fetchData = useCallback(() => {
     // Mengirim keyword untuk pencarian di Repository Backend
@@ -130,8 +121,42 @@ const JabatanList = () => {
     }
   }, [store.delete, dispatch, fetchData])
 
+  const onAddForm = () => {
+    router.replace('/app/jabatan/form')
+  }
+
+  const onImport = () => {
+    router.replace('/app/jabatan/import')
+  }
+
+  const onExport = async () => {
+    try {
+      setLoadingExport(true)
+      const res = await dispatch(postExport({ q: filter })).unwrap()
+
+      if (res?.status && res?.data) {
+        const url = `${process.env.NEXT_PUBLIC_API_URL}${res.data}`
+        const link = document.createElement('a')
+
+        link.href = url
+        link.download = ''
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+    } catch {
+      toast.error('Gagal export data')
+    } finally {
+      setLoadingExport(false)
+    }
+  }
+
+  const handleFilter = (event: any) => {
+    setFilter(event.target.value)
+  }
+
   const renderOption = (row: any) => {
-    return <RowAction row={row} onDeleteSuccess={(id) => dispatch(deleteJabatan(id))} />
+    return <RowAction row={row} onDeleteSuccess={id => dispatch(deleteJabatan(id))} />
   }
 
   const buildTable = () => {
@@ -146,7 +171,7 @@ const JabatanList = () => {
         tableColumn('NAMA JABATAN', 'nama_jabatan'),
         tableColumn('UNIT ORGANISASI', 'orgunit_display'),
         tableColumn('SIFAT', 'sifat_display'),
-        tableColumn('LEVEL', 'level_display'),
+        tableColumn('LEVEL', 'level_display')
       ],
       values: values.map((row: any) => ({
         ...row,
@@ -163,20 +188,10 @@ const JabatanList = () => {
         ),
         // Chip untuk Sifat Jabatan
         sifat_display: (
-          <Chip
-            label={row.sifat_jabatan}
-            size='small'
-            variant='tonal'
-            color='secondary'
-            sx={{ fontWeight: 500 }}
-          />
+          <Chip label={row.sifat_jabatan} size='small' variant='tonal' color='secondary' sx={{ fontWeight: 500 }} />
         ),
         // Menampilkan Level Jabatan
-        level_display: (
-          <Typography variant='body2'>
-            Level {row.level_jabatan}
-          </Typography>
-        )
+        level_display: <Typography variant='body2'>Level {row.level_jabatan}</Typography>
       })),
       count: dataPage?.total || 0,
       perPage: perPage,
@@ -192,31 +207,65 @@ const JabatanList = () => {
     <Grid container spacing={6}>
       <Grid size={12}>
         <Card>
-          <CardHeader
-            title='Master Data Jabatan'
-            subheader='Kelola posisi dan struktur jabatan organisasi'
-          />
-          <Toolbar sx={{ gap: 2, mb: 4, px: '1.5rem !important' }}>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button
-                variant='contained'
-                startIcon={<i className='tabler-plus' />}
-                onClick={() => router.push('/app/jabatan/form')}
-              >
-                Tambah
-              </Button>
-            </Box>
+          <CardHeader title='Jabatan' sx={{ paddingBottom: 0 }} />
+          <Toolbar
+            sx={{
+              px: '1.5rem !important',
+              minHeight: 'auto',
+              gap: 2,
+              flexWrap: 'wrap',
+              mb: '10px'
+            }}
+          >
+            {canCreate && (
+              <Tooltip title='Tambah'>
+                <Button
+                  size='small'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onAddForm}
+                  startIcon={<i className='tabler-plus' />}
+                >
+                  Tambah
+                </Button>
+              </Tooltip>
+            )}
+
+            {canImport && (
+              <Tooltip title='Import CSV'>
+                <Button
+                  size='small'
+                  color='success'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onImport}
+                  startIcon={<i className='tabler-file-import' />}
+                >
+                  Import CSV
+                </Button>
+              </Tooltip>
+            )}
+
+            {canExport && (
+              <Tooltip title='Export CSV'>
+                <Button
+                  size='small'
+                  color='warning'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onExport}
+                  startIcon={<i className='tabler-file-export' />}
+                >
+                  {loadingExport ? 'Proses...' : 'Export CSV'}
+                </Button>
+              </Tooltip>
+            )}
             <Typography sx={{ flex: '1 1 auto' }} />
-            <TextField
-              size='small'
-              placeholder='Cari nama, kode, atau unit...'
-              onChange={(e) => {
-                setFilter(e.target.value)
-                setPage(1)
-              }}
-            />
+            <Tooltip title='Search'>
+              <TextField id='outlined-basic' label='Search' size='small' onChange={handleFilter} />
+            </Tooltip>
           </Toolbar>
-          <TableView changeSort={() => { }} model={buildTable()} />
+          <TableView changeSort={() => {}} model={buildTable()} />
         </Card>
       </Grid>
     </Grid>

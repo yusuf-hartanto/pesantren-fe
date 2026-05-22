@@ -1,3 +1,5 @@
+'use client'
+
 // React Imports
 import type { ReactNode } from 'react'
 
@@ -5,6 +7,10 @@ import type { ReactNode } from 'react'
 import classnames from 'classnames'
 
 // Type Imports
+import useMediaQuery from '@mui/material/useMediaQuery'
+
+import type { Theme } from '@mui/material/styles'
+
 import type { ChildrenType } from '@core/types'
 
 // Component Imports
@@ -16,6 +22,7 @@ import { verticalLayoutClasses } from './utils/layoutClasses'
 // Styled Component Imports
 import StyledContentWrapper from './styles/vertical/StyledContentWrapper'
 
+
 type VerticalLayoutProps = ChildrenType & {
   navigation?: ReactNode
   navbar?: ReactNode
@@ -25,6 +32,8 @@ type VerticalLayoutProps = ChildrenType & {
 const VerticalLayout = (props: VerticalLayoutProps) => {
   // Props
   const { navbar, footer, navigation, children } = props
+  
+  const isBelowMdScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'))
 
   return (
     <div className={classnames(verticalLayoutClasses.root, 'flex flex-auto')}>
@@ -32,7 +41,7 @@ const VerticalLayout = (props: VerticalLayoutProps) => {
       <StyledContentWrapper
         className={classnames(verticalLayoutClasses.contentWrapper, 'flex flex-col min-is-0 is-full')}
       >
-        {navbar || null}
+        {isBelowMdScreen ? null : (navbar || null)}
         {/* Content */}
         <LayoutContent>{children}</LayoutContent>
         {footer || null}

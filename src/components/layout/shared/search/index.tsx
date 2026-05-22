@@ -5,10 +5,9 @@ import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 
 // Next Imports
-import { useParams, useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 
 // MUI Imports
-import IconButton from '@mui/material/IconButton'
 
 // Third-party Imports
 import classnames from 'classnames'
@@ -208,7 +207,7 @@ const NavSearch = () => {
 
   return (
     <>
-      {isBreakpointReached || settings.layout === 'horizontal' ? (
+      {/* {isBreakpointReached || settings.layout === 'horizontal' ? (
         <IconButton className='text-textPrimary' onClick={() => setOpen(true)}>
           <i className='tabler-search text-2xl' />
         </IconButton>
@@ -219,7 +218,7 @@ const NavSearch = () => {
           </IconButton>
           <div className='whitespace-nowrap select-none text-textDisabled'>Search ⌘K</div>
         </div>
-      )}
+      )} */}
       <CommandDialog open={open} onOpenChange={setOpen}>
         <div className='flex items-center justify-between border-be pli-4 plb-3 gap-2'>
           <Title hidden />

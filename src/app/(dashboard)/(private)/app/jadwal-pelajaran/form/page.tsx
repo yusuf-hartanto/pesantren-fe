@@ -92,33 +92,33 @@ const FormValidationBasic = () => {
     hari: {
       value: string
       label: string
-    }
+    } | null
     id_kelas: {
       value: string
       label: string
-    }
+    } | null
     id_tahunajaran: {
       value: string
       label: string
-    }
+    } | null
     id_gmapel: {
       value: string
       label: string
       lembaga_type: string
       id_tingkat: string
-    }
+    } | null
     id_jam_pelajaran: {
       value: string
       label: string
-    }
+    } | null
     id_semester: {
       value: string
       label: string
-    }
+    } | null
     id_lokasi: {
       value: string
       label: string
-    }
+    } | null
     keterangan: string
     status: {
       value: string
@@ -127,36 +127,13 @@ const FormValidationBasic = () => {
   }
 
   const defaultValues = {
-    hari: {
-      value: '',
-      label: ''
-    },
-    id_kelas: {
-      value: '',
-      label: ''
-    },
-    id_tahunajaran: {
-      value: '',
-      label: ''
-    },
-    id_gmapel: {
-      value: '',
-      label: '',
-      lembaga_type: '',
-      id_tingkat: ''
-    },
-    id_jam_pelajaran: {
-      value: '',
-      label: ''
-    },
-    id_semester: {
-      value: '',
-      label: ''
-    },
-    id_lokasi: {
-      value: '',
-      label: ''
-    },
+    hari: null,
+    id_kelas: null,
+    id_tahunajaran: null,
+    id_gmapel: null,
+    id_jam_pelajaran: null,
+    id_semester: null,
+    id_lokasi: null,
     keterangan: '',
     status: {
       value: 'Aktif',
@@ -200,34 +177,45 @@ const FormValidationBasic = () => {
         if (datas) {
           datas.status = statusOption.values.find(r => r.value === datas.status) || { label: 'Arsip', value: 'Arsip' }
           datas.hari = hariOption.values.find(r => r.value === datas.hari)
-          datas.id_kelas = {
-            value: datas.kelas_formal ? datas.kelas_formal.id_kelas : datas.kelas_mda.id_kelas_mda,
-            label: datas.kelas_formal ? datas.kelas_formal.nama_kelas : datas.kelas_mda.nama_kelas
-          }
-          datas.id_tahunajaran = {
-            value: datas.tahun_ajaran.id_tahunajaran,
-            label: datas.tahun_ajaran.tahun_ajaran
-          }
-          datas.id_gmapel = {
-            lembaga_type: datas.jenis_guru.lembaga_type,
-            id_tingkat: datas.jenis_guru.id_tingkat,
-            value: datas.jenis_guru.id_jenisguru,
-            label: `${datas.jenis_guru.pegawai?.nama_lengkap} - ${datas.jenis_guru.mata_pelajaran?.nama_mapel}`
-          }
-          datas.id_jam_pelajaran = {
-            value: datas.jam_pelajaran.id_jampel,
-            label: `${datas.jam_pelajaran.mulai?.slice(0, -3)} - ${datas.jam_pelajaran.selesai?.slice(0, -3)}`
-          }
-          datas.id_lokasi = {
-            value: datas.lokasi.id_lokasi,
-            label: datas.lokasi.nama_lokasi
-          }
-          datas.id_semester = {
-            value: datas.semester.id_semester,
-            label: datas.semester.nama_semester
+
+          if (datas.kelas_formal) {
+            datas.id_kelas = {
+              value: datas.kelas_formal.id_kelas,
+              label: datas.kelas_formal.nama_kelas
+            }
           }
 
-          if (datas.id_gmapel.lembaga_type == 'FORMAL') {
+          if (datas.kelas_mda) {
+            datas.id_kelas = {
+              value: datas.kelas_mda.id_kelas_mda,
+              label: datas.kelas_mda.nama_kelas_mda
+            }
+          }
+
+          datas.id_tahunajaran = {
+            value: datas.tahun_ajaran?.id_tahunajaran,
+            label: datas.tahun_ajaran?.tahun_ajaran
+          }
+          datas.id_gmapel = {
+            lembaga_type: datas.jenis_guru?.lembaga_type,
+            id_tingkat: datas.jenis_guru?.id_tingkat,
+            value: datas.jenis_guru?.id_jenisguru,
+            label: `${datas.jenis_guru?.pegawai?.nama_lengkap} - ${datas.jenis_guru?.mata_pelajaran?.nama_mapel}`
+          }
+          datas.id_jam_pelajaran = {
+            value: datas.jam_pelajaran?.id_jampel,
+            label: `${datas.jam_pelajaran?.mulai?.slice(0, -3)} - ${datas.jam_pelajaran?.selesai?.slice(0, -3)}`
+          }
+          datas.id_lokasi = {
+            value: datas.lokasi?.id_lokasi,
+            label: datas.lokasi?.nama_lokasi
+          }
+          datas.id_semester = {
+            value: datas.semester?.id_semester,
+            label: datas.semester?.nama_semester
+          }
+
+          if (datas.id_gmapel?.lembaga_type == 'FORMAL') {
             dispatch(
               fetchKelasFormalAll({
                 status: 'Aktif',
@@ -272,7 +260,7 @@ const FormValidationBasic = () => {
       dispatch(
         postJadwalPelajaranUpdate({
           id: id,
-          params: { ...state, status: state.status.value, hari: state.hari.value }
+          params: { ...state, status: state.status.value, hari: state.hari?.value }
         })
       )
     } else {
@@ -280,7 +268,7 @@ const FormValidationBasic = () => {
         postJadwalPelajaran({
           ...state,
           status: state.status.value,
-          hari: state.hari.value
+          hari: state.hari?.value
         })
       )
     }
@@ -305,7 +293,7 @@ const FormValidationBasic = () => {
             if (!value.value) return
 
             dispatch(fetchSemesterAll({ status: 'Aktif', id_tahunajaran: value.value }))
-            setValue('id_semester', { value: '', label: '' })
+            setValue('id_semester', null)
           }
         },
         readOnly: Boolean(view)
@@ -369,8 +357,8 @@ const FormValidationBasic = () => {
           onChange: async (value: any) => {
             if (!value.value) return
 
-            setValue('id_kelas', { value: '', label: '' })
-            setState(state => ({ ...state, id_kelas: { value: '', label: '' } }))
+            setValue('id_kelas', null)
+            setState(state => ({ ...state, id_kelas: null }))
 
             if (value.lembaga_type == 'FORMAL') {
               dispatch(
@@ -409,7 +397,7 @@ const FormValidationBasic = () => {
               : storeKelasMda.datas.map(r => {
                   return {
                     label: r.nama_kelas_mda,
-                    value: r.id_kelas
+                    value: r.id_kelas_mda
                   }
                 })
         },

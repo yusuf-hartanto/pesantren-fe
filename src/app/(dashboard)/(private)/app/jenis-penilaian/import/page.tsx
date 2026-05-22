@@ -1,11 +1,8 @@
 'use client'
 
 import { useCallback, useRef, useState } from 'react'
-
 import Link from 'next/link'
-
 import { useRouter } from 'next/navigation'
-
 import { toast } from 'react-toastify'
 import Button from '@mui/material/Button'
 
@@ -13,8 +10,11 @@ import { useAppDispatch } from '@/redux-store/hook'
 import { postBatch, postExport, postImport, resetRedux } from '../slice'
 
 export interface ImportPayload {
-  tahun_ajaran: string
-  status: string
+  jenis_pengujian: string
+  singkatan: string | null
+  lembaga_type: 'FORMAL' | 'PESANTREN'
+  is_ujian: number
+  status: 'active' | 'inactive'
   keterangan: string | null
 }
 
@@ -38,7 +38,7 @@ interface Props {
   onCommit: () => void
 }
 
-export default function ImportExcelPage() {
+export default function ImportExcelJenisPenilaianPage() {
   const dispatch = useAppDispatch()
   const router = useRouter()
 
@@ -52,7 +52,7 @@ export default function ImportExcelPage() {
 
   const onCancel = useCallback(() => {
     dispatch(resetRedux())
-    router.replace('/app/tahun-ajaran/list')
+    router.replace('/app/jenis-penilaian/list')
   }, [dispatch, router])
 
   const downloadTemplate = async () => {
@@ -71,7 +71,6 @@ export default function ImportExcelPage() {
       }
     } catch {
       toast.error('Gagal download template')
-    } finally {
     }
   }
 
@@ -80,14 +79,10 @@ export default function ImportExcelPage() {
 
     if (!file) return
 
-    const allowed = [
-      'text/csv',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    ]
+    const allowed = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
 
     if (!allowed.includes(file.type)) {
-      toast.warning('File harus Excel atau Excel')
+      toast.warning('File harus berformat Excel (.xls, .xlsx)')
       e.target.value = ''
 
       return
@@ -116,7 +111,7 @@ export default function ImportExcelPage() {
         return
       }
 
-      if (mode == 'preview') {
+      if (mode === 'preview') {
         setPreview(data)
       } else {
         toast.success('Import data berhasil')
@@ -131,11 +126,7 @@ export default function ImportExcelPage() {
   }
 
   const handleCommit = async () => {
-    const payloads = preview?.data.map(d => {
-      const { ...payload } = d.payload
-
-      return payload
-    })
+    const payloads = preview?.data.map(d => d.payload)
 
     try {
       setLoadingImport(true)
@@ -148,7 +139,7 @@ export default function ImportExcelPage() {
         return
       }
 
-      toast.success('Import data berhasil')
+      toast.success('Import data jenis penilaian berhasil')
       onCancel()
     } catch (e) {
       console.error(e)
@@ -174,7 +165,7 @@ export default function ImportExcelPage() {
     }
 
     return (
-      <div className='rounded-lg border p-4'>
+      <div className='rounded-lg border p-4 bg-white'>
         <div className='text-sm text-gray-500'>{title}</div>
         <div className={`text-2xl font-bold ${colorMap[color]}`}>{value}</div>
       </div>
@@ -185,35 +176,59 @@ export default function ImportExcelPage() {
     return (
       <div className='space-y-6'>
         <div className='grid grid-cols-3 gap-4'>
-          <SummaryCard title='Total Data' value={result.total} />
+          <SummaryCard title='Total Baris' value={result.total} />
           <SummaryCard title='Valid' value={result.valid} color='green' />
           <SummaryCard title='Invalid' value={result.invalid} color='red' />
         </div>
 
-        <div className='overflow-x-auto rounded-lg border'>
-          <table className='min-w-full text-sm'>
-            <thead className='bg-gray-100 text-left'>
+        <div className='overflow-x-auto rounded-lg border bg-white'>
+          <table className='min-w-full text-xs whitespace-nowrap'>
+            <thead className='bg-gray-100 text-left border-b'>
               <tr>
                 <th className='px-3 py-2'>#</th>
-                <th className='px-3 py-2'>Tahun Ajaran</th>
-                <th className='px-3 py-2'>Status</th>
+                <th className='px-3 py-2'>Jenis Pengujian</th>
+                <th className='px-3 py-2'>Singkatan</th>
+                <th className='px-3 py-2'>Tipe Lembaga</th>
+                <th className='px-3 py-2'>Apakah Ujian</th>
                 <th className='px-3 py-2'>Keterangan</th>
-                <th className='px-3 py-2'>Valid</th>
+                <th className='px-3 py-2'>Status</th>
+                <th className='px-3 py-2'>Keterangan Error</th>
               </tr>
             </thead>
             <tbody>
               {result.data.map(row => (
-                <tr key={row.row} className={row.valid ? 'border-t bg-white' : 'border-t bg-red-50'}>
+                <tr key={row.row} className={row.valid ? 'border-t bg-white hover:bg-gray-50' : 'border-t bg-red-50'}>
                   <td className='px-3 py-2'>{row.row}</td>
-                  <td className='px-3 py-2 font-medium'>{row.payload.tahun_ajaran}</td>
-                  <td className='px-3 py-2'>{row.payload.status}</td>
-                  <td className='px-3 py-2'>{row.payload.keterangan ?? '-'}</td>
+                  <td className='px-3 py-2 font-medium text-gray-900'>{row.payload.jenis_pengujian}</td>
+                  <td className='px-3 py-2 font-mono'>{row.payload.singkatan || '-'}</td>
+                  <td className='px-3 py-2'>
+                    <span
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                        row.payload.lembaga_type === 'FORMAL'
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'bg-purple-100 text-purple-700'
+                      }`}
+                    >
+                      {row.payload.lembaga_type}
+                    </span>
+                  </td>
+                  <td className='px-3 py-2'>{row.payload.is_ujian === 1 ? 'YA' : 'TIDAK'}</td>
+                  <td className='px-3 py-2 max-w-xs truncate italic text-gray-500'>{row.payload.keterangan || '-'}</td>
                   <td className='px-3 py-2'>
                     {row.valid ? (
-                      <span className='text-green-600 font-semibold'>✓</span>
+                      <span className='px-2 py-1 bg-green-100 text-green-700 rounded font-bold text-[9px] uppercase'>
+                        ✓ Valid
+                      </span>
                     ) : (
-                      <span className='text-red-600'>{row.error}</span>
+                      <span className='px-2 py-1 bg-red-100 text-red-700 rounded font-bold text-[9px] uppercase'>
+                        ✕ Tidak Valid
+                      </span>
                     )}
+                  </td>
+                  <td className='px-3 py-2'>
+                    <span className='text-red-600 text-[10px] leading-tight block min-w-[300px] whitespace-normal'>
+                      {row.error || '-'}
+                    </span>
                   </td>
                 </tr>
               ))}
@@ -222,15 +237,8 @@ export default function ImportExcelPage() {
         </div>
 
         <div className='flex justify-end gap-3'>
-          <Button
-            size='small'
-            variant='contained'
-            sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
-            onClick={onCommit}
-            disabled={result.invalid > 0 || loadingImport}
-            startIcon={<i className='tabler-file-import' />}
-          >
-            {loadingImport ? 'Menyimpan...' : 'Import Data'}
+          <Button size='small' variant='contained' onClick={onCommit} disabled={result.invalid > 0 || loadingImport}>
+            {loadingImport ? 'Menyimpan...' : 'Konfirmasi & Simpan'}
           </Button>
         </div>
       </div>
@@ -239,62 +247,54 @@ export default function ImportExcelPage() {
 
   return (
     <div className='min-h-screen bg-gray-50 py-10 px-4'>
-      <div className='max-w-3xl mx-auto'>
+      <div className='max-w-4xl mx-auto'>
         <div className='mb-6'>
           <Link
-            href='/app/tahun-ajaran/list'
+            href='/app/jenis-penilaian/list'
             className='inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900'
           >
-            <i className='tabler-arrow-back-up'></i> Kembali
+            <i className='tabler-arrow-back-up'></i> Kembali ke List Jenis Penilaian
           </Link>
-          <h1 className='text-xl font-semibold mt-2'>Import Excel</h1>
+          <h1 className='text-xl font-semibold mt-2'>Import Jenis Penilaian</h1>
         </div>
 
         <div className='bg-white rounded-xl shadow-sm border p-6 space-y-6'>
           <div className='border border-blue-200 bg-blue-50 rounded-lg p-4 text-sm text-blue-700'>
-            <h3 className='font-medium mb-2'>Petunjuk Import</h3>
-            <ul className='list-disc list-inside space-y-1'>
-              <li>Format file: Excel (encoding UTF-8)</li>
+            <h3 className='font-medium mb-2 font-bold'>Petunjuk Import Jenis Penilaian</h3>
+            <ul className='list-disc list-inside space-y-1 opacity-90'>
+              <li>Gunakan format file Excel terbaru (.xlsx) sesuai template.</li>
               <li>
-                Jika <b>Tahun Ajaran</b> kosong → INSERT (data baru)
+                Sistem melakukan pengecekan kombinasi unik antara <b>Singkatan</b>, <b>Jenis Pengujian</b> dan{' '}
+                <b>Tipe Lembaga</b>.
               </li>
               <li>
-                Jika <b>Tahun Ajaran</b> ada → UPDATE (perbarui data)
+                Kolom Tipe Lembaga hanya menerima nilai:{' '}
+                <code className='bg-blue-100 px-1 rounded text-blue-800 font-mono text-xs'>FORMAL</code> atau{' '}
+                <code className='bg-blue-100 px-1 rounded text-blue-800 font-mono text-xs'>PESANTREN</code>.
               </li>
-              <li>Mode Preview: hanya validasi tanpa menyimpan</li>
-              <li>Mode Commit: validasi dan simpan ke database</li>
+              <li>
+                Mode <b>Commit</b> akan langsung menyimpan data yang valid secara permanen ke database.
+              </li>
             </ul>
 
             <div className='mt-3'>
               <a className='text-blue-600 underline hover:text-blue-400 cursor-pointer' onClick={downloadTemplate}>
-                <b>Download Template Excel</b>
+                <b>Download Template Excel Jenis Penilaian</b>
               </a>
             </div>
           </div>
 
           <div>
-            <label className='block font-medium mb-2'>Mode Import</label>
+            <label className='block font-medium mb-2 text-sm'>Pilih Mode</label>
             <div className='flex gap-6 text-sm'>
-              <label className='flex items-center gap-2'>
-                <input
-                  type='radio'
-                  name='mode'
-                  value='preview'
-                  checked={mode === 'preview'}
-                  onChange={() => setMode('preview')}
-                />
-                Preview (Validasi saja)
+              <label className='flex items-center gap-2 cursor-pointer'>
+                <input type='radio' checked={mode === 'preview'} onChange={() => setMode('preview')} />
+                Preview (Cek Validitas)
               </label>
 
-              <label className='flex items-center gap-2'>
-                <input
-                  type='radio'
-                  name='mode'
-                  value='commit'
-                  checked={mode === 'commit'}
-                  onChange={() => setMode('commit')}
-                />
-                Commit (Simpan data)
+              <label className='flex items-center gap-2 cursor-pointer'>
+                <input type='radio' checked={mode === 'commit'} onChange={() => setMode('commit')} />
+                Commit (Langsung Simpan)
               </label>
             </div>
           </div>
@@ -303,37 +303,35 @@ export default function ImportExcelPage() {
             <ImportPreview result={preview} onCommit={handleCommit} />
           ) : (
             <div>
-              <label className='block font-medium mb-2'>File Excel</label>
-
               <div
                 onClick={() => fileRef.current?.click()}
-                className='border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 transition'
+                className='border-2 border-dashed border-gray-300 rounded-lg p-10 text-center cursor-pointer hover:border-blue-400 transition bg-gray-50'
               >
                 <div className='flex flex-col items-center gap-3'>
-                  <div className='text-gray-400'>
-                    <i className='tabler-arrow-big-up'></i>
+                  <i className='tabler-file-spreadsheet text-4xl text-gray-400'></i>
+                  <div className='text-sm text-gray-600'>
+                    {fileName ? <b className='text-blue-600'>{fileName}</b> : 'Klik atau seret file Excel ke sini'}
                   </div>
-                  <div className='text-sm text-gray-600'>Klik untuk upload file Excel</div>
-
-                  <button type='button' className='px-2 py-1 bg-blue-600 text-white rounded-md text-sm'>
-                    Pilih File
+                  <button type='button' className='px-4 py-1.5 bg-gray-800 text-white rounded-md text-xs'>
+                    Pilih File Penilaian
                   </button>
-
-                  {fileName && <div className='text-xs text-gray-500 mt-2'>{fileName}</div>}
                 </div>
-
-                <input ref={fileRef} type='file' accept='.csv,.xls,.xlsx' className='hidden' onChange={onChangeFile} />
+                <input ref={fileRef} type='file' accept='.xlsx,.xls' className='hidden' onChange={onChangeFile} />
               </div>
 
               <Button
                 size='small'
                 fullWidth
                 variant='contained'
-                sx={{ height: 32, fontSize: '0.75rem', px: 2, mt: 5 }}
+                sx={{ height: 40, mt: 5 }}
                 onClick={onSubmit}
-                startIcon={<i className='tabler-file-import' />}
+                disabled={loading || !file}
               >
-                {loading ? 'Proses..' : mode == 'preview' ? 'Preview Data' : 'Import & Simpan'}
+                {loading
+                  ? 'Sedang Memproses...'
+                  : mode === 'preview'
+                    ? 'Lihat Preview Data'
+                    : 'Proses Import Penilaian'}
               </Button>
             </div>
           )}

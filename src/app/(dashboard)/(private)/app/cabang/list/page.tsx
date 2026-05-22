@@ -2,6 +2,7 @@
 
 // ** React Imports
 import React, { useCallback, useEffect, useState } from 'react'
+
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -18,7 +19,8 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  Box
+  Box,
+  Tooltip
 } from '@mui/material'
 
 // ** Third Party Imports
@@ -26,12 +28,7 @@ import { toast } from 'react-toastify'
 
 // ** Redux & Hooks
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import {
-  deleteCabang,
-  fetchCabangPage,
-  postExportCabang,
-  resetRedux
-} from '../slice/index'
+import { deleteCabang, fetchCabangPage, postExportCabang, resetRedux } from '../slice/index'
 import { useCan } from '@/hooks/useCan'
 
 // ** Custom Components
@@ -69,20 +66,12 @@ const RowAction = ({ row, onDeleteSuccess }: { row: any; onDeleteSuccess: (id: s
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuItem
-          component={Link}
-          href={`/app/cabang/form?id=${row.id_cabang}&view=true`}
-          onClick={handleClose}
-        >
+        <MenuItem component={Link} href={`/app/cabang/form?id=${row.id_cabang}&view=true`} onClick={handleClose}>
           <i className='tabler-eye' style={{ marginRight: 8 }} /> View
         </MenuItem>
 
         {canEdit && (
-          <MenuItem
-            component={Link}
-            href={`/app/cabang/form?id=${row.id_cabang}`}
-            onClick={handleClose}
-          >
+          <MenuItem component={Link} href={`/app/cabang/form?id=${row.id_cabang}`} onClick={handleClose}>
             <i className='tabler-edit' style={{ marginRight: 8 }} /> Edit
           </MenuItem>
         )}
@@ -136,7 +125,9 @@ const CabangList = () => {
     const timer = setTimeout(() => {
       fetchData()
     }, 500)
-    return () => clearTimeout(timer)
+
+    
+return () => clearTimeout(timer)
   }, [fetchData])
 
   // Handle Action Success
@@ -152,22 +143,38 @@ const CabangList = () => {
     dispatch(deleteCabang(id))
   }
 
-  // Logic Export CSV
-  const handleExport = async () => {
+  const onAddForm = () => {
+    router.replace('/app/cabang/form')
+  }
+
+  const onImport = () => {
+    router.replace('/app/cabang/import')
+  }
+
+  const onExport = async () => {
     try {
       setLoadingExport(true)
       const res = await dispatch(postExportCabang({ q: filter })).unwrap()
-      if (res?.data) {
-        window.open(`${process.env.NEXT_PUBLIC_API_URL}${res.data}`, '_blank')
-        toast.success('Export berhasil dimulai')
-      } else {
-        toast.error(res?.message || 'Gagal export data')
+
+      if (res?.status && res?.data) {
+        const url = `${process.env.NEXT_PUBLIC_API_URL}${res.data}`
+        const link = document.createElement('a')
+
+        link.href = url
+        link.download = ''
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
       }
     } catch {
-      toast.error('Terjadi kesalahan sistem saat export')
+      toast.error('Gagal export data')
     } finally {
       setLoadingExport(false)
     }
+  }
+
+  const handleFilter = (event: any) => {
+    setFilter(event.target.value)
   }
 
   /* -----------------------------------------------------------
@@ -190,30 +197,37 @@ const CabangList = () => {
         tableColumn('KONTAK', 'contact_display'),
         tableColumn('WILAYAH', 'wilayah_display'),
         tableColumn('ALAMAT', 'alamat_summary'),
-        tableColumn('TGL UPDATE', 'updated_at'),
+        tableColumn('TGL UPDATE', 'updated_at')
       ],
       values: values.map((row: any) => ({
         ...row,
+
         // Custom display untuk Kontak & Email
         contact_display: (
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography variant='body2' sx={{ fontWeight: 600 }}>{row.contact || '-'}</Typography>
-            <Typography variant='caption' color='text.secondary'>{row.email || '-'}</Typography>
+            <Typography variant='body2' sx={{ fontWeight: 600 }}>
+              {row.contact || '-'}
+            </Typography>
+            <Typography variant='caption' color='text.secondary'>
+              {row.email || '-'}
+            </Typography>
           </Box>
         ),
+
         // Custom display untuk Nama Kota & Provinsi
         wilayah_display: (
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Typography variant='body2'>{row.city?.name || '-'}</Typography>
-            <Typography variant='caption' color='text.disabled'>{row.province?.name || '-'}</Typography>
+            <Typography variant='caption' color='text.disabled'>
+              {row.province?.name || '-'}
+            </Typography>
           </Box>
         ),
+
         // Ringkasan Alamat
         alamat_summary: (
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography variant='body2'>
-              {row.alamat || '-'}
-            </Typography>
+            <Typography variant='body2'>{row.alamat || '-'}</Typography>
           </Box>
         )
       })),
@@ -231,63 +245,66 @@ const CabangList = () => {
     <Grid container spacing={6}>
       <Grid size={12}>
         <Card>
-          <CardHeader
-            title='Daftar Cabang'
-            subheader='Kelola informasi kantor cabang dan wilayah area'
-          />
-
-          <Toolbar sx={{ gap: 2, mb: 4, px: '1.5rem !important', flexWrap: 'wrap' }}>
-            {/* Action Buttons */}
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              {canCreate && (
+          <CardHeader title='Cabang' sx={{ paddingBottom: 0 }} />
+          <Toolbar
+            sx={{
+              px: '1.5rem !important',
+              minHeight: 'auto',
+              gap: 2,
+              flexWrap: 'wrap',
+              mb: '10px'
+            }}
+          >
+            {canCreate && (
+              <Tooltip title='Tambah'>
                 <Button
-                  variant='contained'
+                  size='small'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onAddForm}
                   startIcon={<i className='tabler-plus' />}
-                  onClick={() => router.push('/app/cabang/form')}
                 >
                   Tambah
                 </Button>
-              )}
+              </Tooltip>
+            )}
 
-              {canImport && (
+            {canImport && (
+              <Tooltip title='Import CSV'>
                 <Button
+                  size='small'
                   color='success'
                   variant='outlined'
-                  startIcon={<i className='tabler-upload' />}
-                  onClick={() => router.push('/app/cabang/import')}
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onImport}
+                  startIcon={<i className='tabler-file-import' />}
                 >
-                  Import
+                  Import CSV
                 </Button>
-              )}
+              </Tooltip>
+            )}
 
-              {canExport && (
+            {canExport && (
+              <Tooltip title='Export CSV'>
                 <Button
-                  color='secondary'
+                  size='small'
+                  color='warning'
                   variant='outlined'
-                  startIcon={<i className='tabler-download' />}
-                  onClick={handleExport}
-                  disabled={loadingExport}
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onExport}
+                  startIcon={<i className='tabler-file-export' />}
                 >
-                  {loadingExport ? 'Processing...' : 'Export'}
+                  {loadingExport ? 'Proses...' : 'Export CSV'}
                 </Button>
-              )}
-            </Box>
-
+              </Tooltip>
+            )}
             <Typography sx={{ flex: '1 1 auto' }} />
-
-            {/* Search Filter */}
-            <TextField
-              size='small'
-              placeholder='Cari cabang...'
-              sx={{ width: { xs: '100%', sm: 250 } }}
-              onChange={(e) => {
-                setFilter(e.target.value)
-                setPage(1)
-              }}
-            />
+            <Tooltip title='Cari...'>
+              <TextField id='outlined-basic' label='Cari...' size='small' onChange={handleFilter} />
+            </Tooltip>
           </Toolbar>
 
-          <TableView changeSort={() => { }} model={buildTable()} />
+          <TableView changeSort={() => {}} model={buildTable()} />
         </Card>
       </Grid>
     </Grid>

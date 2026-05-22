@@ -16,11 +16,13 @@ import Header from '@components/layout/horizontal/Header'
 import Navbar from '@components/layout/vertical/Navbar'
 import VerticalFooter from '@components/layout/vertical/Footer'
 import HorizontalFooter from '@components/layout/horizontal/Footer'
-import Customizer from '@core/components/customizer'
 import ScrollToTop from '@core/components/scroll-to-top'
 import AuthGuard from '@/hocs/AuthGuard'
 
+// import Customizer from '@core/components/customizer'
+
 import { getMode, getSystemMode } from '@core/utils/serverHelpers'
+import MobileBottomNav from '@/components/layout/vertical/MobileBottomNav'
 
 const Layout = async (props: ChildrenType ) => {
   const { children } = props
@@ -50,6 +52,7 @@ const Layout = async (props: ChildrenType ) => {
             </HorizontalLayout>
           }
         />
+        {<MobileBottomNav />}
         <ScrollToTop className='mui-fixed'>
           <Button
             variant='contained'
@@ -58,7 +61,7 @@ const Layout = async (props: ChildrenType ) => {
             <i className='tabler-arrow-up' />
           </Button>
         </ScrollToTop>
-        <Customizer dir={direction}  disableDirection />
+        {/* <Customizer dir={direction}  disableDirection /> */}
       </AuthGuard>
     </Providers>
   )

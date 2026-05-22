@@ -55,6 +55,7 @@
     "dompurify": "^3.3.1",
     "fs-extra": "11.2.0",
     "html2canvas": "^1.4.1",
+    "html5-qrcode": "^2.3.8",
     "input-otp": "1.4.1",
     "jsdom": "^26.1.0",
     "jspdf": "^4.2.1",

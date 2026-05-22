@@ -17,16 +17,13 @@ import {
   Menu,
   MenuItem,
   Box,
-  Chip
+  Chip,
+  Tooltip
 } from '@mui/material'
 
 import { toast } from 'react-toastify'
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import {
-  deleteLembagaFormal,
-  fetchLembagaFormalPage,
-  resetRedux
-} from '../slice/index'
+import { deleteLembagaFormal, fetchLembagaFormalPage, postExport, resetRedux } from '../slice/index'
 import { useCan } from '@/hooks/useCan'
 
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
@@ -51,11 +48,7 @@ const RowAction = ({ row, onDeleteSuccess }: { row: any; onDeleteSuccess: (id: s
       <IconButton size='small' onClick={handleOpen}>
         <i className='tabler-dots-vertical' />
       </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem
           component={Link}
           href={`/app/lembaga-formal/form?id=${row.id_lembaga}&view=true`}
@@ -65,11 +58,7 @@ const RowAction = ({ row, onDeleteSuccess }: { row: any; onDeleteSuccess: (id: s
         </MenuItem>
 
         {canEdit && (
-          <MenuItem
-            component={Link}
-            href={`/app/lembaga-formal/form?id=${row.id_lembaga}`}
-            onClick={handleClose}
-          >
+          <MenuItem component={Link} href={`/app/lembaga-formal/form?id=${row.id_lembaga}`} onClick={handleClose}>
             <i className='tabler-edit' style={{ marginRight: 8 }} /> Edit
           </MenuItem>
         )}
@@ -101,13 +90,17 @@ const RowAction = ({ row, onDeleteSuccess }: { row: any; onDeleteSuccess: (id: s
 const LembagaFormalList = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
-
-  // Pastikan nama slice di store sesuai (contoh: lembagaFormal)
   const store = useAppSelector(state => state.lembaga_formal)
+
+  // Permission Hooks
+  const canCreate = useCan('create')
+  const canImport = useCan('import')
+  const canExport = useCan('export')
 
   const [filter, setFilter] = useState('')
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
+  const [loadingExport, setLoadingExport] = useState(false)
 
   const fetchData = useCallback(() => {
     dispatch(fetchLembagaFormalPage({ page, perPage, keyword: filter }))
@@ -126,8 +119,42 @@ const LembagaFormalList = () => {
     }
   }, [store.delete, dispatch, fetchData])
 
+  const onAddForm = () => {
+    router.replace('/app/lembaga-formal/form')
+  }
+
+  const onImport = () => {
+    router.replace('/app/lembaga-formal/import')
+  }
+
+  const onExport = async () => {
+    try {
+      setLoadingExport(true)
+      const res = await dispatch(postExport({ q: filter })).unwrap()
+
+      if (res?.status && res?.data) {
+        const url = `${process.env.NEXT_PUBLIC_API_URL}${res.data}`
+        const link = document.createElement('a')
+
+        link.href = url
+        link.download = ''
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+    } catch {
+      toast.error('Gagal export data')
+    } finally {
+      setLoadingExport(false)
+    }
+  }
+
+  const handleFilter = (event: any) => {
+    setFilter(event.target.value)
+  }
+
   const renderOption = (row: any) => {
-    return <RowAction row={row} onDeleteSuccess={(id) => dispatch(deleteLembagaFormal(id))} />
+    return <RowAction row={row} onDeleteSuccess={id => dispatch(deleteLembagaFormal(id))} />
   }
 
   const buildTable = () => {
@@ -142,7 +169,7 @@ const LembagaFormalList = () => {
         tableColumn('JENIS', 'jenis_display'),
         tableColumn('AKREDITASI', 'akreditasi_display'),
         tableColumn('CABANG', 'cabang_display'),
-        tableColumn('NPSN', 'nomor_npsn'),
+        tableColumn('NPSN', 'nomor_npsn')
       ],
       values: values.map((row: any) => ({
         ...row,
@@ -159,13 +186,7 @@ const LembagaFormalList = () => {
         ),
         // Chip untuk Jenis Lembaga (SD, SMP, dll)
         jenis_display: (
-          <Chip
-            label={row.jenis_lembaga}
-            size='small'
-            variant='tonal'
-            color='primary'
-            sx={{ fontWeight: 500 }}
-          />
+          <Chip label={row.jenis_lembaga} size='small' variant='tonal' color='primary' sx={{ fontWeight: 500 }} />
         ),
         // Akreditasi dengan warna dinamik
         akreditasi_display: (
@@ -173,19 +194,19 @@ const LembagaFormalList = () => {
             label={row.status_akreditasi || 'N/A'}
             size='small'
             color={
-              row.status_akreditasi === 'A' ? 'success' :
-                row.status_akreditasi === 'B' ? 'info' :
-                  row.status_akreditasi === 'C' ? 'warning' : 'default'
+              row.status_akreditasi === 'A'
+                ? 'success'
+                : row.status_akreditasi === 'B'
+                  ? 'info'
+                  : row.status_akreditasi === 'C'
+                    ? 'warning'
+                    : 'default'
             }
             variant='outlined'
           />
         ),
         // Cabang Display
-        cabang_display: (
-          <Typography variant='body2'>
-            {row.cabang?.nama_cabang || '-'}
-          </Typography>
-        ),
+        cabang_display: <Typography variant='body2'>{row.cabang?.nama_cabang || '-'}</Typography>
       })),
       count: dataPage?.total || 0,
       perPage: perPage,
@@ -201,31 +222,65 @@ const LembagaFormalList = () => {
     <Grid container spacing={6}>
       <Grid size={12}>
         <Card>
-          <CardHeader
-            title='Lembaga Pendidikan Formal'
-            subheader='Sekolah formal (SD, SMP, SMA, dsb)'
-          />
-          <Toolbar sx={{ gap: 2, mb: 4, px: '1.5rem !important' }}>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button
-                variant='contained'
-                startIcon={<i className='tabler-plus' />}
-                onClick={() => router.push('/app/lembaga-formal/form')}
-              >
-                Tambah
-              </Button>
-            </Box>
+          <CardHeader title='Lembaga Pendidikan Formal' sx={{ paddingBottom: 0 }} />
+          <Toolbar
+            sx={{
+              px: '1.5rem !important',
+              minHeight: 'auto',
+              gap: 2,
+              flexWrap: 'wrap',
+              mb: '10px'
+            }}
+          >
+            {canCreate && (
+              <Tooltip title='Tambah'>
+                <Button
+                  size='small'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onAddForm}
+                  startIcon={<i className='tabler-plus' />}
+                >
+                  Tambah
+                </Button>
+              </Tooltip>
+            )}
+
+            {canImport && (
+              <Tooltip title='Import CSV'>
+                <Button
+                  size='small'
+                  color='success'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onImport}
+                  startIcon={<i className='tabler-file-import' />}
+                >
+                  Import CSV
+                </Button>
+              </Tooltip>
+            )}
+
+            {canExport && (
+              <Tooltip title='Export CSV'>
+                <Button
+                  size='small'
+                  color='warning'
+                  variant='outlined'
+                  sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
+                  onClick={onExport}
+                  startIcon={<i className='tabler-file-export' />}
+                >
+                  {loadingExport ? 'Proses...' : 'Export CSV'}
+                </Button>
+              </Tooltip>
+            )}
             <Typography sx={{ flex: '1 1 auto' }} />
-            <TextField
-              size='small'
-              placeholder='Cari nama, NPSN, atau jenis...'
-              onChange={(e) => {
-                setFilter(e.target.value)
-                setPage(1)
-              }}
-            />
+            <Tooltip title='Cari...'>
+              <TextField id='outlined-basic' label='Cari...' size='small' onChange={handleFilter} />
+            </Tooltip>
           </Toolbar>
-          <TableView changeSort={() => { }} model={buildTable()} />
+          <TableView changeSort={() => {}} model={buildTable()} />
         </Card>
       </Grid>
     </Grid>

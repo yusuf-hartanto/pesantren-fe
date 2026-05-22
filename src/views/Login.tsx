@@ -18,7 +18,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Button from '@mui/material/Button'
 
 // Third-party Imports
-import { signIn } from 'next-auth/react'
+import { signIn, getSession } from 'next-auth/react'
 import { Controller, useForm } from 'react-hook-form'
 import { valibotResolver } from '@hookform/resolvers/valibot'
 import { object, minLength, string, pipe, nonEmpty } from 'valibot'
@@ -133,10 +133,11 @@ const Login = ({ mode }: { mode: SystemMode }) => {
     })
     
     if (res && res.ok && res.error === null) {
-      // Vars
+      await getSession()
+      
       const redirectURL = searchParams.get('redirectTo') ?? '/'
 
-      router.replace(redirectURL)
+      window.location.href = redirectURL;
     } else {
       if (res?.error) {
         try {

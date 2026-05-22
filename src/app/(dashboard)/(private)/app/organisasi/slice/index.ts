@@ -219,7 +219,6 @@ export const orgUnitSlice = createSlice({
       state.delete = action.payload.message || 'Data berhasil dihapus'
     })
     builder.addCase(deleteOrgUnit.rejected, (state, action) => {
-      console.log('deleted', action.payload);
       state.crud = action.payload || { status: false, message: 'Data gagal dihapus' }
     })
 

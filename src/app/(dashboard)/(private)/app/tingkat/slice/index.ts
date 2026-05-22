@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getSession } from 'next-auth/react'
 
 import api from '@/libs/axios'
 
@@ -52,11 +51,8 @@ export interface FetchParamAlls {
 --------------------------- */
 
 export const fetchTingkatAll = createAsyncThunk<any, FetchParamAlls>('tingkat/fetchAll', async (params, thunkAPI) => {
-  const session = await getSession()
-
   try {
     const response = await api.get(`/app/tingkat/all-data`, {
-      headers: { Authorization: `Bearer ${session?.access_token}` },
       params
     })
 
@@ -66,28 +62,24 @@ export const fetchTingkatAll = createAsyncThunk<any, FetchParamAlls>('tingkat/fe
   }
 })
 
-export const fetchTingkatPage = createAsyncThunk<any, FetchParams>('tingkat/fetchPage', async (params: any, thunkAPI) => {
-  const session = await getSession()
+export const fetchTingkatPage = createAsyncThunk<any, FetchParams>(
+  'tingkat/fetchPage',
+  async (params: any, thunkAPI) => {
+    try {
+      const response = await api.get(`/app/tingkat`, {
+        params
+      })
 
-  try {
-    const response = await api.get(`/app/tingkat`, {
-      headers: { Authorization: `Bearer ${session?.access_token}` },
-      params
-    })
-
-    return response.data
-  } catch (e: any) {
-    return thunkAPI.fulfillWithValue(e.response?.data)
+      return response.data
+    } catch (e: any) {
+      return thunkAPI.fulfillWithValue(e.response?.data)
+    }
   }
-})
+)
 
 export const fetchTingkatById = createAsyncThunk<any, string>('tingkat/fetchById', async (id, thunkAPI) => {
-  const session = await getSession()
-
   try {
-    const response = await api.get(`/app/tingkat/${id}`, {
-      headers: { Authorization: `Bearer ${session?.access_token}` }
-    })
+    const response = await api.get(`/app/tingkat/${id}`, {})
 
     return response.data
   } catch (e: any) {
@@ -96,12 +88,8 @@ export const fetchTingkatById = createAsyncThunk<any, string>('tingkat/fetchById
 })
 
 export const postTingkat = createAsyncThunk<any, any>('tingkat/create', async (params, thunkAPI) => {
-  const session = await getSession()
-
   try {
-    const response = await api.post(`/app/tingkat`, params, {
-      headers: { Authorization: `Bearer ${session?.access_token}` }
-    })
+    const response = await api.post(`/app/tingkat`, params, {})
 
     return response.data
   } catch (e: any) {
@@ -122,12 +110,8 @@ export const postBatchTingkat = createAsyncThunk<any, any>('tingkat/insert', asy
 export const postTingkatUpdate = createAsyncThunk<any, { id: string; param: any }>(
   'tingkat/update',
   async ({ id, param }, thunkAPI) => {
-    const session = await getSession()
-
     try {
-      const response = await api.put(`/app/tingkat/${id}`, param, {
-        headers: { Authorization: `Bearer ${session?.access_token}` }
-      })
+      const response = await api.put(`/app/tingkat/${id}`, param, {})
 
       return response.data
     } catch (e: any) {
@@ -137,12 +121,8 @@ export const postTingkatUpdate = createAsyncThunk<any, { id: string; param: any 
 )
 
 export const deleteTingkat = createAsyncThunk<any, string>('tingkat/delete', async (id, thunkAPI) => {
-  const session = await getSession()
-
   try {
-    const response = await api.delete(`/app/tingkat/${id}`, {
-      headers: { Authorization: `Bearer ${session?.access_token}` }
-    })
+    const response = await api.delete(`/app/tingkat/${id}`, {})
 
     return response.data
   } catch (e: any) {
