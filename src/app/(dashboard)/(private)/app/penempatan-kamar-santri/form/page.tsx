@@ -125,15 +125,15 @@ const FormValidationBasic = () => {
           }
           datas.id_santri = {
             value: datas.id_santri,
-            label: datas.santri.fullname
+            label: datas.santri?.fullname
           }
           datas.id_lokasi = {
             value: datas.id_lokasi,
-            label: datas.lokasi.nama_lokasi
+            label: datas.lokasi?.nama_lokasi
           }
           datas.id_tahunajaran = {
             value: datas.id_tahunajaran,
-            label: datas.tahunAjaran.tahun_ajaran
+            label: datas.tahunAjaran?.tahun_ajaran
           }
 
           setState(datas)

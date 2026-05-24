@@ -82,7 +82,7 @@ const FormValidationBasic = () => {
           datas.petugas = datas.kebersihan_inspeksi?.pegawai?.nama_lengkap
           datas.id_inspeksi = {
             value: datas.kebersihan_inspeksi?.id_inspeksi,
-            label: `${datas.kebersihan_inspeksi?.cabang.nama_cabang} - ${datas.kebersihan_inspeksi?.lokasi.nama_lokasi} - ${tanggalArr[2]}/${tanggalArr[1]}/${tanggalArr[0]} - ${datas.kebersihan_inspeksi?.waktu.slice(0, -3)}`
+            label: `${datas.kebersihan_inspeksi?.cabang.nama_cabang} - ${datas.kebersihan_inspeksi?.lokasi?.nama_lokasi} - ${tanggalArr[2]}/${tanggalArr[1]}/${tanggalArr[0]} - ${datas.kebersihan_inspeksi?.waktu.slice(0, -3)}`
           }
 
           datas.tingkat = convertOptionTingkat().find(d => d.value === datas.tingkat)
@@ -166,7 +166,7 @@ const FormValidationBasic = () => {
             const tanggalArr = r.tanggal?.split('-')
 
             return {
-              label: `${r.cabang.nama_cabang} - ${r.lokasi.nama_lokasi} - ${tanggalArr[2]}/${tanggalArr[1]}/${tanggalArr[0]} - ${r.waktu.slice(0, -3)}`,
+              label: `${r.cabang?.nama_cabang} - ${r.lokasi?.nama_lokasi} - ${tanggalArr[2]}/${tanggalArr[1]}/${tanggalArr[0]} - ${r.waktu.slice(0, -3)}`,
               value: r.id_inspeksi
             }
           })
