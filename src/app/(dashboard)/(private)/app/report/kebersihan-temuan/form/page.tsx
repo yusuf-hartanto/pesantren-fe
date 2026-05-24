@@ -11,23 +11,20 @@ import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
 
 // ** Third Party Imports
-import { toast } from 'react-toastify'
 import { useForm } from 'react-hook-form'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import { fetchKebersihanTemuanById, postKebersihanTemuan, postKebersihanTemuanUpdate, resetRedux } from '../slice/index'
-import { field, fieldBuildSubmit, formColumn } from '@views/onevour/form/AppFormBuilder'
-import { fetchKebersihanInspeksiAll } from '../../kebersihan-inspeksi/slice'
+import { fetchKebersihanTemuanById, resetRedux } from '../../../kebersihan-temuan/slice/index'
+import { field, formColumn, fieldBuildSubmit } from '@views/onevour/form/AppFormBuilder'
+import { fetchKebersihanInspeksiAll } from '../../../kebersihan-inspeksi/slice'
 
 const FormValidationBasic = () => {
   const router = useRouter()
 
   const searchParams = useSearchParams()
   const id = searchParams.get('id')
-  const view = searchParams.get('view')
 
   const dispatch = useAppDispatch()
-  const store = useAppSelector(state => state.kebersihan_temuan)
   const storeInspeksi = useAppSelector(state => state.kebersihan_inspeksi)
 
   interface FormData {
@@ -66,7 +63,7 @@ const FormValidationBasic = () => {
 
   const onCancel = useCallback(() => {
     dispatch(resetRedux())
-    router.replace('/app/kebersihan-temuan/list')
+    router.replace('/app/report/kebersihan-temuan/list')
   }, [dispatch, router])
 
   useEffect(() => {
@@ -94,41 +91,6 @@ const FormValidationBasic = () => {
     }
   }, [dispatch, id, reset])
 
-  useEffect(() => {
-    if (!store.crud) return
-
-    if (store.crud.status) {
-      toast.success('Success saved')
-      onCancel()
-    } else {
-      toast.error('Error saved: ' + store.crud.message)
-
-      setLoading(false)
-    }
-  }, [onCancel, store])
-
-  const onSubmit = () => {
-    if (loading) return
-    setLoading(true)
-
-    if (id) {
-      // update
-      dispatch(
-        postKebersihanTemuanUpdate({
-          id: id,
-          params: { ...state, tingkat: state.tingkat?.value }
-        })
-      )
-    } else {
-      dispatch(
-        postKebersihanTemuan({
-          ...state,
-          tingkat: state.tingkat?.value
-        })
-      )
-    }
-  }
-
   const convertOptionTingkat = () => {
     return [
       {
@@ -148,13 +110,13 @@ const FormValidationBasic = () => {
 
   const fields = () => {
     return [
-      (Boolean(view) ? field({
+      field({
         type: 'text',
         key: 'petugas',
         label: 'Petugas',
         placeholder: 'Input Petugas',
         readOnly: true
-      }) : ''),      
+      }),
       field({
         type: 'select',
         key: 'id_inspeksi',
@@ -171,26 +133,24 @@ const FormValidationBasic = () => {
             }
           })
         },
-        readOnly: Boolean(view)
+        readOnly: true
       }),
       field({
         type: 'text',
         key: 'kategori',
         label: 'Kategori',
         placeholder: 'Input Kategori',
-        required: true,
-        readOnly: Boolean(view)
+        readOnly: true
       }),
       field({
         type: 'select',
         key: 'tingkat',
         label: 'Tingkat',
         placeholder: 'Input Tingkat',
-        required: true,
         options: {
           values: convertOptionTingkat()
         },
-        readOnly: Boolean(view)
+        readOnly: true
       }),
       field({
         type: 'textarea',
@@ -198,7 +158,7 @@ const FormValidationBasic = () => {
         label: 'Deskripsi',
         placeholder: 'Input Deskripsi',
         required: false,
-        readOnly: Boolean(view)
+        readOnly: true
       }),
       field({
         type: 'image',
@@ -207,25 +167,24 @@ const FormValidationBasic = () => {
         placeholder: 'Upload foto',
         urlImage: '',
         required: false,
-        readOnly: Boolean(view)
+        readOnly: true
       }),
       field({
         type: 'checkbox',
         key: 'perlu_tindak_lanjut',
         label: 'Perlu Tindak Lanjut',
         placeholder: 'Input Perlu Tindak Lanjut',
-        required: false,
-        readOnly: Boolean(view)
+        readOnly: true
       }),
-      fieldBuildSubmit({ onCancel: onCancel, loading: loading, disabled: Boolean(view) })
+      fieldBuildSubmit({ onCancel: onCancel, loading: loading, disabled: true, cancel: 'Kembali' })
     ]
   }
 
   return (
     <Card>
-      <CardHeader title='Form Temuan' />
+      <CardHeader title='Inspeksi Temuan' />
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} autoComplete='off'>
+        <form autoComplete='off'>
           {formColumn({
             control: control,
             errors: errors,

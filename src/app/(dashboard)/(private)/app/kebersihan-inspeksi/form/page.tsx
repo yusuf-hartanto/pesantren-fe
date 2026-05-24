@@ -240,16 +240,16 @@ const FormValidationBasic = () => {
           }
           datas.waktu = datas.waktu ? timeToDate(datas.waktu) : null
           datas.id_cabang = {
-            value: datas.cabang.id_cabang,
-            label: datas.cabang.nama_cabang
+            value: datas.cabang?.id_cabang,
+            label: datas.cabang?.nama_cabang
           }
           datas.id_lokasi = {
-            value: datas.lokasi.id_lokasi,
-            label: datas.lokasi.nama_lokasi
+            value: datas.lokasi?.id_lokasi,
+            label: datas.lokasi?.nama_lokasi
           }
           datas.id_petugas = {
-            value: datas.pegawai.id_pegawai,
-            label: datas.pegawai.nama_lengkap
+            value: datas.pegawai?.id_pegawai,
+            label: datas.pegawai?.nama_lengkap
           }
 
           if (datas.jadwal_inspeksi_kebersihan) {
