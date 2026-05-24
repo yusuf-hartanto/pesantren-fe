@@ -165,11 +165,11 @@ export default function MobileBottomNav() {
           />
 
           <BottomNavigationAction
-            label='Santri'
-            value='/app/santri/list'
-            icon={<i className='tabler-users' />}
+            label='Absensi'
+            value='/app/absen-harian-santri/list'
+            icon={<i className='tabler-calendar-user' />}
             component={Link}
-            href='/app/santri/list'
+            href='/app/absen-harian-santri/list'
             onClick={handleCloseSidebar}
           />
 
@@ -177,11 +177,11 @@ export default function MobileBottomNav() {
           <Box sx={{ flex: 1, minWidth: 50, display: 'flex', justifyContent: 'center' }} />
 
           <BottomNavigationAction
-            label='Absensi'
-            value='/app/absen-harian-santri/list'
-            icon={<i className='tabler-calendar-user' />}
+            label='Kebersihan'
+            value='/app/kebersihan-inspeksi/list'
+            icon={<i className='tabler-vacuum-cleaner' />}
             component={Link}
-            href='/app/absen-harian-santri/list'
+            href='/app/kebersihan-inspeksi/list'
             onClick={handleCloseSidebar}
           />
 
@@ -219,15 +219,15 @@ export default function MobileBottomNav() {
           {/* Menu Kebersihan */}
           <MenuItem
             component={Link}
-            href='/app/kebersihan-inspeksi/list'
+            href='/app/santri/list'
             onClick={() => {
               handleCloseMenu()
               handleCloseSidebar()
             }}
             sx={{ gap: 1.5 }}
           >
-            <i className='tabler-vacuum-cleaner text-xl' />
-            <Typography variant='body2'>Kebersihan</Typography>
+            <i className='tabler-users text-xl' />
+            <Typography variant='body2'>Santri</Typography>
           </MenuItem>
 
           {/* Menu Profile */}
