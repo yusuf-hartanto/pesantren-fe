@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -14,7 +14,7 @@ import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
 import Grid from '@mui/material/Grid2'
-import { Dialog, Typography, IconButton, DialogContent } from '@mui/material'
+import { Dialog, Typography, IconButton, DialogContent, Menu, MenuItem } from '@mui/material'
 
 import { toast } from 'react-toastify'
 
@@ -30,8 +30,13 @@ export default function MobileBottomNav() {
   const dispatch = useAppDispatch()
   const isBelowMdScreen = useMediaQuery(theme.breakpoints.down('md'))
 
+  // State untuk QR Scanner
   const [scannerType, setScannerType] = useState<string | null>(null)
   const [showQrScanner, setShowQrScanner] = useState(false)
+
+  // State untuk Popup Menu (Dots Tiga)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const openMenu = Boolean(anchorEl)
 
   const { isToggled, toggleVerticalNav } = useVerticalNav()
 
@@ -60,10 +65,19 @@ export default function MobileBottomNav() {
     setScannerType(null)
   }
 
+  // Handler Popup Menu
+  const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null)
+  }
+
   const handleScan = (data: any) => {
     toast.success(`Kode: ${data}`)
 
-    if (scannerType && scannerType == 'inspeksi') {
+    if (scannerType && scannerType === 'inspeksi') {
       dispatch(
         locationQrCodeKebersihanInspeksi({
           qr_code: data
@@ -81,7 +95,7 @@ export default function MobileBottomNav() {
       handleBackCategory()
     }
 
-    if (scannerType && scannerType == 'presensi') {
+    if (scannerType && scannerType === 'presensi') {
       toast.warning('Maaf, fitur Presensi akan segera datang!!!')
       handleBackCategory()
     }
@@ -101,6 +115,7 @@ export default function MobileBottomNav() {
       elevation={8}
     >
       <Box sx={{ position: 'relative' }}>
+        {/* FAB SCANNER BUTTON */}
         <Fab
           onClick={handleOpenScanner}
           sx={{
@@ -114,6 +129,7 @@ export default function MobileBottomNav() {
             backgroundColor: theme.palette.background.paper,
             color: theme.palette.primary.main,
             border: `1px solid ${theme.palette.background.default}`,
+            boxShadow: theme.shadows[4],
             '&:hover': {
               backgroundColor: theme.palette.background.paper
             }
@@ -122,11 +138,21 @@ export default function MobileBottomNav() {
           <i className='tabler-qrcode text-2xl' />
         </Fab>
 
+        {/* NAVIGATION SYSTEM */}
         <BottomNavigation
           showLabels
           value={pathname}
           sx={{
-            height: 70
+            height: 70,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            px: 1,
+            '& .MuiBottomNavigationAction-root': {
+              minWidth: 'auto',
+              flex: 1,
+              padding: '6px 0'
+            }
           }}
         >
           <BottomNavigationAction
@@ -147,29 +173,78 @@ export default function MobileBottomNav() {
             onClick={handleCloseSidebar}
           />
 
-          <Box sx={{ width: 60 }} />
-
-          {/* <BottomNavigationAction
-            label='Transaksi'
-            value='/app/transaksi/list'
-            icon={<i className='tabler-receipt' />}
-            component={Link}
-            href='/app/transaksi/list'
-            onClick={handleClick}
-          /> */}
+          {/* Spacer Tengah Menjaga Keseimbangan Layout */}
+          <Box sx={{ flex: 1, minWidth: 50, display: 'flex', justifyContent: 'center' }} />
 
           <BottomNavigationAction
-            label='Kebersihan'
-            value='/app/kebersihan-inspeksi/list'
-            icon={<i className='tabler-vacuum-cleaner' />}
+            label='Absensi'
+            value='/app/absen-harian-santri/list'
+            icon={<i className='tabler-calendar-user' />}
             component={Link}
-            href='/app/kebersihan-inspeksi/list'
+            href='/app/absen-harian-santri/list'
             onClick={handleCloseSidebar}
           />
 
-          <BottomNavigationAction label='Profile' icon={<i className='tabler-user' />} onClick={handleClick} />
+          {/* Menu Dots Tiga memicu Popup */}
+          <BottomNavigationAction
+            label='Lainnya'
+            icon={<i className='tabler-dots-vertical' />}
+            onClick={handleOpenMenu}
+          />
         </BottomNavigation>
+
+        {/* POPUP MENU CONTEXTUAL */}
+        <Menu
+          anchorEl={anchorEl}
+          open={openMenu}
+          onClose={handleCloseMenu}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right'
+          }}
+          transformOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right'
+          }}
+          slotProps={{
+            paper: {
+              sx: {
+                minWidth: 160,
+                boxShadow: theme.shadows[3],
+                marginBottom: '10px'
+              }
+            }
+          }}
+        >
+          {/* Menu Kebersihan */}
+          <MenuItem
+            component={Link}
+            href='/app/kebersihan-inspeksi/list'
+            onClick={() => {
+              handleCloseMenu()
+              handleCloseSidebar()
+            }}
+            sx={{ gap: 1.5 }}
+          >
+            <i className='tabler-vacuum-cleaner text-xl' />
+            <Typography variant='body2'>Kebersihan</Typography>
+          </MenuItem>
+
+          {/* Menu Profile */}
+          <MenuItem
+            onClick={() => {
+              handleCloseMenu()
+              handleClick()
+            }}
+            sx={{ gap: 1.5 }}
+          >
+            <i className='tabler-user text-xl' />
+            <Typography variant='body2'>Profile</Typography>
+          </MenuItem>
+        </Menu>
       </Box>
+
+      {/* DIALOG POPUP SCANNER */}
       {showQrScanner && (
         <Dialog open={showQrScanner} onClose={handleCloseScanner} fullScreen>
           <Box
@@ -188,8 +263,9 @@ export default function MobileBottomNav() {
                   <i className='tabler-arrow-left' />
                 </IconButton>
               )}
-
-              <Typography variant='h6'>{scannerType ? `Scan ${scannerType}` : 'Pilih Scanner'}</Typography>
+              <Typography variant='h6'>
+                {scannerType ? `Scan ${scannerType.charAt(0).toUpperCase() + scannerType.slice(1)}` : 'Pilih Scanner'}
+              </Typography>
             </Box>
 
             <IconButton onClick={handleCloseScanner}>
@@ -225,9 +301,7 @@ export default function MobileBottomNav() {
                     }}
                   >
                     <i className='tabler-vacuum-cleaner text-4xl mb-2' />
-
                     <Typography variant='h6'>Inspeksi</Typography>
-
                     <Typography variant='body2' color='text.secondary'>
                       Scan QR inspeksi
                     </Typography>
@@ -251,9 +325,7 @@ export default function MobileBottomNav() {
                     }}
                   >
                     <i className='tabler-qrcode text-4xl mb-2' />
-
                     <Typography variant='h6'>Presensi</Typography>
-
                     <Typography variant='body2' color='text.secondary'>
                       Scan QR presensi
                     </Typography>

@@ -19,7 +19,9 @@ export interface LocationImportPayload {
   nama_lokasi: string
   jenis_lokasi: string
   parent: string | null
+  parent_nama: string | null
   cabang: string | null
+  cabang_nama: string | null
   latitude: string | number | null
   longitude: string | number | null
   map_zoom: number | null
@@ -226,12 +228,12 @@ export default function ImportLocationPage() {
                     <div className='text-[10px]'>C: {row.payload.cabang_nama ?? '-'}</div>
                   </td>
                   <td className='px-3 py-2 font-mono text-[10px] text-gray-500'>
-                    <div>{row.payload.latitude ?? 0}, {row.payload.longitude ?? 0}</div>
+                    <div>
+                      {row.payload.latitude ?? 0}, {row.payload.longitude ?? 0}
+                    </div>
                     <div>Zoom: {row.payload.map_zoom ?? '-'}</div>
                   </td>
-                  <td className='px-3 py-2 text-center font-medium'>
-                    {row.payload.kapasitas ?? 0}
-                  </td>
+                  <td className='px-3 py-2 text-center font-medium'>{row.payload.kapasitas ?? 0}</td>
                   <td className='px-3 py-2'>
                     {row.valid ? (
                       <span className='text-green-600 font-semibold flex items-center gap-1'>
@@ -283,14 +285,23 @@ export default function ImportLocationPage() {
             </h3>
             <ul className='list-disc list-inside space-y-1 ml-1 text-xs'>
               <li>Format file: Excel (.xlsx atau .xls) dengan encoding UTF-8.</li>
-              <li>Sistem menggunakan <b>Kode Lokasi</b> sebagai identifier unik.</li>
-              <li>Jika <b>Kode Lokasi</b> sudah ada di database → Sistem melakukan <b>UPDATE</b>.</li>
-              <li>Pastikan <b>Parent</b> dan <b>Cabang</b> merujuk pada Kode Lokasi yang sudah terdaftar.</li>
+              <li>
+                Sistem menggunakan <b>Kode Lokasi</b> sebagai identifier unik.
+              </li>
+              <li>
+                Jika <b>Kode Lokasi</b> sudah ada di database → Sistem melakukan <b>UPDATE</b>.
+              </li>
+              <li>
+                Pastikan <b>Parent</b> dan <b>Cabang</b> merujuk pada Kode Lokasi yang sudah terdaftar.
+              </li>
               <li>Koordinat menggunakan format desimal (contoh: -6.12345, 106.12345).</li>
             </ul>
 
             <div className='mt-3'>
-              <a className='text-blue-600 underline hover:text-blue-400 cursor-pointer font-bold' onClick={downloadTemplate}>
+              <a
+                className='text-blue-600 underline hover:text-blue-400 cursor-pointer font-bold'
+                onClick={downloadTemplate}
+              >
                 Download Template Excel Lokasi
               </a>
             </div>
@@ -341,7 +352,10 @@ export default function ImportLocationPage() {
                   </div>
                   <div className='text-sm text-gray-600 font-medium'>Klik untuk pilih file Excel Lokasi</div>
 
-                  <button type='button' className='px-4 py-1.5 bg-blue-600 text-white rounded-md text-xs font-bold hover:bg-blue-700 transition'>
+                  <button
+                    type='button'
+                    className='px-4 py-1.5 bg-blue-600 text-white rounded-md text-xs font-bold hover:bg-blue-700 transition'
+                  >
                     Pilih File
                   </button>
 
@@ -363,7 +377,11 @@ export default function ImportLocationPage() {
                 onClick={onSubmit}
                 startIcon={<i className='tabler-circle-check' />}
               >
-                {loading ? 'Sedang Memproses..' : mode === 'preview' ? 'Preview Data Lokasi' : 'Import & Simpan Sekarang'}
+                {loading
+                  ? 'Sedang Memproses..'
+                  : mode === 'preview'
+                    ? 'Preview Data Lokasi'
+                    : 'Import & Simpan Sekarang'}
               </Button>
             </div>
           )}

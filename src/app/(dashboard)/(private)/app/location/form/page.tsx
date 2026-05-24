@@ -7,20 +7,13 @@ import { toast } from 'react-toastify'
 import { useForm } from 'react-hook-form'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import {
-  fetchLocationById,
-  fetchLocationPage,
-  postLocation,
-  postLocationUpdate,
-  resetRedux
-} from '../slice/index'
+import { fetchLocationById, fetchLocationPage, postLocation, postLocationUpdate, resetRedux } from '../slice/index'
 import { fetchCabangPage } from '../../cabang/slice/index'
 
 import { field, fieldBuildSubmit, formColumn } from '@views/onevour/form/AppFormBuilder'
 import QrPrintModal from './QrPrintModal'
-import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic'
 import GeoLocation from './GeoLocation'
-
 
 const LocationForm = () => {
   const router = useRouter()
@@ -36,23 +29,40 @@ const LocationForm = () => {
     parents: [] as any[],
     cabang: [] as any[],
     jenis: [
-      { label: 'Cabang', value: 'Cabang' }, { label: 'Asrama', value: 'Asrama' },
-      { label: 'Kamar', value: 'Kamar' }, { label: 'Masjid', value: 'Masjid' },
-      { label: 'Area Masjid', value: 'AreaMasjid' }, { label: 'Sekolah Formal', value: 'SekolahFormal' },
-      { label: 'Sekolah MDA', value: 'SekolahMDA' }, { label: 'Ruang Kelas', value: 'RuangKelas' },
-      { label: 'Ruang Guru', value: 'RuangGuru' }, { label: 'Ruang TU', value: 'RuangTU' },
-      { label: 'Perpustakaan', value: 'Perpustakaan' }, { label: 'Laboratorium', value: 'Laboratorium' },
-      { label: 'Guest House', value: 'GuestHouse' }, { label: 'Klinik', value: 'Klinik' },
-      { label: 'UKS', value: 'UKS' }, { label: 'Dapur', value: 'Dapur' },
-      { label: 'Kantin', value: 'Kantin' }, { label: 'Koperasi', value: 'Koperasi' },
-      { label: 'Kantor', value: 'Kantor' }, { label: 'Aula', value: 'Aula' },
-      { label: 'Gudang', value: 'Gudang' }, { label: 'Lapangan', value: 'Lapangan' },
-      { label: 'Parkiran', value: 'Parkiran' }, { label: 'Pos Satpam', value: 'PosSatpam' },
-      { label: 'Ruang Rapat', value: 'RuangRapat' }, { label: 'Ruang Serbaguna', value: 'RuangSerbaguna' },
-      { label: 'Taman', value: 'Taman' }, { label: 'Area Umum', value: 'AreaUmum' },
-      { label: 'Ruang Makan', value: 'RuangMakan' }, { label: 'Lahan', value: 'Lahan' },
-      { label: 'Workshop', value: 'Workshop' }, { label: 'Studio', value: 'Studio' },
-      { label: 'Ruang IT', value: 'RuangIT' }, { label: 'Gedung Lain', value: 'GedungLain' },
+      { label: 'Cabang', value: 'Cabang' },
+      { label: 'Asrama', value: 'Asrama' },
+      { label: 'Kamar', value: 'Kamar' },
+      { label: 'Masjid', value: 'Masjid' },
+      { label: 'Area Masjid', value: 'AreaMasjid' },
+      { label: 'Sekolah Formal', value: 'SekolahFormal' },
+      { label: 'Sekolah MDA', value: 'SekolahMDA' },
+      { label: 'Ruang Kelas', value: 'RuangKelas' },
+      { label: 'Ruang Guru', value: 'RuangGuru' },
+      { label: 'Ruang TU', value: 'RuangTU' },
+      { label: 'Perpustakaan', value: 'Perpustakaan' },
+      { label: 'Laboratorium', value: 'Laboratorium' },
+      { label: 'Guest House', value: 'GuestHouse' },
+      { label: 'Klinik', value: 'Klinik' },
+      { label: 'UKS', value: 'UKS' },
+      { label: 'Dapur', value: 'Dapur' },
+      { label: 'Kantin', value: 'Kantin' },
+      { label: 'Koperasi', value: 'Koperasi' },
+      { label: 'Kantor', value: 'Kantor' },
+      { label: 'Aula', value: 'Aula' },
+      { label: 'Gudang', value: 'Gudang' },
+      { label: 'Lapangan', value: 'Lapangan' },
+      { label: 'Parkiran', value: 'Parkiran' },
+      { label: 'Pos Satpam', value: 'PosSatpam' },
+      { label: 'Ruang Rapat', value: 'RuangRapat' },
+      { label: 'Ruang Serbaguna', value: 'RuangSerbaguna' },
+      { label: 'Taman', value: 'Taman' },
+      { label: 'Area Umum', value: 'AreaUmum' },
+      { label: 'Ruang Makan', value: 'RuangMakan' },
+      { label: 'Lahan', value: 'Lahan' },
+      { label: 'Workshop', value: 'Workshop' },
+      { label: 'Studio', value: 'Studio' },
+      { label: 'Ruang IT', value: 'RuangIT' },
+      { label: 'Gedung Lain', value: 'GedungLain' },
       { label: 'Area Lain', value: 'AreaLain' }
     ]
   })
@@ -70,9 +80,14 @@ const LocationForm = () => {
     keterangan: ''
   })
 
-  const [isGeoModalOpen, setGeoModalOpen] = useState(false);
+  const [isGeoModalOpen, setGeoModalOpen] = useState(false)
 
-  const { control, handleSubmit, formState: { errors }, reset } = useForm({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm({
     values: state
   })
 
@@ -91,8 +106,10 @@ const LocationForm = () => {
         .filter((item: any) => item.id_lokasi !== id) // Hindari circular reference
         .map((item: any) => ({ label: item.nama_lokasi, value: item.id_lokasi }))
 
-      const cabangOptions = (resCabang?.data?.values || [])
-        .map((item: any) => ({ label: item.nama_cabang, value: item.id_cabang }))
+      const cabangOptions = (resCabang?.data?.values || []).map((item: any) => ({
+        label: item.nama_cabang,
+        value: item.id_cabang
+      }))
 
       setOpt(prev => ({ ...prev, parents: parentOptions, cabang: cabangOptions }))
 
@@ -106,14 +123,14 @@ const LocationForm = () => {
             ...d,
             jenis_lokasi: d.jenis_lokasi ? { label: d.jenis_lokasi, value: d.jenis_lokasi } : null,
             id_cabang: d.id_cabang ? cabangOptions.find((o: any) => o.value === d.id_cabang) : null,
-            parent_id: d.parent ? { label: d.parent.nama_lokasi, value: d.parent_id } : null,
+            parent_id: d.parent ? { label: d.parent.nama_lokasi, value: d.parent_id } : null
           }
           setState(formatted)
           reset(formatted)
         }
       }
     } catch (err) {
-      toast.error("Gagal memuat referensi data")
+      toast.error('Gagal memuat referensi data')
     }
   }, [id, dispatch, reset])
 
@@ -128,7 +145,7 @@ const LocationForm = () => {
     if (store.crud?.status) {
       toast.success(store.crud?.message || 'Data berhasil disimpan')
       dispatch(resetRedux())
-      // router.replace('/app/location/list')
+      router.replace('/app/location/list')
     } else {
       if (store.crud?.message) {
         toast.error(store.crud?.message || 'Gagal menyimpan data lokasi')
@@ -168,7 +185,13 @@ const LocationForm = () => {
   const fields = () => [
     // --- Informasi Utama ---
     field({ type: 'text', key: 'nama_lokasi', label: 'Nama Lokasi', required: true, readOnly: !!view }),
-    field({ type: 'text', key: 'kode_lokasi', label: 'Kode Lokasi', tooltip: "Jika kosong, akan diisi otomatis oleh sistem", readOnly: !!view }),
+    field({
+      type: 'text',
+      key: 'kode_lokasi',
+      label: 'Kode Lokasi',
+      tooltip: 'Jika kosong, akan diisi otomatis oleh sistem',
+      readOnly: !!view
+    }),
 
     field({
       type: 'select',
@@ -205,12 +228,10 @@ const LocationForm = () => {
     field({ type: 'numeral', key: 'map_zoom', label: 'Zoom Level Map', readOnly: !!view }), // Ditambahkan
 
     // --- Sistem ---
-    ...(id ? [
-      field({ type: 'image', key: 'qr_code_base64', base64: true, label: 'QR Code' })
-    ] : []),
+    ...(id ? [field({ type: 'image', key: 'qr_code_base64', base64: true, label: 'QR Code' })] : []),
 
     // --- Lainnya ---
-    field({ type: 'textarea', key: 'keterangan', label: 'Keterangan', readOnly: !!view }),
+    field({ type: 'textarea', key: 'keterangan', label: 'Keterangan', readOnly: !!view })
 
     // fieldBuildSubmit({
     //   onCancel: () => router.push('/app/location/list'),
@@ -219,72 +240,65 @@ const LocationForm = () => {
     // })
   ]
 
-  const [isQrModalOpen, setQrModalOpen] = useState(false);
-
+  const [isQrModalOpen, setQrModalOpen] = useState(false)
 
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <Card>
-          <CardHeader
-            title={id ? (view ? 'Detail Lokasi' : 'Edit Lokasi') : 'Tambah Lokasi'}
-            subheader='Pastikan data lokasi sesuai dengan hierarki cabang atau gedung'
-          />
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              {formColumn({ control, errors, state, setState, fields: fields() })}
+        {!isGeoModalOpen && (
+          <Card>
+            <CardHeader
+              title={id ? (view ? 'Detail Lokasi' : 'Edit Lokasi') : 'Tambah Lokasi'}
+              subheader='Pastikan data lokasi sesuai dengan hierarki cabang atau gedung'
+            />
+            <CardContent>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                {formColumn({ control, errors, state, setState, fields: fields() })}
 
-              <Grid container spacing={2} sx={{ mt: 4 }}>
-                <Grid item xs={12} className='demo-space-x'>
-                  {/* Tombol Submit */}
-                  <Button
-                    variant='contained'
-                    type='submit'
-                    disabled={store.loading || !!view}
-                  >
-                    {store.loading ? <CircularProgress size={20} color="inherit" /> : 'Simpan'}
-                  </Button>
-
-                  {/* Tombol Cancel */}
-                  <Button
-                    variant='outlined'
-                    color='secondary'
-                    onClick={() => router.push('/app/location/list')}
-                  >
-                    Batal
-                  </Button>
-
-                  {/* Tombol Kelola Area (Hanya muncul saat Edit) */}
-                  {id && (
-                    <Button
-                      type='button'
-                      variant='outlined'
-                      color='primary'
-                      startIcon={<i className='tabler-map-pin' />}
-                      // onClick={() => router.push(`/app/location/geo?id=${id}`)}
-                      onClick={() => setGeoModalOpen(true)}
-                    >
-                      Kelola Area
+                <Grid container spacing={2} sx={{ mt: 4 }}>
+                  <Grid item xs={12} className='demo-space-x'>
+                    {/* Tombol Submit */}
+                    <Button variant='contained' type='submit' disabled={store.loading || !!view}>
+                      {store.loading ? <CircularProgress size={20} color='inherit' /> : 'Simpan'}
                     </Button>
-                  )}
 
-                  {/* Tombol Cetak QR (Hanya muncul saat Edit) */}
-                  {id && (
-                    <Button
-                      type='button'
-                      variant='contained'
-                      color='info'
-                      startIcon={<i className='tabler-qrcode' />}
-                      onClick={() => setQrModalOpen(true)}
-                    >
-                      Cetak QR
+                    {/* Tombol Cancel */}
+                    <Button variant='outlined' color='secondary' onClick={() => router.push('/app/location/list')}>
+                      Batal
                     </Button>
-                  )}
+
+                    {/* Tombol Kelola Area (Hanya muncul saat Edit) */}
+                    {id && (
+                      <Button
+                        type='button'
+                        variant='outlined'
+                        color='primary'
+                        startIcon={<i className='tabler-map-pin' />}
+                        // onClick={() => router.push(`/app/location/geo?id=${id}`)}
+                        onClick={() => setGeoModalOpen(true)}
+                      >
+                        Kelola Area
+                      </Button>
+                    )}
+
+                    {/* Tombol Cetak QR (Hanya muncul saat Edit) */}
+                    {id && (
+                      <Button
+                        type='button'
+                        variant='contained'
+                        color='info'
+                        startIcon={<i className='tabler-qrcode' />}
+                        onClick={() => setQrModalOpen(true)}
+                      >
+                        Cetak QR
+                      </Button>
+                    )}
+                  </Grid>
                 </Grid>
-              </Grid>
-            </form>
-          </CardContent>
-        </Card>
+              </form>
+            </CardContent>
+          </Card>
+        )}
         {isGeoModalOpen && (
           <Card id={`map-container-card-${id || 'default'}`} sx={{ mt: 4 }}>
             <CardHeader
@@ -292,7 +306,7 @@ const LocationForm = () => {
               subheader={`Kode Lokasi: ${state.kode_lokasi}`}
               action={
                 <IconButton onClick={() => setGeoModalOpen(false)}>
-                  <i className="tabler-x" />
+                  <i className='tabler-x' />
                 </IconButton>
               }
             />
@@ -303,11 +317,7 @@ const LocationForm = () => {
         )}
       </Grid>
 
-      <QrPrintModal
-        open={isQrModalOpen}
-        onClose={() => setQrModalOpen(false)}
-        data={state}
-      />
+      <QrPrintModal open={isQrModalOpen} onClose={() => setQrModalOpen(false)} data={state} />
     </Grid>
   )
 }

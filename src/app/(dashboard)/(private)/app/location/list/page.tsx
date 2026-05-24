@@ -23,12 +23,7 @@ import {
 
 import { toast } from 'react-toastify'
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import {
-  deleteLocation,
-  fetchLocationPage,
-  postExportLocation,
-  resetRedux
-} from '../slice/index'
+import { deleteLocation, fetchLocationPage, postExportLocation, resetRedux } from '../slice/index'
 import { useCan } from '@/hooks/useCan'
 
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
@@ -53,25 +48,13 @@ const RowAction = ({ row, onDeleteSuccess }: { row: any; onDeleteSuccess: (id: s
       <IconButton size='small' onClick={handleOpen}>
         <i className='tabler-dots-vertical' />
       </IconButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem
-          component={Link}
-          href={`/app/location/form?id=${row.id_lokasi}&view=true`}
-          onClick={handleClose}
-        >
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+        <MenuItem component={Link} href={`/app/location/form?id=${row.id_lokasi}&view=true`} onClick={handleClose}>
           <i className='tabler-eye' style={{ marginRight: 8 }} /> View
         </MenuItem>
 
         {/* {canEdit && ( */}
-        <MenuItem
-          component={Link}
-          href={`/app/location/form?id=${row.id_lokasi}`}
-          onClick={handleClose}
-        >
+        <MenuItem component={Link} href={`/app/location/form?id=${row.id_lokasi}`} onClick={handleClose}>
           <i className='tabler-edit' style={{ marginRight: 8 }} /> Edit
         </MenuItem>
         {/* )} */}
@@ -132,7 +115,7 @@ const LocationList = () => {
   }, [store.delete, dispatch, fetchData])
 
   const renderOption = (row: any) => {
-    return <RowAction row={row} onDeleteSuccess={(id) => dispatch(deleteLocation(id))} />
+    return <RowAction row={row} onDeleteSuccess={id => dispatch(deleteLocation(id))} />
   }
 
   const buildTable = () => {
@@ -147,19 +130,13 @@ const LocationList = () => {
         tableColumn('NAMA LOKASI', 'nama_lokasi'),
         tableColumn('JENIS', 'jenis_display'),
         tableColumn('INDUK LOKASI', 'parent_display'), // Self-referencing display
-        tableColumn('KAPASITAS', 'kapasitas_display'),
+        tableColumn('KAPASITAS', 'kapasitas_display')
       ],
       values: values.map((row: any) => ({
         ...row,
         // Chip untuk Jenis Lokasi
         jenis_display: (
-          <Chip
-            label={row.jenis_lokasi}
-            size='small'
-            variant='tonal'
-            color='primary'
-            sx={{ fontWeight: 500 }}
-          />
+          <Chip label={row.jenis_lokasi} size='small' variant='tonal' color='primary' sx={{ fontWeight: 500 }} />
         ),
         // Menampilkan Nama Parent (Induk Lokasi)
         parent_display: (
@@ -217,6 +194,10 @@ const LocationList = () => {
     }
   }
 
+  const handleFilter = (event: any) => {
+    setFilter(event.target.value)
+  }
+
   return (
     <Grid container spacing={6}>
       <Grid size={12}>
@@ -224,13 +205,13 @@ const LocationList = () => {
           <CardHeader title='Master Data Lokasi' />
           <Toolbar sx={{ gap: 2, mb: 4, px: '1.5rem !important' }}>
             {canCreate && (
-              <Tooltip title="Tambah">
+              <Tooltip title='Tambah'>
                 <Button
-                  size="small"
-                  variant="outlined"
+                  size='small'
+                  variant='outlined'
                   sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
                   onClick={onAddForm}
-                  startIcon={<i className="tabler-plus" />}
+                  startIcon={<i className='tabler-plus' />}
                 >
                   Tambah
                 </Button>
@@ -238,14 +219,14 @@ const LocationList = () => {
             )}
 
             {canImport && (
-              <Tooltip title="Import CSV">
+              <Tooltip title='Import CSV'>
                 <Button
-                  size="small"
-                  color="success"
-                  variant="outlined"
+                  size='small'
+                  color='success'
+                  variant='outlined'
                   sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
                   onClick={onImport}
-                  startIcon={<i className="tabler-file-import" />}
+                  startIcon={<i className='tabler-file-import' />}
                 >
                   Import CSV
                 </Button>
@@ -253,21 +234,25 @@ const LocationList = () => {
             )}
 
             {canExport && (
-              <Tooltip title="Export CSV">
+              <Tooltip title='Export CSV'>
                 <Button
-                  size="small"
-                  color="warning"
-                  variant="outlined"
+                  size='small'
+                  color='warning'
+                  variant='outlined'
                   sx={{ height: 32, fontSize: '0.75rem', px: 2 }}
                   onClick={onExport}
-                  startIcon={<i className="tabler-file-export" />}
+                  startIcon={<i className='tabler-file-export' />}
                 >
                   {loadingExport ? 'Proses...' : 'Export CSV'}
                 </Button>
               </Tooltip>
             )}
+            <Typography sx={{ flex: '1 1 auto' }} />
+            <Tooltip title='Cari...'>
+              <TextField id='outlined-basic' label='Cari...' size='small' onChange={handleFilter} />
+            </Tooltip>
           </Toolbar>
-          <TableView changeSort={() => { }} model={buildTable()} />
+          <TableView changeSort={() => {}} model={buildTable()} />
         </Card>
       </Grid>
     </Grid>

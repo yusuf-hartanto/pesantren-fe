@@ -276,9 +276,9 @@ const TableInspeksi = () => {
 
           return {
             ...row,
-            cabang: row.cabang.nama_cabang,
-            lokasi: row.lokasi.nama_lokasi,
-            petugas: row.pegawai.nama_lengkap,
+            cabang: row.cabang?.nama_cabang,
+            lokasi: row.lokasi?.nama_lokasi,
+            petugas: row.pegawai?.nama_lengkap,
             waktu_custom: row.waktu ? row.waktu.slice(0, -3) : '-',
             tanggal_custom: row.tanggal ? `${tanggalArr[2]}/${tanggalArr[1]}/${tanggalArr[0]}` : '-'
           }
