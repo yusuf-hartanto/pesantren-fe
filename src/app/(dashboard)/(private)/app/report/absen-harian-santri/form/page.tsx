@@ -37,7 +37,7 @@ import { toast } from 'react-toastify'
 import { format } from 'date-fns'
 
 import { useAppDispatch, useAppSelector } from '@/redux-store/hook'
-import { fetchSantriKamarReady, postAbsenScanQR } from '../slice'
+import { fetchSantriKamarReady, postAbsenScanQR } from '../../../absen-harian-santri/slice'
 import QRScanner from '@/views/onevour/components/qr-scanner'
 
 // Interface untuk baris data di Form Kolektif
@@ -151,7 +151,7 @@ const PresensiFormPage = () => {
       // await dispatch(postAbsenKolektif(payload)).unwrap()
 
       toast.success('Data presensi massal kamar berhasil disimpan!')
-      router.push('/app/absen-harian-santri/list')
+      router.push('/app/report/absen-harian-santri/list')
     } catch {
       toast.error('Gagal menyimpan data presensi kolektif')
     } finally {
@@ -231,7 +231,7 @@ const PresensiFormPage = () => {
             variant='outlined'
             color='secondary'
             component={Link}
-            href='/app/absen-harian-santri/list'
+            href='/app/report/absen-harian-santri/list'
             startIcon={<i className='tabler-arrow-left' />}
           >
             Kembali
@@ -466,20 +466,27 @@ const PresensiFormPage = () => {
 
                         {/* 5. Kolom Status Kehadiran Dropdown */}
                         <TableCell>
-                          <FormControl fullWidth size='small'>
+                          <FormControl fullWidth>
                             <Select
+                              size='small'
                               value={santri.status_kehadiran}
-                              onChange={e => handleStatusChange(santri.id_santri, e.target.value as any)}
+                              onChange={e =>
+                                handleStatusChange(
+                                  santri.id_santri,
+                                  e.target.value as 'Hadir' | 'Izin' | 'Sakit' | 'Alfa'
+                                )
+                              }
+                              disabled
                               sx={{
-                                fontWeight: 600,
-                                color:
+                                minWidth: 120,
+                                backgroundColor:
                                   santri.status_kehadiran === 'Hadir'
-                                    ? 'success.main'
+                                    ? '#e8f5e9'
                                     : santri.status_kehadiran === 'Izin'
-                                      ? 'info.main'
+                                      ? '#fff3e0'
                                       : santri.status_kehadiran === 'Sakit'
-                                        ? 'warning.main'
-                                        : 'error.main'
+                                        ? '#e3f2fd'
+                                        : '#ffebee'
                               }}
                             >
                               <MenuItem value='Hadir'>Hadir</MenuItem>
@@ -498,6 +505,7 @@ const PresensiFormPage = () => {
                             placeholder='Contoh: Sakit demam, Izin jenguk...'
                             value={santri.keterangan}
                             onChange={e => handleKeteranganChange(santri.id_santri, e.target.value)}
+                            disabled
                           />
                         </TableCell>
                       </TableRow>
@@ -513,25 +521,10 @@ const PresensiFormPage = () => {
                 variant='outlined'
                 color='secondary'
                 component={Link}
-                href='/app/absen-harian-santri/list'
-                disabled={loadingSubmit}
+                href='/app/report/absen-harian-santri/list'
+                startIcon={<i className='tabler-arrow-left' />}
               >
-                Batal
-              </Button>
-              <Button
-                variant='contained'
-                color='primary'
-                onClick={handleSubmitKolektif}
-                disabled={loadingSubmit || listSantriAbsen.length === 0}
-                startIcon={
-                  loadingSubmit ? (
-                    <CircularProgress size={20} color='inherit' />
-                  ) : (
-                    <i className='tabler-device-floppy' />
-                  )
-                }
-              >
-                Simpan Presensi Massal
+                Kembali
               </Button>
             </Box>
           </Card>

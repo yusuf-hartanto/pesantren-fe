@@ -10,20 +10,14 @@ import {
   TextField,
   Toolbar,
   Button,
-  Typography,
   TableCell,
   IconButton,
   Menu,
   MenuItem,
-  Box,
   Chip,
   FormControl,
   InputLabel,
   Select,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Autocomplete,
   CircularProgress
 } from '@mui/material'
@@ -35,12 +29,11 @@ import {
   fetchAbsenSantriPage,
   deleteAbsenSantri,
   postAbsenExport,
-  fetchSantriKamarReady,
   fetchMatchingShiftAsrama,
   resetRedux
-} from '../slice'
+} from '../../../absen-harian-santri/slice'
 
-import { fetchLocationPage } from '../../location/slice'
+import { fetchLocationPage } from '../../../location/slice'
 
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
@@ -59,7 +52,7 @@ interface KamarOption {
 }
 
 // Komponen Aksi Baris Tabel
-const RowAction = ({ row, onDeleteSuccess }: { row: any; onDeleteSuccess: (id: string) => void }) => {
+const RowAction = ({ row }: { row: any }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [openConfirm, setOpenConfirm] = useState(false)
 
@@ -69,27 +62,10 @@ const RowAction = ({ row, onDeleteSuccess }: { row: any; onDeleteSuccess: (id: s
         <i className='tabler-dots-vertical' />
       </IconButton>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-        <MenuItem component={Link} href={`/app/absen-harian-santri/form?id=${row.id_absen}&view=true&mode=kolektif&tanggal=${row.tanggal}&id_lokasi_kamar=${row.id_lokasi_kamar}&id_shift_presensi=${row.id_shift_presensi}&nama_shift=${row.shiftPresensi?.nama_shift || ''}&nama_lokasi=${row.lokasiKamar?.nama_lokasi || ''}`}>
+        <MenuItem component={Link} href={`/app/report/absen-harian-santri/form?id=${row.id_absen}&view=true&mode=kolektif&tanggal=${row.tanggal}&id_lokasi_kamar=${row.id_lokasi_kamar}&id_shift_presensi=${row.id_shift_presensi}&nama_shift=${row.shiftPresensi?.nama_shift || ''}&nama_lokasi=${row.lokasiKamar?.nama_lokasi || ''}`}>
           <i className='tabler-eye' style={{ marginRight: 8 }} /> View
         </MenuItem>
-        <MenuItem component={Link} href={`/app/absen-harian-santri/form?id=${row.id_absen}&mode=kolektif&tanggal=${row.tanggal}&id_lokasi_kamar=${row.id_lokasi_kamar}&id_shift_presensi=${row.id_shift_presensi}&nama_shift=${row.shiftPresensi?.nama_shift || ''}&nama_lokasi=${row.lokasiKamar?.nama_lokasi || ''}`}>
-          <i className='tabler-edit' style={{ marginRight: 8 }} /> Edit
-        </MenuItem>
-        <MenuItem onClick={() => setOpenConfirm(true)} sx={{ color: 'error.main' }}>
-          <i className='tabler-trash' style={{ marginRight: 8 }} /> Delete
-        </MenuItem>
       </Menu>
-
-      <DialogDelete
-        id={row.santri?.fullname || 'Data Absen'}
-        open={openConfirm}
-        onClose={() => setOpenConfirm(false)}
-        handleOk={() => {
-          onDeleteSuccess(row.id_absen)
-          setOpenConfirm(false)
-        }}
-        handleClose={() => setOpenConfirm(false)}
-      />
     </TableCell>
   )
 }
@@ -100,8 +76,6 @@ const AbsenHarianSantriList = () => {
   const store = useAppSelector(state => state.absen_harian_santri)
 
   // Permission Hooks
-  const canCreate = useCan('create')
-  const canImport = useCan('import')
   const canExport = useCan('export')
 
   // Opsi Data Dropdown Master
@@ -118,17 +92,19 @@ const AbsenHarianSantriList = () => {
   const [searchTyped, setSearchTyped] = useState('')
 
   // State Snapshot Filter Sah (Mencegah Auto Fetch)
-  const [currentFilters, setCurrentFilters] = useState<any>(null)
-  const [isFilterApplied, setIsFilterApplied] = useState(false)
+  const [currentFilters, setCurrentFilters] = useState<any>({
+    tanggal: format(new Date(), 'yyyy-MM-dd'),
+    idShift: '',
+    idLokasi: '',
+    status: 'Semua',
+    searchTyped: ''
+  })
+  const [isFilterApplied, setIsFilterApplied] = useState(true)
 
   // State Pagination & Loading Utama
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
   const [loadingExport, setLoadingExport] = useState(false)
-
-  // State Modals Control
-  const [anchorPresensi, setAnchorPresensi] = useState<null | HTMLElement>(null)
-  const [openModalKonfirmasi, setOpenModalKonfirmasi] = useState(false)
 
   // Ambil Master Data Shift via fetchMatchingShiftAsrama
   useEffect(() => {
@@ -173,7 +149,6 @@ const AbsenHarianSantriList = () => {
   // Fungsi Fetch Data Utama Log Tabel
   const executeFetchData = useCallback(
     (currentPage: number, currentPerPage: number, filters: any) => {
-      if (!filters) return
       dispatch(
         fetchAbsenSantriPage({
           page: currentPage,
@@ -196,15 +171,6 @@ const AbsenHarianSantriList = () => {
     }
   }, [page, perPage, isFilterApplied, currentFilters, executeFetchData])
 
-  // Efek refresh setelah delete data
-  useEffect(() => {
-    if (store.delete?.status) {
-      toast.success('Data absensi santri berhasil dihapus')
-      if (isFilterApplied && currentFilters) executeFetchData(page, perPage, currentFilters)
-      dispatch(resetRedux())
-    }
-  }, [store.delete, dispatch, page, perPage, isFilterApplied, currentFilters, executeFetchData])
-
   // Handler Kirim Filter Utama via Tombol Cari / Enter
   const handleSearchSubmit = () => {
     const filters = {
@@ -222,14 +188,25 @@ const AbsenHarianSantriList = () => {
 
   // Handler Reset Filter
   const handleResetFilter = () => {
-    setTanggal(format(new Date(), 'yyyy-MM-dd'))
+    const defaultTanggal = format(new Date(), 'yyyy-MM-dd')
+    const filters = {
+      tanggal: defaultTanggal,
+      idShift: '',
+      idLokasi: '',
+      status: 'Semua',
+      searchTyped: ''
+    }
+
+    setTanggal(defaultTanggal)
     setSelectedShift(listShift.find(s => s.id_shift === '') || null)
     setSelectedKamar(listKamar.find(k => k.id_lokasi === '') || null)
     setStatus('Semua')
     setSearchTyped('')
+    
     setPage(1)
-    setIsFilterApplied(false)
-    setCurrentFilters(null)
+    setIsFilterApplied(true)
+    setCurrentFilters(filters)
+    executeFetchData(1, perPage, filters)
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -255,48 +232,6 @@ const AbsenHarianSantriList = () => {
       return false
     }
     return true
-  }
-
-  // Klik Utama Tombol Mulai Presensi
-  const handleMulaiPresensiClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (validatePresensiInput()) {
-      setAnchorPresensi(e.currentTarget)
-    }
-  }
-
-  // Handle Mulai Presensi -> QR Scan Route
-  const handleOpsiScanQR = () => {
-    setAnchorPresensi(null)
-    if (!validatePresensiInput()) return
-
-    const idKmr = selectedKamar?.id_lokasi
-    const idSft = selectedShift?.id_shift
-    router.push(
-      `/app/absen-harian-santri/form?mode=scan_qr&tanggal=${tanggal}&id_lokasi_kamar=${idKmr}&id_shift_presensi=${idSft}&nama_shift=${selectedShift?.nama_shift}&nama_lokasi=${selectedKamar?.nama_lokasi}`
-    )
-  }
-
-  // Handle Mulai Presensi -> Manual Form Popup Confirm
-  const handleOpsiFormPresensi = async () => {
-    setAnchorPresensi(null)
-    if (!validatePresensiInput()) return
-
-    const idKmr = selectedKamar?.id_lokasi as string
-    const waktuSekarang = format(new Date(), 'HH:mm')
-
-    await dispatch(fetchMatchingShiftAsrama({ waktu_absen: waktuSekarang }))
-    await dispatch(fetchSantriKamarReady({ id_lokasi_kamar: idKmr }))
-
-    setOpenModalKonfirmasi(true)
-  }
-
-  const handleLanjutkanPresensi = () => {
-    setOpenModalKonfirmasi(false)
-    const idKmr = selectedKamar?.id_lokasi
-    const activeShift = store.currentShift?.id_shift || selectedShift?.id_shift
-    router.push(
-      `/app/absen-harian-santri/form?mode=kolektif&tanggal=${tanggal}&id_lokasi_kamar=${idKmr}&id_shift_presensi=${activeShift}&nama_shift=${selectedShift?.nama_shift}&nama_lokasi=${selectedKamar?.nama_lokasi}`
-    )
   }
 
   const onExport = async () => {
@@ -330,7 +265,7 @@ const AbsenHarianSantriList = () => {
   }
 
   const renderOption = (row: any) => {
-    return <RowAction row={row} onDeleteSuccess={id => dispatch(deleteAbsenSantri(id))} />
+    return <RowAction row={row} />
   }
 
   const buildTable = () => {
@@ -342,6 +277,9 @@ const AbsenHarianSantriList = () => {
       page: page,
       fields: [
         tableColumn('OPTION', 'act-x', 'left', renderOption as any),
+        tableColumn('LOKASI', 'lokasi'),
+        tableColumn('PETUGAS', 'petugas'),
+        tableColumn('PRESENSI', 'presensi'),
         tableColumn('NAMA SANTRI', 'santri.fullname'),
         tableColumn('NIS', 'santri.nis'),
         tableColumn('KAMAR', 'lokasiKamar.nama_lokasi'),
@@ -350,6 +288,9 @@ const AbsenHarianSantriList = () => {
       ],
       values: tableValues.map((row: any) => ({
         ...row,
+        lokasi: row.lokasiKamar?.nama_lokasi || '-',
+        presensi: row.shiftPresensi?.nama_shift || '-',
+        petugas: row.petugas?.nama_lengkap || '-',
         status_display: (
           <Chip
             label={row.status_kehadiran}
@@ -497,27 +438,6 @@ const AbsenHarianSantriList = () => {
               Reset Filter
             </Button>
 
-            {canCreate && (
-              <>
-                <Button
-                  variant='contained'
-                  color='primary'
-                  startIcon={<i className='tabler-plus' />}
-                  onClick={handleMulaiPresensiClick}
-                >
-                  Mulai Presensi
-                </Button>
-                <Menu anchorEl={anchorPresensi} open={Boolean(anchorPresensi)} onClose={() => setAnchorPresensi(null)}>
-                  <MenuItem onClick={handleOpsiScanQR}>
-                    <i className='tabler-qrcode' style={{ marginRight: 8 }} /> Scan QR Kartu Santri
-                  </MenuItem>
-                  <MenuItem onClick={handleOpsiFormPresensi}>
-                    <i className='tabler-forms' style={{ marginRight: 8 }} /> Form Presensi
-                  </MenuItem>
-                </Menu>
-              </>
-            )}
-
             {canExport && (
               <Button
                 color='success'
@@ -528,110 +448,15 @@ const AbsenHarianSantriList = () => {
                 {loadingExport ? 'Proses...' : 'Export CSV'}
               </Button>
             )}
-
-            {canImport && (
-              <Button
-                color='secondary'
-                variant='contained'
-                startIcon={<i className='tabler-file-import' />}
-                component={Link}
-                href='/app/absen-harian-santri/import'
-              >
-                Import CSV
-              </Button>
-            )}
           </Toolbar>
         </Card>
 
         {/* LOG DATA UTAMA RENDERING */}
         <Card>
-          <CardHeader title='Log Presensi Harian Santri' />
-
-          {!isFilterApplied ? (
-            <Box sx={{ p: 10, textAlign: 'center', color: 'text.secondary' }}>
-              <i
-                className='tabler-filter-off'
-                style={{ fontSize: '48px', marginBottom: '16px', display: 'block', color: '#9e9e9e' }}
-              />
-              <Typography variant='h6' sx={{ fontWeight: 500, mb: 1 }}>
-                Belum Ada Data Ditampilkan
-              </Typography>
-              <Typography variant='body2' color='text.secondary'>
-                Silakan tentukan filter di atas kemudian klik tombol <b>Cari</b> untuk memuat data log presensi santri.
-              </Typography>
-            </Box>
-          ) : (
-            <TableView changeSort={() => {}} model={buildTable()} />
-          )}
+          <CardHeader title='Daftar Absensi Harian Santri' />
+          <TableView changeSort={() => {}} model={buildTable()} />
         </Card>
       </Grid>
-
-      {/* POPUP MODAL KONFIRMASI OTOMATIS */}
-      <Dialog open={openModalKonfirmasi} onClose={() => setOpenModalKonfirmasi(false)} maxWidth='xs' fullWidth>
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 2 }}>
-          <Typography variant='h6' sx={{ fontWeight: 700 }}>
-            Konfirmasi Presensi Hari Ini
-          </Typography>
-          <IconButton onClick={() => setOpenModalKonfirmasi(false)} size='small'>
-            <i className='tabler-x' />
-          </IconButton>
-        </DialogTitle>
-
-        <DialogContent dividers sx={{ p: 4 }}>
-          <Typography variant='subtitle1' sx={{ fontWeight: 700, mb: 3, color: 'text.primary' }}>
-            Presensi Harian Santri
-          </Typography>
-
-          <Box sx={{ display: 'grid', gridTemplateColumns: '100px 10px 1fr', gap: 1.5, mb: 4 }}>
-            <Typography variant='body2' color='text.secondary'>
-              Tanggal
-            </Typography>
-            <Typography variant='body2'>:</Typography>
-            <Typography variant='body2' sx={{ fontWeight: 500 }}>
-              {tanggal} (otomatis)
-            </Typography>
-
-            <Typography variant='body2' color='text.secondary'>
-              Waktu
-            </Typography>
-            <Typography variant='body2'>:</Typography>
-            <Typography variant='body2' sx={{ fontWeight: 500 }}>
-              {format(new Date(), 'HH:mm')} (otomatis)
-            </Typography>
-
-            <Typography variant='body2' color='text.secondary'>
-              Shift
-            </Typography>
-            <Typography variant='body2'>:</Typography>
-            <Typography variant='body2' sx={{ fontWeight: 500 }}>
-              {store.currentShift?.nama_shift || selectedShift?.nama_shift || ''} (otomatis)
-            </Typography>
-
-            <Typography variant='body2' color='text.secondary'>
-              Lokasi
-            </Typography>
-            <Typography variant='body2'>:</Typography>
-            <Typography variant='body2' sx={{ fontWeight: 500 }}>
-              {selectedKamar?.nama_lokasi || '-'} (otomatis)
-            </Typography>
-          </Box>
-
-          <Box sx={{ bgcolor: 'rgba(79, 129, 189, 0.08)', p: 3, borderRadius: 1, borderLeft: '4px solid #4F81BD' }}>
-            <Typography variant='body2' color='primary.main' sx={{ fontWeight: 600 }}>
-              Santri terdeteksi: <span style={{ fontWeight: 800 }}>{store.santriKamar?.length || 0} orang</span>
-            </Typography>
-          </Box>
-        </DialogContent>
-
-        <DialogActions sx={{ p: 3, gap: 1 }}>
-          <Button onClick={() => setOpenModalKonfirmasi(false)} variant='outlined' color='secondary'>
-            Batal
-          </Button>
-          <Button onClick={handleLanjutkanPresensi} variant='contained' color='primary'>
-            Lanjutkan Presensi
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Grid>
   )
 }
