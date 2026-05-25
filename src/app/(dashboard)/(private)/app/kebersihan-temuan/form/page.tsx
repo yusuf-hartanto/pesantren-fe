@@ -25,6 +25,7 @@ const FormValidationBasic = () => {
   const searchParams = useSearchParams()
   const id = searchParams.get('id')
   const view = searchParams.get('view')
+  const tindakan = searchParams.get('tindakan')
 
   const dispatch = useAppDispatch()
   const store = useAppSelector(state => state.kebersihan_temuan)
@@ -43,6 +44,15 @@ const FormValidationBasic = () => {
     } | null
     perlu_tindak_lanjut: boolean
     foto_path: string
+    foto_path_tindakan: string
+    petugas: {
+      value: string
+      label: string
+    } | null
+    status: {
+      value: number
+      label: string
+    } | null
   }
 
   const defaultValues = {
@@ -51,7 +61,10 @@ const FormValidationBasic = () => {
     deskripsi: '',
     tingkat: null,
     perlu_tindak_lanjut: false,
-    foto_path: ''
+    foto_path: '',
+    foto_path_tindakan: '',
+    petugas: null,
+    status: null
   }
 
   const [state, setState] = useState<FormData>(defaultValues)
@@ -61,6 +74,7 @@ const FormValidationBasic = () => {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
     reset
   } = useForm({ defaultValues })
 
@@ -86,6 +100,7 @@ const FormValidationBasic = () => {
           }
 
           datas.tingkat = convertOptionTingkat().find(d => d.value === datas.tingkat)
+          datas.status = convertOptionStatus().find(d => d.value === datas.status)
 
           setState(datas)
           reset(datas)
@@ -116,14 +131,15 @@ const FormValidationBasic = () => {
       dispatch(
         postKebersihanTemuanUpdate({
           id: id,
-          params: { ...state, tingkat: state.tingkat?.value }
+          params: { ...state, tingkat: state.tingkat?.value, status: state.status?.value || 0 }
         })
       )
     } else {
       dispatch(
         postKebersihanTemuan({
           ...state,
-          tingkat: state.tingkat?.value
+          tingkat: state.tingkat?.value,
+          status: state.status?.value || 0
         })
       )
     }
@@ -146,15 +162,60 @@ const FormValidationBasic = () => {
     ]
   }
 
-  const fields = () => {
+  const convertOptionStatus = () => {
     return [
-      (Boolean(view) ? field({
-        type: 'text',
-        key: 'petugas',
-        label: 'Petugas',
-        placeholder: 'Input Petugas',
-        readOnly: true
-      }) : ''),      
+      {
+        label: 'Belum Diproses',
+        value: 0
+      },
+      {
+        label: 'Sedang Diproses',
+        value: 1
+      },
+      {
+        label: 'Sudah Diproses',
+        value: 2
+      },
+      {
+        label: 'Tidak Dapat Diproses',
+        value: 3
+      }
+    ]
+  }
+
+  const fields = () => {
+    let tindakanForm: {}[] = []
+
+    if (tindakan || view) {
+      tindakanForm = [
+        field({
+          type: 'separator',
+          label: 'Tindakan'
+        }),
+        field({
+          type: 'select',
+          key: 'status',
+          label: 'Status',
+          placeholder: 'Pilih Status',
+          required: true,
+          options: {
+            values: convertOptionStatus()
+          },
+          readOnly: Boolean(view)
+        }),
+        field({
+          type: 'image',
+          key: 'foto_path_tindakan',
+          label: 'Foto Tindakan',
+          placeholder: 'Upload foto',
+          urlImage: '',
+          required: false,
+          readOnly: Boolean(view)
+        })
+      ]
+    }
+
+    return [
       field({
         type: 'select',
         key: 'id_inspeksi',
@@ -167,11 +228,24 @@ const FormValidationBasic = () => {
 
             return {
               label: `${r.cabang?.nama_cabang} - ${r.lokasi?.nama_lokasi} - ${tanggalArr[2]}/${tanggalArr[1]}/${tanggalArr[0]} - ${r.waktu.slice(0, -3)}`,
-              value: r.id_inspeksi
+              value: r.id_inspeksi,
+              petugas: r.pegawai?.nama_lengkap
             }
-          })
+          }),
+          onChange: (e: any) => {
+            if (!e) return
+
+            setValue('petugas', e.petugas)
+          }
         },
-        readOnly: Boolean(view)
+        readOnly: Boolean(view) || Boolean(tindakan)
+      }),
+      field({
+        type: 'text',
+        key: 'petugas',
+        label: 'Petugas',
+        placeholder: 'Input Petugas',
+        readOnly: true
       }),
       field({
         type: 'text',
@@ -179,7 +253,7 @@ const FormValidationBasic = () => {
         label: 'Kategori',
         placeholder: 'Input Kategori',
         required: true,
-        readOnly: Boolean(view)
+        readOnly: Boolean(view) || Boolean(tindakan)
       }),
       field({
         type: 'select',
@@ -190,7 +264,7 @@ const FormValidationBasic = () => {
         options: {
           values: convertOptionTingkat()
         },
-        readOnly: Boolean(view)
+        readOnly: Boolean(view) || Boolean(tindakan)
       }),
       field({
         type: 'textarea',
@@ -198,7 +272,7 @@ const FormValidationBasic = () => {
         label: 'Deskripsi',
         placeholder: 'Input Deskripsi',
         required: false,
-        readOnly: Boolean(view)
+        readOnly: Boolean(view) || Boolean(tindakan)
       }),
       field({
         type: 'image',
@@ -207,7 +281,7 @@ const FormValidationBasic = () => {
         placeholder: 'Upload foto',
         urlImage: '',
         required: false,
-        readOnly: Boolean(view)
+        readOnly: Boolean(view) || Boolean(tindakan)
       }),
       field({
         type: 'checkbox',
@@ -215,8 +289,9 @@ const FormValidationBasic = () => {
         label: 'Perlu Tindak Lanjut',
         placeholder: 'Input Perlu Tindak Lanjut',
         required: false,
-        readOnly: Boolean(view)
+        readOnly: Boolean(view) || Boolean(tindakan)
       }),
+      ...tindakanForm,
       fieldBuildSubmit({ onCancel: onCancel, loading: loading, disabled: Boolean(view) })
     ]
   }

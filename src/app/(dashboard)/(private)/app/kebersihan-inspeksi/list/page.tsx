@@ -10,7 +10,7 @@ import Grid from '@mui/material/Grid2'
 import Card from '@mui/material/Card'
 
 import CardHeader from '@mui/material/CardHeader'
-import { TextField, Toolbar } from '@mui/material'
+import { TextField, Toolbar, Table, TableBody, TableContainer, TableHead, TableRow, Box } from '@mui/material'
 import Tooltip from '@mui/material/Tooltip'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
@@ -32,10 +32,48 @@ import {
 import { tableColumn } from '@views/onevour/table/TableViewBuilder'
 import TableView from '@views/onevour/table/TableView'
 import DialogDelete from '@views/onevour/components/dialog-delete'
+import DialogInformation from '@views/onevour/components/dialog-information'
 
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
 import { useCan } from '@/hooks/useCan'
+import CustomChip from '@/@core/components/mui/Chip'
+
+const statusObj: Record<string, { color: any; value: string }> = {
+  0: {
+    color: 'secondary',
+    value: 'Belum Diproses'
+  },
+  1: {
+    color: 'info',
+    value: 'Sedang Diproses'
+  },
+  2: {
+    color: 'success',
+    value: 'Sudah Diproses'
+  },
+  3: {
+    color: 'error',
+    value: 'Tidak Dapat Diproses'
+  }
+}
+
+const convertOptionTingkat = () => {
+  return [
+    {
+      label: 'Ringan',
+      value: 1
+    },
+    {
+      label: 'Sedang',
+      value: 2
+    },
+    {
+      label: 'Berat',
+      value: 3
+    }
+  ]
+}
 
 function RowAction(data: any) {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -251,6 +289,89 @@ const TableInspeksi = () => {
     return <RowAction row={row} handleAktifOrArsip={handleAktifOrArsip} />
   }
 
+  const detail = (row: any) => {
+    return <Detail row={row} />
+  }
+
+  const imageView = (row: any) => {
+    if (row.foto_path?.match(/^data:(.+);base64,(.+)$/)) {
+      return <img src={row.foto_path} alt='image' width={100} height={100} />
+    }
+
+    return <img src={`${process.env.NEXT_PUBLIC_API_URL}${row.foto_path}`} alt='image' width={100} height={100} />
+  }
+
+  const imageViewTindakan = (row: any) => {
+    if (!row.foto_path_tindakan) return null
+
+    if (row.foto_path_tindakan?.match(/^data:(.+);base64,(.+)$/)) {
+      return <img src={row.foto_path_tindakan} alt='image' width={100} height={100} />
+    }
+
+    return (
+      <img src={`${process.env.NEXT_PUBLIC_API_URL}${row.foto_path_tindakan}`} alt='image' width={100} height={100} />
+    )
+  }
+
+  const Detail = (row: any) => {
+    const [openDetail, setOpenDetail] = useState(false)
+
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Button size='small' variant='outlined' color='success' onClick={() => setOpenDetail(true)}>
+          Lihat
+        </Button>
+        <DialogInformation
+          title='Detail'
+          content={
+            <>
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Status</TableCell>
+                      <TableCell>Kategori</TableCell>
+                      <TableCell>Deskripsi</TableCell>
+                      <TableCell>Tingkat</TableCell>
+                      <TableCell>Tindak Lanjut</TableCell>
+                      <TableCell>Foto</TableCell>
+                      <TableCell>Foto Tindakan</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {row.row.temuans.map((data: any, index: number) => (
+                      <TableRow key={index} sx={{ '&:last-of-type .MuiTableCell-root ': { border: 0 } }}>
+                        <TableCell>
+                          <CustomChip
+                            round='true'
+                            size='small'
+                            label={statusObj[data.status]?.value}
+                            color={statusObj[data.status]?.color}
+                            sx={{ textTransform: 'capitalize' }}
+                          />
+                        </TableCell>
+                        <TableCell>{data.kategori}</TableCell>
+                        <TableCell>{data.deskripsi}</TableCell>
+                        <TableCell>{convertOptionTingkat().find(d => d.value === data.tingkat)?.label}</TableCell>
+                        <TableCell>{data.perlu_tindak_lanjut ? 'Ya' : 'Tidak'}</TableCell>
+                        <TableCell>{imageView(data)}</TableCell>
+                        <TableCell>{imageViewTindakan(data)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </>
+          }
+          open={openDetail}
+          handleOk={() => {
+            setOpenDetail(false)
+          }}
+        />
+      </Box>
+    )
+  }
+
   const buildTable = () => {
     const { dataPage } = store
 
@@ -268,6 +389,7 @@ const TableInspeksi = () => {
           tableColumn('WAKTU', 'waktu_custom'),
           tableColumn('PETUGAS', 'petugas'),
           tableColumn('STATUS', 'status_kondisi'),
+          tableColumn('STATUS TEMUAN', 'status_temuan'),
           tableColumn('CATATAN UMUM', 'catatan_umum'),
           tableColumn('TERAKHIR DIUBAH', 'updated_at')
         ],
@@ -280,7 +402,8 @@ const TableInspeksi = () => {
             lokasi: row.lokasi?.nama_lokasi || '-',
             petugas: row.pegawai?.nama_lengkap || '-',
             waktu_custom: row.waktu ? row.waktu.slice(0, -3) : '-',
-            tanggal_custom: row.tanggal ? `${tanggalArr[2]}/${tanggalArr[1]}/${tanggalArr[0]}` : '-'
+            tanggal_custom: row.tanggal ? `${tanggalArr[2]}/${tanggalArr[1]}/${tanggalArr[0]}` : '-',
+            status_temuan: detail(row)
           }
         }),
         count: total,

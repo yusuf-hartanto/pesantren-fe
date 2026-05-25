@@ -152,7 +152,7 @@ const TableTemuan = () => {
     <Grid container spacing={6} sx={{ width: '100%' }}>
       <Grid size={12}>
         <Card>
-          <CardHeader title='Temuan' sx={{ paddingBottom: 0 }} />
+          <CardHeader title='Log' sx={{ paddingBottom: 0 }} />
           <Toolbar
             sx={{
               px: '1.5rem !important',

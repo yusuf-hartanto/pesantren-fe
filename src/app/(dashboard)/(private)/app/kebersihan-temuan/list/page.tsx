@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { Fragment, useCallback, useEffect, useState } from 'react'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -30,6 +30,26 @@ import DialogDelete from '@views/onevour/components/dialog-delete'
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
 import { useCan } from '@/hooks/useCan'
+import CustomChip from '@/@core/components/mui/Chip'
+
+const statusObj: Record<string, { color: any; value: string }> = {
+  0: {
+    color: 'secondary',
+    value: 'Belum Diproses'
+  },
+  1: {
+    color: 'info',
+    value: 'Sedang Diproses'
+  },
+  2: {
+    color: 'success',
+    value: 'Sudah Diproses'
+  },
+  3: {
+    color: 'error',
+    value: 'Tidak Dapat Diproses'
+  }
+}
 
 function RowAction(data: any) {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -82,6 +102,17 @@ function RowAction(data: any) {
         >
           <i className='tabler-eye' />
           View
+        </MenuItem>
+
+        <MenuItem
+          key='tindakan'
+          component={Link}
+          sx={{ '& svg': { mr: 2 } }}
+          href={`/app/kebersihan-temuan/form?id=${data.row.id_temuan}&tindakan=true`}
+          onClick={handleView}
+        >
+          <i className='tabler-check' />
+          Tindakan
         </MenuItem>
 
         {canEdit && [
@@ -240,11 +271,23 @@ const TableTemuan = () => {
   }
 
   const imageView = (row: any) => {
-    if (row.foto_path.match(/^data:(.+);base64,(.+)$/)) {
+    if (row.foto_path?.match(/^data:(.+);base64,(.+)$/)) {
       return <img src={row.foto_path} alt='image' width={100} height={100} />
     }
 
     return <img src={`${process.env.NEXT_PUBLIC_API_URL}${row.foto_path}`} alt='image' width={100} height={100} />
+  }
+
+  const imageViewTindakan = (row: any) => {
+    if (!row.foto_path_tindakan) return null
+
+    if (row.foto_path_tindakan?.match(/^data:(.+);base64,(.+)$/)) {
+      return <img src={row.foto_path_tindakan} alt='image' width={100} height={100} />
+    }
+
+    return (
+      <img src={`${process.env.NEXT_PUBLIC_API_URL}${row.foto_path_tindakan}`} alt='image' width={100} height={100} />
+    )
   }
 
   const buildTable = () => {
@@ -257,17 +300,40 @@ const TableTemuan = () => {
         page: page,
         fields: [
           tableColumn('OPTION', 'act-x', 'left', renderOption as any),
+          tableColumn('INSPEKSI & PETUGAS', 'inspeksi'),
+          tableColumn('STATUS', 'status_text'),
           tableColumn('KATEGORI', 'kategori'),
           tableColumn('DESKRIPSI', 'deskripsi'),
           tableColumn('TINGKAT', 'tingkat_custom'),
-          tableColumn('PERLU TINDAK LANJUT', 'tindak_lanjut'),
-          tableColumn('FOTO', 'foto_path', 'left', imageView as any)
+          tableColumn('TINDAK LANJUT', 'tindak_lanjut'),
+          tableColumn('FOTO', 'foto_path', 'left', imageView as any),
+          tableColumn('FOTO TINDAKAN', 'foto_path_tindakan', 'left', imageViewTindakan as any)
         ],
         values: values?.map((row: any) => {
+          const tanggalArr = row.kebersihan_inspeksi?.tanggal?.split('-')
+
           return {
             ...row,
-            tingkat_custom: row.tingkat?.label ?? convertOptionTingkat().find(d => d.value === row.tingkat)?.label,
-            tindak_lanjut: row.perlu_tindak_lanjut ? 'Ya' : 'Tidak'
+            tingkat_custom: convertOptionTingkat().find(d => d.value === row.tingkat)?.label,
+            tindak_lanjut: row.perlu_tindak_lanjut ? 'Ya' : 'Tidak',
+            inspeksi: (
+              <Fragment>
+                <p>{`${row.kebersihan_inspeksi?.cabang?.nama_cabang}`}</p>
+                <p>{`${row.kebersihan_inspeksi?.lokasi?.nama_lokasi}`}</p>
+                <p>{`${tanggalArr[2]}/${tanggalArr[1]}/${tanggalArr[0]}`}</p>
+                <p>{`${row.kebersihan_inspeksi?.waktu.slice(0, -3)}`}</p>
+                <p>{`${row.kebersihan_inspeksi?.pegawai?.nama_lengkap}`}</p>
+              </Fragment>
+            ),
+            status_text: (
+              <CustomChip
+                round='true'
+                size='small'
+                label={statusObj[row.status]?.value}
+                color={statusObj[row.status]?.color}
+                sx={{ textTransform: 'capitalize' }}
+              />
+            )
           }
         }),
         count: total,
