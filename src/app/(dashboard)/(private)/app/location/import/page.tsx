@@ -29,8 +29,6 @@ export interface LocationImportPayload {
   kapasitas: number | null
   lantai: string | number | null
   keterangan: string | null
-  parent_nama: string | null
-  cabang_nama: string | null
 }
 
 export interface ImportRow {
@@ -156,8 +154,8 @@ export default function ImportLocationPage() {
 
       if (!res.status) {
         toast.warning(res.message)
-        
-return
+
+        return
       }
 
       toast.success('Simpan data lokasi berhasil')
