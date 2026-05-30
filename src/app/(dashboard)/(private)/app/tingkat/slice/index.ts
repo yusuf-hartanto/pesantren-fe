@@ -10,6 +10,7 @@ export interface FetchParams {
   page?: number
   perPage?: number
   q?: string
+  type?: string
 }
 
 export interface InitialState {
