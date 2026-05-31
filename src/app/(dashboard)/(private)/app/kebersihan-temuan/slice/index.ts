@@ -15,6 +15,7 @@ export interface FetchParams {
   id_cabang?: string
   id_lokasi?: string
   id_petugas?: string
+  status?: number | string
 }
 
 export interface InitialState {

@@ -10,7 +10,7 @@ import Grid from '@mui/material/Grid2'
 import Card from '@mui/material/Card'
 
 import CardHeader from '@mui/material/CardHeader'
-import { TextField, Toolbar } from '@mui/material'
+import { Autocomplete, TextField, Toolbar } from '@mui/material'
 import Tooltip from '@mui/material/Tooltip'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
@@ -31,6 +31,9 @@ import DialogDelete from '@views/onevour/components/dialog-delete'
 import '@assets/iconify-icons/generated-icons.css'
 import { useCan } from '@/hooks/useCan'
 import CustomChip from '@/@core/components/mui/Chip'
+import { fetchCabangAll } from '../../cabang/slice'
+import { fetchLocationAll } from '../../location/slice'
+import { fetchPegawaiAll } from '../../guru-mata-pelajaran/slice'
 
 const statusObj: Record<string, { color: any; value: string }> = {
   0: {
@@ -50,6 +53,26 @@ const statusObj: Record<string, { color: any; value: string }> = {
     value: 'Tidak Dapat Diproses'
   }
 }
+
+const statuss = [
+  { label: 'Semua', value: '' },
+  {
+    label: 'Belum Diproses',
+    value: 0
+  },
+  {
+    label: 'Sedang Diproses',
+    value: 1
+  },
+  {
+    label: 'Sudah Diproses',
+    value: 2
+  },
+  {
+    label: 'Tidak Dapat Diproses',
+    value: 3
+  }
+]
 
 function RowAction(data: any) {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -156,11 +179,34 @@ function RowAction(data: any) {
   )
 }
 
+interface CabangOption {
+  label: string
+  value: string
+}
+
+interface LokasiOption {
+  label: string
+  value: string
+}
+
+interface StatusOption {
+  label: string
+  value: number | string
+}
+
+interface PetugasOption {
+  label: string
+  value: string
+}
+
 const TableTemuan = () => {
   // ** Hooks
   const router = useRouter()
   const dispatch = useAppDispatch()
   const store = useAppSelector(state => state.kebersihan_temuan)
+  const storeCabang = useAppSelector(state => state.cabang)
+  const storeLokasi = useAppSelector(state => state.location)
+  const storePegawai = useAppSelector(state => state.guru_mata_pelajaran)
 
   const canCreate = useCan('create')
   const canImport = useCan('import')
@@ -170,27 +216,65 @@ const TableTemuan = () => {
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
   const [loadingExport, setLoadingExport] = useState(false)
+  const [selectedCabang, setSelectedCabang] = useState<CabangOption | null>({ label: 'Semua', value: '' })
+  const [selectedLokasi, setSelectedLokasi] = useState<LokasiOption | null>({ label: 'Semua', value: '' })
+  const [selectedStatus, setSelectedStatus] = useState<StatusOption | null>({ label: 'Semua', value: '' })
+  const [selectedPetugas, setSelectedPetugas] = useState<PetugasOption | null>({ label: 'Semua', value: '' })
 
   useEffect(() => {
     if (store.delete) {
-      dispatch(fetchKebersihanTemuanPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(
+        fetchKebersihanTemuanPage({
+          page: 1,
+          perPage: perPage,
+          q: filter,
+          id_cabang: selectedCabang?.value,
+          id_lokasi: selectedLokasi?.value,
+          status: selectedStatus?.value,
+          id_petugas: selectedPetugas?.value
+        })
+      )
       dispatch(resetRedux())
     }
+
+    dispatch(fetchCabangAll({}))
+    dispatch(fetchLocationAll({}))
+    dispatch(fetchPegawaiAll({}))
   }, [dispatch, filter, perPage, store.delete])
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setPage(1)
-      dispatch(fetchKebersihanTemuanPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(
+        fetchKebersihanTemuanPage({
+          page: 1,
+          perPage: perPage,
+          q: filter,
+          id_cabang: selectedCabang?.value,
+          id_lokasi: selectedLokasi?.value,
+          status: selectedStatus?.value,
+          id_petugas: selectedPetugas?.value
+        })
+      )
     }, 500)
 
     return () => clearTimeout(timer)
-  }, [dispatch, filter, perPage])
+  }, [dispatch, filter, perPage, selectedCabang, selectedLokasi, selectedStatus, selectedPetugas])
 
   const handleChangePage = useCallback(
     (newPage: number) => {
       setPage(newPage)
-      dispatch(fetchKebersihanTemuanPage({ page: newPage, perPage: perPage, q: filter }))
+      dispatch(
+        fetchKebersihanTemuanPage({
+          page: newPage,
+          perPage: perPage,
+          q: filter,
+          id_cabang: selectedCabang?.value,
+          id_lokasi: selectedLokasi?.value,
+          status: selectedStatus?.value,
+          id_petugas: selectedPetugas?.value
+        })
+      )
     },
     [dispatch, perPage, filter]
   )
@@ -246,7 +330,17 @@ const TableTemuan = () => {
 
     setPage(1)
     setPerPage(newPerPage)
-    dispatch(fetchKebersihanTemuanPage({ page: 1, perPage: newPerPage, q: filter }))
+    dispatch(
+      fetchKebersihanTemuanPage({
+        page: 1,
+        perPage: newPerPage,
+        q: filter,
+        id_cabang: selectedCabang?.value,
+        id_lokasi: selectedLokasi?.value,
+        status: selectedStatus?.value,
+        id_petugas: selectedPetugas?.value
+      })
+    )
   }
 
   const renderOption = (row: any) => {
@@ -350,6 +444,107 @@ const TableTemuan = () => {
 
   return (
     <Grid container spacing={6} sx={{ width: '100%' }}>
+      <Grid size={12}>
+        <Card sx={{ p: 5 }}>
+          <Grid container spacing={4}>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <Autocomplete
+                size='small'
+                options={storeCabang.datas.map(r => {
+                  return {
+                    label: `${r.nama_cabang}`,
+                    value: r.id_cabang
+                  }
+                })}
+                value={selectedCabang}
+                onChange={(_, newValue) => setSelectedCabang(newValue)}
+                getOptionLabel={option => option.label || ''}
+                isOptionEqualToValue={(option, value) => option.value === value?.value}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label='Cabang'
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: <>{params.InputProps.endAdornment}</>
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <Autocomplete
+                size='small'
+                options={storeLokasi.datas.map(r => {
+                  return {
+                    label: `${r.parent ? `${r.parent.nama_lokasi} / ` : ''}${r.nama_lokasi}`,
+                    value: r.id_lokasi
+                  }
+                })}
+                value={selectedLokasi}
+                onChange={(_, newValue) => setSelectedLokasi(newValue)}
+                getOptionLabel={option => option.label || ''}
+                isOptionEqualToValue={(option, value) => option.value === value?.value}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label='Lokasi'
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: <>{params.InputProps.endAdornment}</>
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <Autocomplete
+                size='small'
+                options={storePegawai.pegawai.map(r => {
+                  return {
+                    label: `${r.nama_lengkap}`,
+                    value: r.id_pegawai
+                  }
+                })}
+                value={selectedPetugas}
+                onChange={(_, newValue) => setSelectedPetugas(newValue)}
+                getOptionLabel={option => option.label || ''}
+                isOptionEqualToValue={(option, value) => option.value === value?.value}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label='Petugas'
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: <>{params.InputProps.endAdornment}</>
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <Autocomplete
+                size='small'
+                options={statuss}
+                value={selectedStatus}
+                onChange={(_, newValue) => setSelectedStatus(newValue)}
+                getOptionLabel={option => option.label || ''}
+                isOptionEqualToValue={(option, value) => option.value === value?.value}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label='Status'
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: <>{params.InputProps.endAdornment}</>
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+        </Card>
+      </Grid>
       <Grid size={12}>
         <Card>
           <CardHeader title='Temuan' sx={{ paddingBottom: 0 }} />

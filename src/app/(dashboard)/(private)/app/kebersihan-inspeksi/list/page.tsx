@@ -10,7 +10,17 @@ import Grid from '@mui/material/Grid2'
 import Card from '@mui/material/Card'
 
 import CardHeader from '@mui/material/CardHeader'
-import { TextField, Toolbar, Table, TableBody, TableContainer, TableHead, TableRow, Box } from '@mui/material'
+import {
+  TextField,
+  Toolbar,
+  Table,
+  TableBody,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Box,
+  Autocomplete
+} from '@mui/material'
 import Tooltip from '@mui/material/Tooltip'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
@@ -38,6 +48,8 @@ import DialogInformation from '@views/onevour/components/dialog-information'
 import '@assets/iconify-icons/generated-icons.css'
 import { useCan } from '@/hooks/useCan'
 import CustomChip from '@/@core/components/mui/Chip'
+import { fetchCabangAll } from '../../cabang/slice'
+import { fetchLocationAll } from '../../location/slice'
 
 const statusObj: Record<string, { color: any; value: string }> = {
   0: {
@@ -74,6 +86,18 @@ const convertOptionTingkat = () => {
     }
   ]
 }
+
+const statuss = [
+  { label: 'Semua', value: '' },
+  {
+    label: 'BERSIH',
+    value: 'BERSIH'
+  },
+  {
+    label: 'KOTOR',
+    value: 'KOTOR'
+  }
+]
 
 function RowAction(data: any) {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -169,11 +193,28 @@ function RowAction(data: any) {
   )
 }
 
+interface CabangOption {
+  label: string
+  value: string
+}
+
+interface LokasiOption {
+  label: string
+  value: string
+}
+
+interface StatusOption {
+  label: string
+  value: string
+}
+
 const TableInspeksi = () => {
   // ** Hooks
   const router = useRouter()
   const dispatch = useAppDispatch()
   const store = useAppSelector(state => state.kebersihan_inspeksi)
+  const storeCabang = useAppSelector(state => state.cabang)
+  const storeLokasi = useAppSelector(state => state.location)
 
   const canCreate = useCan('create')
   const canImport = useCan('import')
@@ -183,27 +224,60 @@ const TableInspeksi = () => {
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
   const [loadingExport, setLoadingExport] = useState(false)
+  const [selectedCabang, setSelectedCabang] = useState<CabangOption | null>({ label: 'Semua', value: '' })
+  const [selectedLokasi, setSelectedLokasi] = useState<LokasiOption | null>({ label: 'Semua', value: '' })
+  const [selectedStatus, setSelectedStatus] = useState<StatusOption | null>({ label: 'Semua', value: '' })
 
   useEffect(() => {
     if (store.delete) {
-      dispatch(fetchKebersihanInspeksiPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(
+        fetchKebersihanInspeksiPage({
+          page: 1,
+          perPage: perPage,
+          q: filter,
+          id_cabang: selectedCabang?.value,
+          id_lokasi: selectedLokasi?.value,
+          status: selectedStatus?.value
+        })
+      )
       dispatch(resetRedux())
     }
+
+    dispatch(fetchCabangAll({}))
+    dispatch(fetchLocationAll({}))
   }, [dispatch, filter, perPage, store.delete])
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setPage(1)
-      dispatch(fetchKebersihanInspeksiPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(
+        fetchKebersihanInspeksiPage({
+          page: 1,
+          perPage: perPage,
+          q: filter,
+          id_cabang: selectedCabang?.value,
+          id_lokasi: selectedLokasi?.value,
+          status: selectedStatus?.value
+        })
+      )
     }, 500)
 
     return () => clearTimeout(timer)
-  }, [dispatch, filter, perPage])
+  }, [dispatch, filter, perPage, selectedCabang, selectedLokasi, selectedStatus])
 
   const handleChangePage = useCallback(
     (newPage: number) => {
       setPage(newPage)
-      dispatch(fetchKebersihanInspeksiPage({ page: newPage, perPage: perPage, q: filter }))
+      dispatch(
+        fetchKebersihanInspeksiPage({
+          page: newPage,
+          perPage: perPage,
+          q: filter,
+          id_cabang: selectedCabang?.value,
+          id_lokasi: selectedLokasi?.value,
+          status: selectedStatus?.value
+        })
+      )
     },
     [dispatch, perPage, filter]
   )
@@ -282,7 +356,16 @@ const TableInspeksi = () => {
 
     setPage(1)
     setPerPage(newPerPage)
-    dispatch(fetchKebersihanInspeksiPage({ page: 1, perPage: newPerPage, q: filter }))
+    dispatch(
+      fetchKebersihanInspeksiPage({
+        page: 1,
+        perPage: newPerPage,
+        q: filter,
+        id_cabang: selectedCabang?.value,
+        id_lokasi: selectedLokasi?.value,
+        status: selectedStatus?.value
+      })
+    )
   }
 
   const renderOption = (row: any) => {
@@ -388,7 +471,7 @@ const TableInspeksi = () => {
           tableColumn('TANGGAL', 'tanggal_custom'),
           tableColumn('WAKTU', 'waktu_custom'),
           tableColumn('PETUGAS', 'petugas'),
-          tableColumn('STATUS', 'status_kondisi'),
+          tableColumn('KONDISI', 'status_kondisi'),
           tableColumn('STATUS TEMUAN', 'status_temuan'),
           tableColumn('CATATAN UMUM', 'catatan_umum'),
           tableColumn('TERAKHIR DIUBAH', 'updated_at')
@@ -420,6 +503,82 @@ const TableInspeksi = () => {
 
   return (
     <Grid container spacing={6} sx={{ width: '100%' }}>
+      <Grid size={12}>
+        <Card sx={{ p: 5 }}>
+          <Grid container spacing={4}>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <Autocomplete
+                size='small'
+                options={storeCabang.datas.map(r => {
+                  return {
+                    label: `${r.nama_cabang}`,
+                    value: r.id_cabang
+                  }
+                })}
+                value={selectedCabang}
+                onChange={(_, newValue) => setSelectedCabang(newValue)}
+                getOptionLabel={option => option.label || ''}
+                isOptionEqualToValue={(option, value) => option.value === value?.value}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label='Cabang'
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: <>{params.InputProps.endAdornment}</>
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <Autocomplete
+                size='small'
+                options={storeLokasi.datas.map(r => {
+                  return {
+                    label: `${r.parent ? `${r.parent.nama_lokasi} / ` : ''}${r.nama_lokasi}`,
+                    value: r.id_lokasi
+                  }
+                })}
+                value={selectedLokasi}
+                onChange={(_, newValue) => setSelectedLokasi(newValue)}
+                getOptionLabel={option => option.label || ''}
+                isOptionEqualToValue={(option, value) => option.value === value?.value}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label='Lokasi'
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: <>{params.InputProps.endAdornment}</>
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <Autocomplete
+                size='small'
+                options={statuss}
+                value={selectedStatus}
+                onChange={(_, newValue) => setSelectedStatus(newValue)}
+                getOptionLabel={option => option.label || ''}
+                isOptionEqualToValue={(option, value) => option.value === value?.value}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label='Kondisi'
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: <>{params.InputProps.endAdornment}</>
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+        </Card>
+      </Grid>
       <Grid size={12}>
         <Card>
           <CardHeader title='Kebersihan Inspeksi' sx={{ paddingBottom: 0 }} />

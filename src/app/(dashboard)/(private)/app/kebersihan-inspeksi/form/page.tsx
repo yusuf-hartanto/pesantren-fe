@@ -339,7 +339,9 @@ const FormValidationBasic = () => {
                 tingkat: r.tingkat?.value ?? r.tingkat,
                 perlu_tindak_lanjut: r.perlu_tindak_lanjut,
                 deskripsi: r.deskripsi,
-                foto_path: r.foto_path
+                foto_path: r.foto_path,
+                foto_path_tindakan: r.foto_path_tindakan,
+                status: r.status
               }
             })
           }
@@ -358,31 +360,34 @@ const FormValidationBasic = () => {
               tingkat: r.tingkat?.value ?? r.tingkat,
               perlu_tindak_lanjut: r.perlu_tindak_lanjut,
               deskripsi: r.deskripsi,
-              foto_path: r.foto_path
+              foto_path: r.foto_path,
+              foto_path_tindakan: r.foto_path_tindakan,
+              status: r.status
             }
           })
         })
       ).then(res => {
         const result = { ...res?.payload }
-
-        dispatch(
-          postKebersihanScanLog({
-            id_inspeksi: {
-              value: result.data?.id_inspeksi
-            },
-            id_lokasi: state.id_lokasi,
-            id_petugas: state.id_petugas,
-            qr_code: state.qr_code,
-            scan_latitude: state.latitude,
-            scan_longitude: state.longitude,
-            jarak_meter: state.distance,
-            valid_qr: state.scan_type === 'QR',
-            valid_geo: state.scan_type === 'GPS',
-            metode_scan: state.scan_type,
-            scan_source: isPWA() ? 'PWA' : 'WEB',
-            keterangan: 'Inspeksi'
-          })
-        )
+        if (result?.status) {
+          dispatch(
+            postKebersihanScanLog({
+              id_inspeksi: {
+                value: result.data?.id_inspeksi
+              },
+              id_lokasi: state.id_lokasi,
+              id_petugas: state.id_petugas,
+              qr_code: state.qr_code,
+              scan_latitude: state.latitude,
+              scan_longitude: state.longitude,
+              jarak_meter: state.distance,
+              valid_qr: state.scan_type === 'QR',
+              valid_geo: state.scan_type === 'GPS',
+              metode_scan: state.scan_type,
+              scan_source: isPWA() ? 'PWA' : 'WEB',
+              keterangan: 'Inspeksi'
+            })
+          )
+        }
       })
     }
   }

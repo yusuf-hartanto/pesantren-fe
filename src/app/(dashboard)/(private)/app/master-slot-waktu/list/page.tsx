@@ -10,7 +10,7 @@ import Grid from '@mui/material/Grid2'
 import Card from '@mui/material/Card'
 
 import CardHeader from '@mui/material/CardHeader'
-import { TextField, Toolbar } from '@mui/material'
+import { Autocomplete, TextField, Toolbar } from '@mui/material'
 import Tooltip from '@mui/material/Tooltip'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
@@ -30,6 +30,30 @@ import DialogDelete from '@views/onevour/components/dialog-delete'
 // Generated Icon CSS Imports
 import '@assets/iconify-icons/generated-icons.css'
 import { useCan } from '@/hooks/useCan'
+import CustomChip from '@/@core/components/mui/Chip'
+
+const statusObj: Record<string, { color: any; value: string }> = {
+  Aktif: {
+    color: 'success',
+    value: 'Aktif'
+  },
+  Nonaktif: {
+    color: 'secondary',
+    value: 'Nonaktif'
+  }
+}
+
+const statuss = [
+  { label: 'Semua', value: '' },
+  {
+    label: 'Aktif',
+    value: 'Ya'
+  },
+  {
+    label: 'Nonaktif',
+    value: 'Tidak'
+  }
+]
 
 function RowAction(data: any) {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -125,6 +149,11 @@ function RowAction(data: any) {
   )
 }
 
+interface StatusOption {
+  label: string
+  value: string
+}
+
 const Table = () => {
   // ** Hooks
   const router = useRouter()
@@ -139,10 +168,11 @@ const Table = () => {
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
   const [loadingExport, setLoadingExport] = useState(false)
+  const [selectedStatus, setSelectedStatus] = useState<StatusOption | null>({ label: 'Semua', value: '' })
 
   useEffect(() => {
     if (store.delete) {
-      dispatch(fetchMasterSlotWaktuPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(fetchMasterSlotWaktuPage({ page: 1, perPage: perPage, q: filter, status: selectedStatus?.value }))
       dispatch(resetRedux())
     }
   }, [dispatch, filter, perPage, store.delete])
@@ -150,16 +180,16 @@ const Table = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setPage(1)
-      dispatch(fetchMasterSlotWaktuPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(fetchMasterSlotWaktuPage({ page: 1, perPage: perPage, q: filter, status: selectedStatus?.value }))
     }, 500)
 
     return () => clearTimeout(timer)
-  }, [dispatch, filter, perPage])
+  }, [dispatch, filter, perPage, selectedStatus])
 
   const handleChangePage = useCallback(
     (newPage: number) => {
       setPage(newPage)
-      dispatch(fetchMasterSlotWaktuPage({ page: newPage, perPage: perPage, q: filter }))
+      dispatch(fetchMasterSlotWaktuPage({ page: newPage, perPage: perPage, q: filter, status: selectedStatus?.value }))
     },
     [dispatch, perPage, filter]
   )
@@ -215,7 +245,7 @@ const Table = () => {
 
     setPage(1)
     setPerPage(newPerPage)
-    dispatch(fetchMasterSlotWaktuPage({ page: 1, perPage: newPerPage, q: filter }))
+    dispatch(fetchMasterSlotWaktuPage({ page: 1, perPage: newPerPage, q: filter, status: selectedStatus?.value }))
   }
 
   const renderOption = (row: any) => {
@@ -234,14 +264,22 @@ const Table = () => {
           tableColumn('OPTION', 'act-x', 'left', renderOption as any),
           tableColumn('KODE SLOT', 'kode_slot'),
           tableColumn('JAM (MULAI - SELESAI)', 'jam'),
-          tableColumn('AKTIF', 'status_custom'),
+          tableColumn('STATUS', 'status_custom'),
           tableColumn('KETERANGAN', 'keterangan')
         ],
         values: values?.map((row: any) => {
           return {
             ...row,
             jam: `${row.jam_mulai?.slice(0, -3)} - ${row.jam_selesai?.slice(0, -3)}`,
-            status_custom: row.is_active ? 'Ya' : 'Tidak'
+            status_custom: (
+              <CustomChip
+                round='true'
+                size='small'
+                label={statusObj[row.is_active ? 'Aktif' : 'Nonaktif']?.value}
+                color={statusObj[row.is_active ? 'Aktif' : 'Nonaktif']?.color}
+                sx={{ textTransform: 'capitalize' }}
+              />
+            )
           }
         }),
         count: total,
@@ -258,6 +296,32 @@ const Table = () => {
 
   return (
     <Grid container spacing={6} sx={{ width: '100%' }}>
+      <Grid size={12}>
+        <Card sx={{ p: 5 }}>
+          <Grid container spacing={4}>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <Autocomplete
+                size='small'
+                options={statuss}
+                value={selectedStatus}
+                onChange={(_, newValue) => setSelectedStatus(newValue)}
+                getOptionLabel={option => option.label || ''}
+                isOptionEqualToValue={(option, value) => option.value === value?.value}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label='Status'
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: <>{params.InputProps.endAdornment}</>
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+        </Card>
+      </Grid>
       <Grid size={12}>
         <Card>
           <CardHeader title='Master Slot Waktu' sx={{ paddingBottom: 0 }} />

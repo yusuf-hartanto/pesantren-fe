@@ -10,6 +10,9 @@ export interface FetchParams {
   page: number
   perPage: number
   q: string
+  id_cabang?: string
+  id_lokasi?: string
+  status?: string
 }
 
 export interface InitialState {

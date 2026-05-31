@@ -118,7 +118,9 @@ const ItemForm = ({ temuanDetailsSelected, onAddTemuanDetail, onDeleteTemuanDeta
     kategori: '',
     perlu_tindak_lanjut: false,
     foto_path: '',
-    edit: false
+    edit: false,
+    foto_path_tindakan: '',
+    status: 0
   }
 
   const [state, setState] = useState(defaultValues)
