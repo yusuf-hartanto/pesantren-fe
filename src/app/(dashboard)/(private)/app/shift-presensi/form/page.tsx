@@ -291,7 +291,7 @@ const FormValidationBasic = () => {
 
   return (
     <Card>
-      <CardHeader title='Form Kelas Formal' />
+      <CardHeader title='Form Shift Presensi' />
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} autoComplete='off'>
           {formColumn({

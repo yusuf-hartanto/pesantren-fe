@@ -10,7 +10,7 @@ import Grid from '@mui/material/Grid2'
 import Card from '@mui/material/Card'
 
 import CardHeader from '@mui/material/CardHeader'
-import { TextField, Toolbar } from '@mui/material'
+import { Autocomplete, TextField, Toolbar } from '@mui/material'
 import Tooltip from '@mui/material/Tooltip'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
@@ -48,6 +48,38 @@ const statusObj: Record<string, { color: any; value: string }> = {
     value: 'Nonaktif'
   }
 }
+
+const statuss = [
+  { label: 'Semua', value: '' },
+  {
+    label: 'Aktif',
+    value: 'Aktif'
+  },
+  {
+    label: 'Nonaktif',
+    value: 'Nonaktif'
+  }
+]
+
+const kategoriShifts = [
+  { label: 'Semua', value: '' },
+  {
+    label: 'ASRAMA',
+    value: 'ASRAMA'
+  },
+  {
+    label: 'PEGAWAI',
+    value: 'PEGAWAI'
+  },
+  {
+    label: 'SHOLAT',
+    value: 'SHOLAT'
+  },
+  {
+    label: 'UMUM',
+    value: 'UMUM'
+  }
+]
 
 function RowAction(data: any) {
   const [anchorEl, setAnchorEl] = useState(null)
@@ -150,6 +182,16 @@ function RowAction(data: any) {
   )
 }
 
+interface StatusOption {
+  label: string
+  value: string
+}
+
+interface KategoriOption {
+  label: string
+  value: string
+}
+
 const Table = () => {
   // ** Hooks
   const router = useRouter()
@@ -164,10 +206,20 @@ const Table = () => {
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(10)
   const [loadingExport, setLoadingExport] = useState(false)
+  const [selectedStatus, setSelectedStatus] = useState<StatusOption | null>({ label: 'Semua', value: '' })
+  const [selectedKategori, setSelectedKategori] = useState<KategoriOption | null>({ label: 'Semua', value: '' })
 
   useEffect(() => {
     if (store.delete) {
-      dispatch(fetchShiftPresensiPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(
+        fetchShiftPresensiPage({
+          page: 1,
+          perPage: perPage,
+          q: filter,
+          status: selectedStatus?.value,
+          kategori_shift: selectedKategori?.value
+        })
+      )
       dispatch(resetRedux())
     }
   }, [dispatch, filter, perPage, store.delete])
@@ -175,16 +227,32 @@ const Table = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setPage(1)
-      dispatch(fetchShiftPresensiPage({ page: 1, perPage: perPage, q: filter }))
+      dispatch(
+        fetchShiftPresensiPage({
+          page: 1,
+          perPage: perPage,
+          q: filter,
+          status: selectedStatus?.value,
+          kategori_shift: selectedKategori?.value
+        })
+      )
     }, 500)
 
     return () => clearTimeout(timer)
-  }, [dispatch, filter, perPage])
+  }, [dispatch, filter, perPage, selectedStatus, selectedKategori])
 
   const handleChangePage = useCallback(
     (newPage: number) => {
       setPage(newPage)
-      dispatch(fetchShiftPresensiPage({ page: newPage, perPage: perPage, q: filter }))
+      dispatch(
+        fetchShiftPresensiPage({
+          page: newPage,
+          perPage: perPage,
+          q: filter,
+          status: selectedStatus?.value,
+          kategori_shift: selectedKategori?.value
+        })
+      )
     },
     [dispatch, perPage, filter]
   )
@@ -253,7 +321,15 @@ const Table = () => {
 
     setPage(1)
     setPerPage(newPerPage)
-    dispatch(fetchShiftPresensiPage({ page: 1, perPage: newPerPage, q: filter }))
+    dispatch(
+      fetchShiftPresensiPage({
+        page: 1,
+        perPage: newPerPage,
+        q: filter,
+        status: selectedStatus?.value,
+        kategori_shift: selectedKategori?.value
+      })
+    )
   }
 
   const renderOption = (row: any) => {
@@ -311,6 +387,52 @@ const Table = () => {
 
   return (
     <Grid container spacing={6} sx={{ width: '100%' }}>
+      <Grid size={12}>
+        <Card sx={{ p: 5 }}>
+          <Grid container spacing={4}>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <Autocomplete
+                size='small'
+                options={statuss}
+                value={selectedStatus}
+                onChange={(_, newValue) => setSelectedStatus(newValue)}
+                getOptionLabel={option => option.label || ''}
+                isOptionEqualToValue={(option, value) => option.value === value?.value}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label='Status'
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: <>{params.InputProps.endAdornment}</>
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 3 }}>
+              <Autocomplete
+                size='small'
+                options={kategoriShifts}
+                value={selectedKategori}
+                onChange={(_, newValue) => setSelectedKategori(newValue)}
+                getOptionLabel={option => option.label || ''}
+                isOptionEqualToValue={(option, value) => option.value === value?.value}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    label='Kategori Shift'
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: <>{params.InputProps.endAdornment}</>
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+          </Grid>
+        </Card>
+      </Grid>
       <Grid size={12}>
         <Card>
           <CardHeader title='Shift Presensi' sx={{ paddingBottom: 0 }} />
